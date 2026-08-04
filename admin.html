@@ -249,6 +249,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L22 8H6"/></svg>
       <span>Products</span>
     </button>
+    <button class="nav-item" data-panel="subcategories">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
+      <span>Subcategories</span>
+    </button>
     <button class="nav-item" data-panel="deals">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>
       <span>Deals &amp; Discounts</span>
@@ -310,6 +314,37 @@
     </section>
 
     <!-- ============ DEALS PANEL ============ -->
+    <!-- ============ SUBCATEGORIES PANEL ============ -->
+    <section class="panel" id="panel-subcategories">
+      <div class="section-title"><h2>Subcategories</h2></div>
+      <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:22px; max-width:560px;">Manage the subcategories shoppers see for each category. Create one here and it's ready to pick next time you add a product — even before any product uses it.</p>
+
+      <div class="card" style="padding:22px 22px 6px; margin-bottom:22px;">
+        <div class="coupon-add-row" style="grid-template-columns:1fr 1fr auto;">
+          <div class="field"><label>Category</label>
+            <select id="newSub-cat">
+              <option value="women">Women</option>
+              <option value="men">Men</option>
+              <option value="footwear">Footwear</option>
+              <option value="accessories">Accessories</option>
+            </select>
+          </div>
+          <div class="field"><label>New Subcategory Name</label><input type="text" id="newSub-name" placeholder="e.g. Jumpsuits"></div>
+          <button class="btn btn-primary btn-sm" id="addSubBtn" style="margin-bottom:18px;">Add</button>
+        </div>
+      </div>
+
+      <div class="cat-filter" id="subCatFilter" style="margin-bottom:18px;"></div>
+
+      <div class="card">
+        <table>
+          <thead><tr><th>Subcategory</th><th>Category</th><th>Products</th><th></th></tr></thead>
+          <tbody id="subcategoriesTbody"></tbody>
+        </table>
+        <div class="empty-state" id="subEmptyState" style="display:none;">No subcategories yet — add one above.</div>
+      </div>
+    </section>
+
     <section class="panel" id="panel-deals">
       <div class="section-title"><h2>Deals &amp; Discounts</h2></div>
       <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:22px; max-width:560px;">Turn storewide offers on or off. Disabled deals disappear from the live site's Deals section entirely.</p>
@@ -429,7 +464,7 @@ create table deals (
 );
 
 create table coupons (
-  code text primary key,
+  code text not null primary key,
   type text not null,
   value numeric default 0,
   label text,
@@ -454,8 +489,41 @@ create policy "Admins write coupons" on coupons for all
 
 alter publication supabase_realtime add table products;
 alter publication supabase_realtime add table deals;
-alter publication supabase_realtime add table coupons;</div>
+alter publication supabase_realtime add table coupons;
+
+create table subcategories (
+  cat text not null,
+  name text not null,
+  primary key (cat, name)
+);
+
+alter table subcategories enable row level security;
+
+create policy "Public read subcategories" on subcategories for select using (true);
+create policy "Admins write subcategories" on subcategories for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+alter publication supabase_realtime add table subcategories;</div>
         <button class="btn btn-outline btn-sm copy-btn" id="copyRulesBtn">Copy Schema</button>
+      </div>
+
+      <div class="instructions">
+        <h3>Already set up? Add the new Subcategories table</h3>
+        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">If you ran the schema above before Subcategories existed, just run this smaller addition once in the SQL Editor — it won't affect your existing products, deals, or coupons.</p>
+        <div class="code-block" id="subRulesBlock">create table subcategories (
+  cat text not null,
+  name text not null,
+  primary key (cat, name)
+);
+
+alter table subcategories enable row level security;
+
+create policy "Public read subcategories" on subcategories for select using (true);
+create policy "Admins write subcategories" on subcategories for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+alter publication supabase_realtime add table subcategories;</div>
+        <button class="btn btn-outline btn-sm copy-btn" id="copySubRulesBtn">Copy Addition</button>
       </div>
 
       <div class="instructions">
@@ -628,10 +696,17 @@ alter publication supabase_realtime add table coupons;</div>
     { code:'SAVE25',    type:'flat',    value:25, label:'$25 off orders over $150', min:150, enabled:true },
     { code:'FREESHIP',  type:'shipping',value:0,  label:'Free shipping applied', min:null, enabled:true }
   ];
+  var STARTER_SUBCATEGORIES = [
+    { cat:'women', name:'Outerwear' }, { cat:'women', name:'Dresses' }, { cat:'women', name:'Tops' }, { cat:'women', name:'Trousers' }, { cat:'women', name:'Knitwear' },
+    { cat:'men', name:'Outerwear' }, { cat:'men', name:'Shirts' }, { cat:'men', name:'Denim' }, { cat:'men', name:'Knitwear' },
+    { cat:'footwear', name:'Boots' }, { cat:'footwear', name:'Sneakers' }, { cat:'footwear', name:'Heels' }, { cat:'footwear', name:'Loafers' },
+    { cat:'accessories', name:'Bags' }, { cat:'accessories', name:'Jewelry' }, { cat:'accessories', name:'Belts' }, { cat:'accessories', name:'Scarves' }
+  ];
 
   /* ---------- STATE ---------- */
-  var state = { products:[], deals:{}, coupons:{} };
+  var state = { products:[], deals:{}, coupons:{}, subcategories:[] };
   var prodFilter = { cat:'all', search:'' };
+  var subFilter = { cat:'all' };
   var sb = null;
   var channels = [];
   var seedOffered = false;
@@ -732,6 +807,7 @@ alter publication supabase_realtime add table coupons;</div>
     document.getElementById('appRoot').classList.add('unlocked');
     document.getElementById('sidebarWho').textContent = user.email;
     buildCatFilter();
+    buildSubCatFilter();
     startRealtimeSync();
   }
 
@@ -762,6 +838,7 @@ alter publication supabase_realtime add table coupons;</div>
       }
       state.products = res.data || [];
       renderProductsTable();
+      renderSubcategoriesPanel();
       setStatus('Synced — ' + state.products.length + (state.products.length === 1 ? ' product live' : ' products live'));
       document.getElementById('seedBanner').style.display = (state.products.length === 0 && !seedOffered) ? 'flex' : 'none';
     });
@@ -780,10 +857,17 @@ alter publication supabase_realtime add table coupons;</div>
       renderCoupons();
     });
   }
+  function refreshSubcategories(){
+    return sb.from('subcategories').select('*').order('name').then(function(res){
+      if(res.error){ console.error(res.error); return; }
+      state.subcategories = res.data || [];
+      renderSubcategoriesPanel();
+    });
+  }
 
   function startRealtimeSync(){
     setStatus('Connecting…');
-    Promise.all([refreshProducts(), refreshDeals(), refreshCoupons()]);
+    Promise.all([refreshProducts(), refreshDeals(), refreshCoupons(), refreshSubcategories()]);
 
     var pCh = sb.channel('admin-products')
       .on('postgres_changes', { event:'*', schema:'public', table:'products' }, refreshProducts)
@@ -794,18 +878,22 @@ alter publication supabase_realtime add table coupons;</div>
     var cCh = sb.channel('admin-coupons')
       .on('postgres_changes', { event:'*', schema:'public', table:'coupons' }, refreshCoupons)
       .subscribe();
-    channels = [pCh, dCh, cCh];
+    var sCh = sb.channel('admin-subcategories')
+      .on('postgres_changes', { event:'*', schema:'public', table:'subcategories' }, refreshSubcategories)
+      .subscribe();
+    channels = [pCh, dCh, cCh, sCh];
   }
 
   /* ---------- SEED STARTER CATALOG ---------- */
   function seedDatabase(){
-    if(!confirm('Load the starter catalog (27 sample products + starter deals/coupons)? This is meant for a fresh, empty database.')) return;
+    if(!confirm('Load the starter catalog (27 sample products + starter deals/coupons/subcategories)? This is meant for a fresh, empty database.')) return;
     seedOffered = true;
     document.getElementById('seedBanner').style.display = 'none';
     Promise.all([
       sb.from('products').insert(STARTER_PRODUCTS),
       sb.from('deals').upsert(STARTER_DEALS, { onConflict:'key' }),
-      sb.from('coupons').upsert(STARTER_COUPONS, { onConflict:'code' })
+      sb.from('coupons').upsert(STARTER_COUPONS, { onConflict:'code' }),
+      sb.from('subcategories').upsert(STARTER_SUBCATEGORIES, { onConflict:'cat,name' })
     ]).then(function(results){
       var err = results.find(function(r){ return r.error; });
       if(err){ showToast('Seed failed: ' + err.error.message); }
@@ -917,12 +1005,72 @@ alter publication supabase_realtime add table coupons;</div>
   function populateSubSelect(cat, selected){
     var input = document.getElementById('pf-sub');
     var list = document.getElementById('pf-sub-list');
+    var managedSubs = state.subcategories.filter(function(s){ return s.cat === cat; }).map(function(s){ return s.name; });
     var staticSubs = subcategories[cat] || [];
     var usedSubs = state.products.filter(function(p){ return p.cat === cat && p.sub; }).map(function(p){ return p.sub; });
-    var allSubs = Array.from(new Set(staticSubs.concat(usedSubs)));
+    var allSubs = Array.from(new Set(managedSubs.concat(staticSubs, usedSubs)));
     list.innerHTML = allSubs.map(function(s){ return '<option value="'+s+'">'; }).join('');
     input.value = selected || '';
   }
+
+  /* ---------- SUBCATEGORIES PANEL ---------- */
+  function buildSubCatFilter(){
+    var cats = [['all','All'],['women','Women'],['men','Men'],['footwear','Footwear'],['accessories','Accessories']];
+    var wrap = document.getElementById('subCatFilter');
+    wrap.innerHTML = cats.map(function(c){
+      return '<button data-cat="'+c[0]+'" class="'+(subFilter.cat===c[0]?'active':'')+'">'+c[1]+'</button>';
+    }).join('');
+    wrap.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        subFilter.cat = b.dataset.cat;
+        buildSubCatFilter();
+        renderSubcategoriesPanel();
+      });
+    });
+  }
+
+  function renderSubcategoriesPanel(){
+    var list = state.subcategories.filter(function(s){ return subFilter.cat === 'all' || s.cat === subFilter.cat; });
+    document.getElementById('subEmptyState').style.display = list.length ? 'none' : 'block';
+    document.getElementById('subcategoriesTbody').innerHTML = list.map(function(s){
+      var count = state.products.filter(function(p){ return p.cat === s.cat && p.sub === s.name; }).length;
+      return '<tr data-cat="'+s.cat+'" data-name="'+s.name+'">' +
+        '<td><strong>'+s.name+'</strong></td>' +
+        '<td style="text-transform:capitalize;">'+s.cat+'</td>' +
+        '<td>'+count+' '+(count === 1 ? 'product' : 'products')+'</td>' +
+        '<td><button class="icon-action" data-act="delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger);"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  document.getElementById('addSubBtn').addEventListener('click', function(){
+    var cat = document.getElementById('newSub-cat').value;
+    var name = document.getElementById('newSub-name').value.trim();
+    if(!name){ showToast('Enter a subcategory name'); return; }
+    var exists = state.subcategories.some(function(s){ return s.cat === cat && s.name.toLowerCase() === name.toLowerCase(); });
+    if(exists){ showToast('That subcategory already exists for this category'); return; }
+    sb.from('subcategories').insert({ cat:cat, name:name }).then(function(res){
+      if(res.error){ showToast('Add failed: ' + res.error.message); return; }
+      document.getElementById('newSub-name').value = '';
+      showToast(name + ' added to ' + cat);
+    });
+  });
+
+  document.getElementById('subcategoriesTbody').addEventListener('click', function(e){
+    var btn = e.target.closest('[data-act="delete"]');
+    if(!btn) return;
+    var tr = btn.closest('tr');
+    var cat = tr.dataset.cat, name = tr.dataset.name;
+    var count = state.products.filter(function(p){ return p.cat === cat && p.sub === name; }).length;
+    var msg = count > 0
+      ? 'Delete "'+name+'"? '+count+' existing product(s) still using it will keep that value, but it will no longer be suggested for new products.'
+      : 'Delete "'+name+'"?';
+    if(!confirm(msg)) return;
+    sb.from('subcategories').delete().eq('cat', cat).eq('name', name).then(function(res){
+      if(res.error){ showToast('Delete failed: ' + res.error.message); }
+      else{ showToast('Subcategory deleted'); }
+    });
+  });
   function populateSizeChecks(cat, selectedSizes){
     var presets = sizePresets[cat] || oneSize;
     var wrap = document.getElementById('pf-sizes');
@@ -1253,6 +1401,14 @@ alter publication supabase_realtime add table coupons;</div>
     var text = document.getElementById('rulesBlock').textContent;
     navigator.clipboard.writeText(text).then(function(){
       showToast('Schema copied to clipboard');
+    }).catch(function(){
+      showToast('Could not copy — select the text manually');
+    });
+  });
+  document.getElementById('copySubRulesBtn').addEventListener('click', function(){
+    var text = document.getElementById('subRulesBlock').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      showToast('Addition copied to clipboard');
     }).catch(function(){
       showToast('Could not copy — select the text manually');
     });
