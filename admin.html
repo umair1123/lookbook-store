@@ -289,9 +289,14 @@
       </div>
       <div class="section-title">
         <h2>Catalog <span style="color:var(--brown-mid); font-weight:400; font-size:14px;" id="prodCountLabel"></span></h2>
-        <button class="btn btn-primary" id="addProductBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> Add Product
-        </button>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" id="bulkAddBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Bulk Add
+          </button>
+          <button class="btn btn-primary" id="addProductBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> Add Product
+          </button>
+        </div>
       </div>
 
       <div class="toolbar-row">
@@ -621,6 +626,56 @@ alter publication supabase_realtime add table subcategories;</div>
       <div class="modal-foot">
         <button class="btn btn-outline" id="modalCancel">Cancel</button>
         <button class="btn btn-primary" id="modalSave">Save Product</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BULK ADD MODAL ============ -->
+<div class="modal-overlay" id="bulkModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Bulk Add Products</h3>
+      <button class="modal-close" id="bulkModalClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p class="hint" style="margin-bottom:18px;">One product per line. Everything below (category, price, image, etc.) applies to every product you list — good for adding several sizes, colors, or variations of the same item at once. You can fine-tune each one individually afterward from the catalog table.</p>
+      <div class="field"><label>Product Names — one per line</label>
+        <textarea id="bulk-names" rows="6" style="width:100%; border:1px solid var(--line); background:var(--white); padding:12px 14px; font-size:14px; border-radius:4px; color:var(--ink); resize:vertical; font-family:inherit;" placeholder="Camel Coat — Small&#10;Camel Coat — Medium&#10;Camel Coat — Large"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Category</label>
+          <select id="bulk-cat">
+            <option value="women">Women</option>
+            <option value="men">Men</option>
+            <option value="footwear">Footwear</option>
+            <option value="accessories">Accessories</option>
+          </select>
+        </div>
+        <div class="field"><label>Subcategory</label>
+          <input type="text" id="bulk-sub" list="pf-sub-list" placeholder="e.g. Outerwear">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Price ($)</label><input type="number" id="bulk-price" min="0" step="0.01" placeholder="120.00"></div>
+        <div class="field"><label>Compare-at / "Was" Price ($) — optional</label><input type="number" id="bulk-was" min="0" step="0.01" placeholder="Leave blank if none"></div>
+      </div>
+      <div class="field"><label>Image URL — same photo for all of them</label><input type="text" id="bulk-img" placeholder="https://images.unsplash.com/…"></div>
+      <div class="field" style="margin-top:16px;"><label>Discount / Badge</label>
+        <select id="bulk-tag">
+          <option value="">None</option>
+          <option value="New">New</option>
+          <option value="Bestseller">Bestseller</option>
+          <option value="Sale">Sale</option>
+          <option value="BOGO">BOGO</option>
+          <option value="Bundle">Bundle</option>
+          <option value="Flash Sale">Flash Sale</option>
+        </select>
+      </div>
+      <div class="field"><label>Available Sizes</label><div class="size-check-group" id="bulk-sizes"></div></div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" id="bulkModalCancel">Cancel</button>
+        <button class="btn btn-primary" id="bulkModalSave">Add Products</button>
       </div>
     </div>
   </div>
@@ -996,10 +1051,10 @@ alter publication supabase_realtime add table subcategories;</div>
     delete copy.id;
     copy.name = copy.name + ' (Copy)';
     copy.added = Date.now();
-    sb.from('products').insert(copy).then(function(res){
-      if(res.error){ showToast('Duplicate failed: ' + res.error.message); }
-      else{ showToast('Product duplicated'); }
-    });
+    // Open the form pre-filled instead of saving right away, so the name
+    // (or anything else) can be changed before it's actually created.
+    openProductForm(copy);
+    showToast('Rename or edit, then Save to create the duplicate');
   }
 
   /* ---------- PRODUCT FORM MODAL ---------- */
@@ -1166,8 +1221,9 @@ alter publication supabase_realtime add table subcategories;</div>
   });
 
   function openProductForm(product){
-    document.getElementById('modalTitle').textContent = product ? 'Edit Product' : 'Add Product';
-    document.getElementById('pf-id').value = product ? product.id : '';
+    var isNew = !product || !product.id;
+    document.getElementById('modalTitle').textContent = isNew ? 'Add Product' : 'Edit Product';
+    document.getElementById('pf-id').value = (product && product.id) ? product.id : '';
     document.getElementById('pf-name').value = product ? product.name : '';
     document.getElementById('pf-cat').value = product ? product.cat : 'women';
     populateSubSelect(product ? product.cat : 'women', product ? product.sub : null);
@@ -1233,6 +1289,88 @@ alter publication supabase_realtime add table subcategories;</div>
       } else {
         showToast(idVal ? 'Product updated' : 'Product added');
         closeModal();
+      }
+    }).finally(function(){
+      saveBtn.disabled = false;
+    });
+  });
+
+  /* ---------- BULK ADD MODAL ---------- */
+  var bulkModal = document.getElementById('bulkModal');
+
+  function openBulkModal(){
+    document.getElementById('bulk-names').value = '';
+    document.getElementById('bulk-cat').value = 'women';
+    document.getElementById('bulk-price').value = '';
+    document.getElementById('bulk-was').value = '';
+    document.getElementById('bulk-img').value = '';
+    document.getElementById('bulk-tag').value = '';
+    populateSubSelect('women', null);
+    document.getElementById('bulk-sub').value = '';
+    populateBulkSizeChecks('women', null);
+    bulkModal.classList.add('open');
+  }
+  function closeBulkModal(){ bulkModal.classList.remove('open'); }
+
+  function populateBulkSizeChecks(cat, selectedSizes){
+    var presets = sizePresets[cat] || oneSize;
+    var wrap = document.getElementById('bulk-sizes');
+    var uniq = Array.from(new Set(presets));
+    wrap.innerHTML = uniq.map(function(s){
+      var checked = (selectedSizes || []).indexOf(s) > -1 ? ' checked' : '';
+      return '<label class="size-check"><input type="checkbox" value="'+s+'"'+checked+'> '+s+'</label>';
+    }).join('');
+  }
+
+  document.getElementById('bulkAddBtn').addEventListener('click', openBulkModal);
+  document.getElementById('bulkModalClose').addEventListener('click', closeBulkModal);
+  document.getElementById('bulkModalCancel').addEventListener('click', closeBulkModal);
+  bulkModal.addEventListener('click', function(e){ if(e.target === bulkModal) closeBulkModal(); });
+  document.getElementById('bulk-cat').addEventListener('change', function(){
+    populateSubSelect(this.value, null);
+    document.getElementById('bulk-sub').value = '';
+    populateBulkSizeChecks(this.value, null);
+  });
+
+  document.getElementById('bulkModalSave').addEventListener('click', function(){
+    var names = document.getElementById('bulk-names').value.split('\n').map(function(n){ return n.trim(); }).filter(Boolean);
+    var cat = document.getElementById('bulk-cat').value;
+    var sub = document.getElementById('bulk-sub').value.trim();
+    var price = parseFloat(document.getElementById('bulk-price').value);
+    var was = document.getElementById('bulk-was').value;
+    var img = document.getElementById('bulk-img').value.trim() || 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=700&auto=format&fit=crop';
+    var tag = document.getElementById('bulk-tag').value;
+    var sizes = Array.from(document.querySelectorAll('#bulk-sizes input:checked')).map(function(i){ return i.value; });
+    if(sizes.length === 0) sizes = ['One Size'];
+
+    if(names.length === 0){ showToast('List at least one product name'); return; }
+    if(!sub){ showToast('Enter a subcategory'); return; }
+    if(isNaN(price) || price < 0){ showToast('Enter a valid price'); return; }
+
+    var baseTime = Date.now();
+    var rows = names.map(function(name, i){
+      return {
+        name: name,
+        cat: cat,
+        sub: sub,
+        price: price,
+        was: was ? parseFloat(was) : null,
+        img: img,
+        tag: tag,
+        rating: 4,
+        sizes: sizes,
+        added: baseTime + i
+      };
+    });
+
+    var saveBtn = document.getElementById('bulkModalSave');
+    saveBtn.disabled = true;
+    sb.from('products').insert(rows).then(function(res){
+      if(res.error){
+        showToast('Bulk add failed: ' + res.error.message);
+      } else {
+        showToast(rows.length + (rows.length === 1 ? ' product added' : ' products added'));
+        closeBulkModal();
       }
     }).finally(function(){
       saveBtn.disabled = false;
