@@ -498,7 +498,11 @@ alter publication supabase_realtime add table coupons;</div>
             <option value="accessories">Accessories</option>
           </select>
         </div>
-        <div class="field"><label>Subcategory</label><select id="pf-sub"></select></div>
+        <div class="field"><label>Subcategory</label>
+          <input type="text" id="pf-sub" list="pf-sub-list" placeholder="e.g. Outerwear, or type a new one">
+          <datalist id="pf-sub-list"></datalist>
+          <p class="hint">Pick an existing one from the suggestions, or just type a brand new subcategory.</p>
+        </div>
       </div>
       <div class="form-row">
         <div class="field"><label>Price ($)</label><input type="number" id="pf-price" min="0" step="0.01" placeholder="120.00"></div>
@@ -911,9 +915,13 @@ alter publication supabase_realtime add table coupons;</div>
   var currentRating = 4;
 
   function populateSubSelect(cat, selected){
-    var sel = document.getElementById('pf-sub');
-    var subs = subcategories[cat] || [];
-    sel.innerHTML = subs.map(function(s){ return '<option value="'+s+'"'+(s===selected?' selected':'')+'>'+s+'</option>'; }).join('');
+    var input = document.getElementById('pf-sub');
+    var list = document.getElementById('pf-sub-list');
+    var staticSubs = subcategories[cat] || [];
+    var usedSubs = state.products.filter(function(p){ return p.cat === cat && p.sub; }).map(function(p){ return p.sub; });
+    var allSubs = Array.from(new Set(staticSubs.concat(usedSubs)));
+    list.innerHTML = allSubs.map(function(s){ return '<option value="'+s+'">'; }).join('');
+    input.value = selected || '';
   }
   function populateSizeChecks(cat, selectedSizes){
     var presets = sizePresets[cat] || oneSize;
@@ -1039,7 +1047,9 @@ alter publication supabase_realtime add table coupons;</div>
   document.getElementById('modalSave').addEventListener('click', function(){
     var name = document.getElementById('pf-name').value.trim();
     var price = parseFloat(document.getElementById('pf-price').value);
+    var sub = document.getElementById('pf-sub').value.trim();
     if(!name){ showToast('Give the product a name first'); return; }
+    if(!sub){ showToast('Enter a subcategory'); return; }
     if(isNaN(price) || price < 0){ showToast('Enter a valid price'); return; }
 
     var idVal = document.getElementById('pf-id').value;
@@ -1052,7 +1062,7 @@ alter publication supabase_realtime add table coupons;</div>
     var data = {
       name: name,
       cat: document.getElementById('pf-cat').value,
-      sub: document.getElementById('pf-sub').value,
+      sub: sub,
       price: price,
       was: was ? parseFloat(was) : null,
       img: document.getElementById('pf-img').value.trim() || 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=700&auto=format&fit=crop',
