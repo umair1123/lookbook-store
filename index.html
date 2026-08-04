@@ -123,6 +123,11 @@
   .nav-dropdown-trigger{ display:flex; align-items:center; gap:5px; cursor:pointer; }
   .nav-dropdown-trigger svg{ width:11px; height:11px; transition:transform .3s var(--ease); }
   .nav-dropdown:hover .nav-dropdown-trigger svg, .nav-dropdown:focus-within .nav-dropdown-trigger svg{ transform:rotate(180deg); }
+  /* invisible bridge so moving the mouse from the trigger down to the menu doesn't break :hover */
+  .nav-dropdown::after{
+    content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+    width:220px; height:22px;
+  }
   .nav-dropdown-menu{
     position:absolute; top:100%; left:50%; transform:translateX(-50%) translateY(6px);
     background:var(--white); border:1px solid var(--line); border-radius:6px; box-shadow:var(--shadow-soft);
@@ -138,8 +143,44 @@
   }
   .nav-dropdown-menu a:hover{ background:var(--paper); }
   .nav-dropdown-menu a::after{ display:none; }
-  .mobile-cat-list{ display:flex; flex-direction:column; align-items:center; gap:14px; margin-top:-6px; }
-  .mobile-cat-list a{ color:var(--camel-light) !important; font-family:'Manrope',sans-serif !important; font-size:15px !important; font-style:normal !important; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
+  .mobile-cat-list{ display:flex; flex-direction:column; align-items:center; gap:16px; margin-top:-6px; width:100%; }
+
+  /* nested subcategory flyout (desktop) */
+  .cat-item{ position:relative; }
+  .cat-item-row{ display:flex; align-items:center; justify-content:space-between; border-radius:4px; }
+  .cat-item-row:hover{ background:var(--paper); }
+  .cat-item-row a{ flex:1; }
+  .cat-item-row a:hover{ background:none; }
+  .cat-item-row .sub-caret{ padding:0 12px; color:var(--brown-mid); font-size:11px; }
+  /* invisible bridge so moving the mouse right, into the flyout, doesn't break :hover */
+  .cat-item::after{
+    content:''; position:absolute; top:0; left:100%; width:16px; height:100%;
+  }
+  .sub-flyout{
+    position:absolute; top:-8px; left:100%; margin-left:6px;
+    background:var(--white); border:1px solid var(--line); border-radius:6px; box-shadow:var(--shadow-soft);
+    min-width:170px; padding:8px;
+    opacity:0; pointer-events:none; transform:translateX(-6px);
+    transition:opacity .2s var(--ease), transform .2s var(--ease);
+  }
+  .cat-item:hover .sub-flyout, .cat-item:focus-within .sub-flyout{ opacity:1; pointer-events:auto; transform:translateX(0); }
+  .sub-flyout a{ display:block; padding:9px 13px; font-size:12.5px; font-weight:600; border-radius:4px; color:var(--brown-deep); }
+  .sub-flyout a:hover{ background:var(--paper); }
+
+  /* mobile accordion */
+  .mobile-cat-item{ width:100%; max-width:280px; }
+  .mobile-cat-row{ display:flex; align-items:center; justify-content:center; gap:10px; }
+  .mobile-cat-row a{ color:var(--camel-light) !important; font-family:'Manrope',sans-serif !important; font-size:15px !important; font-style:normal !important; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
+  .mobile-sub-toggle{
+    background:none; border:1px solid rgba(250,246,240,0.3); border-radius:50%; width:24px; height:24px;
+    color:var(--camel-light); display:flex; align-items:center; justify-content:center; transition:transform .3s var(--ease);
+  }
+  .mobile-sub-toggle.open{ transform:rotate(180deg); }
+  .mobile-sub-list{
+    display:none; flex-direction:column; align-items:center; gap:10px; margin-top:12px; padding-bottom:4px;
+  }
+  .mobile-sub-list.open{ display:flex; }
+  .mobile-sub-list a{ color:rgba(250,246,240,0.65) !important; font-family:'Manrope',sans-serif !important; font-size:12.5px !important; font-style:normal !important; text-transform:uppercase; letter-spacing:0.04em; }
   .nav-actions{ display:flex; align-items:center; gap:22px; }
   .icon-btn{ background:none; border:none; display:flex; align-items:center; color:var(--espresso); position:relative; padding:4px; }
   .icon-btn svg{ width:21px; height:21px; }
@@ -1143,19 +1184,26 @@
   }
 
   /* ---------- BUILD SUBCATEGORY DROPDOWN FOR CURRENT CATEGORY ---------- */
-  function buildSubSelect(){
+  function buildSubSelect(preselect){
     var sel = document.getElementById('subSelect');
     var subs = subcategories[state.cat];
     if(!subs){
       sel.innerHTML = '<option value="all">All Types</option>';
       sel.disabled = true;
-    } else {
-      sel.disabled = false;
-      sel.innerHTML = '<option value="all">All ' + categories.find(function(c){return c.id===state.cat;}).label + '</option>' +
-        subs.map(function(s){ return '<option value="'+s+'">'+s+'</option>'; }).join('');
+      sel.value = 'all';
+      state.sub = 'all';
+      return;
     }
-    sel.value = 'all';
-    state.sub = 'all';
+    sel.disabled = false;
+    sel.innerHTML = '<option value="all">All ' + categories.find(function(c){return c.id===state.cat;}).label + '</option>' +
+      subs.map(function(s){ return '<option value="'+s+'">'+s+'</option>'; }).join('');
+    if(preselect && subs.indexOf(preselect) > -1){
+      sel.value = preselect;
+      state.sub = preselect;
+    } else {
+      sel.value = 'all';
+      state.sub = 'all';
+    }
   }
 
   function getFiltered(){
@@ -1541,29 +1589,83 @@
     applyCategoryFromHash();
   }
 
-  /* ---------- NAV: CATEGORY DROPDOWN + DEEP LINKS ---------- */
+  /* ---------- NAV: CATEGORY + SUBCATEGORY DROPDOWN, DEEP LINKS ---------- */
+  function catHash(catId, subName){
+    if(catId === 'all') return '#shop';
+    var h = '#shop-' + catId;
+    if(subName) h += '~' + encodeURIComponent(subName);
+    return h;
+  }
+
   function buildNavCategoryMenu(){
-    var links = categories.map(function(c){
-      var href = c.id === 'all' ? '#shop' : '#shop-' + c.id;
-      return '<a href="'+href+'" data-cat="'+c.id+'">'+c.label+'</a>';
+    // ---- Desktop: nested flyout ----
+    var desktopHtml = categories.map(function(c){
+      if(c.id === 'all'){
+        return '<a href="#shop" data-cat="all">All</a>';
+      }
+      var subs = subcategories[c.id] || [];
+      var catLink = '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">'+c.label+'</a>';
+      if(subs.length === 0){
+        return '<div class="cat-item"><div class="cat-item-row">'+catLink+'</div></div>';
+      }
+      var flyout = '<div class="sub-flyout">' +
+        '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">All ' + c.label + '</a>' +
+        subs.map(function(s){ return '<a href="'+catHash(c.id, s)+'" data-cat="'+c.id+'" data-sub="'+s+'">'+s+'</a>'; }).join('') +
+      '</div>';
+      return '<div class="cat-item">' +
+        '<div class="cat-item-row">'+catLink+'<span class="sub-caret">▸</span></div>' +
+        flyout +
+      '</div>';
     }).join('');
-    document.getElementById('navCatMenu').innerHTML = links;
-    document.getElementById('mobileCatMenu').innerHTML = links;
+    document.getElementById('navCatMenu').innerHTML = desktopHtml;
+
+    // ---- Mobile: accordion ----
+    var mobileHtml = categories.map(function(c){
+      if(c.id === 'all'){
+        return '<div class="mobile-cat-item"><div class="mobile-cat-row"><a href="#shop" data-cat="all">All</a></div></div>';
+      }
+      var subs = subcategories[c.id] || [];
+      var catLink = '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">'+c.label+'</a>';
+      if(subs.length === 0){
+        return '<div class="mobile-cat-item"><div class="mobile-cat-row">'+catLink+'</div></div>';
+      }
+      var subList = '<div class="mobile-sub-list" data-sublist="'+c.id+'">' +
+        '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">All '+c.label+'</a>' +
+        subs.map(function(s){ return '<a href="'+catHash(c.id, s)+'" data-cat="'+c.id+'" data-sub="'+s+'">'+s+'</a>'; }).join('') +
+      '</div>';
+      return '<div class="mobile-cat-item">' +
+        '<div class="mobile-cat-row">'+catLink+
+          '<button type="button" class="mobile-sub-toggle" data-toggle="'+c.id+'" aria-label="Show '+c.label+' types">' +
+            '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>' +
+          '</button>' +
+        '</div>' +
+        subList +
+      '</div>';
+    }).join('');
+    document.getElementById('mobileCatMenu').innerHTML = mobileHtml;
   }
 
   document.addEventListener('click', function(e){
+    var toggle = e.target.closest('[data-toggle]');
+    if(toggle){
+      var key = toggle.dataset.toggle;
+      var list = document.querySelector('.mobile-sub-list[data-sublist="'+key+'"]');
+      toggle.classList.toggle('open');
+      if(list) list.classList.toggle('open');
+      return;
+    }
     var link = e.target.closest('[data-cat]');
     if(!link) return;
     e.preventDefault();
-    applyCategoryFilter(link.dataset.cat, true);
+    applyCategoryFilter(link.dataset.cat, link.dataset.sub || null, true);
   });
 
-  function applyCategoryFilter(catId, scroll){
+  function applyCategoryFilter(catId, subName, scroll){
     state.cat = catId;
     buildTabs();
-    buildSubSelect();
+    buildSubSelect(subName);
     renderProducts();
-    var newHash = catId === 'all' ? '#shop' : '#shop-' + catId;
+    var newHash = catHash(catId, subName);
     if(location.hash !== newHash) history.replaceState(null, '', newHash);
     if(scroll){
       var shopSection = document.getElementById('shop');
@@ -1576,11 +1678,12 @@
 
   function applyCategoryFromHash(){
     var hash = location.hash || '';
-    var match = hash.match(/^#shop-(.+)$/);
+    var match = hash.match(/^#shop-([^~]+)(?:~(.+))?$/);
     if(match){
       var catId = match[1];
+      var subName = match[2] ? decodeURIComponent(match[2]) : null;
       if(categories.some(function(c){ return c.id === catId; })){
-        applyCategoryFilter(catId, false);
+        applyCategoryFilter(catId, subName, false);
       }
     }
   }
