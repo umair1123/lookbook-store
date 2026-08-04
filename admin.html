@@ -776,10 +776,6 @@ alter publication supabase_realtime add table subcategories;</div>
     sb.auth.onAuthStateChange(function(event, session){
       if(session && session.user){ unlockApp(session.user); } else { lockApp(); }
     });
-    sb.auth.getSession().then(function(res){
-      var session = res.data && res.data.session;
-      if(session && session.user){ unlockApp(session.user); } else { lockApp(); }
-    });
 
     document.getElementById('lockForm').addEventListener('submit', function(e){
       e.preventDefault();
@@ -866,6 +862,14 @@ alter publication supabase_realtime add table subcategories;</div>
   }
 
   function startRealtimeSync(){
+    // Defensive: if this ever runs more than once (e.g. an auth event fires twice),
+    // tear down any previous channels first — reusing a channel name after it's
+    // already subscribed throws "cannot add postgres_changes callbacks after subscribe()".
+    if(channels.length){
+      channels.forEach(function(ch){ sb.removeChannel(ch); });
+      channels = [];
+    }
+
     setStatus('Connecting…');
     Promise.all([refreshProducts(), refreshDeals(), refreshCoupons(), refreshSubcategories()]);
 
