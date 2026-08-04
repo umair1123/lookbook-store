@@ -3,12 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Look Book — Contemporary Fashion, Curated Edits</title>
-<meta name="description" content="Look Book is a contemporary fashion house offering curated seasonal edits, personal styling, and considered essentials for men and women. Shop the new collection.">
-<meta name="keywords" content="fashion store, online clothing, ecommerce, lookbook, boutique, apparel">
-<meta property="og:title" content="Look Book — Contemporary Fashion, Curated Edits">
-<meta property="og:description" content="Curated seasonal edits and considered essentials. Shop new arrivals at Look Book.">
-<meta property="og:type" content="website">
+<title id="pageTitle">Look Book</title>
+<meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -629,23 +625,34 @@
     .newsletter-form input{ border-bottom:1px solid rgba(250,246,240,0.4); padding-bottom:12px; width:100%; }
   }
 </style>
+<style>
+  /* ============ CATEGORY PAGE SPECIFIC ============ */
+  .cat-banner{
+    padding:150px 0 70px; background:radial-gradient(circle at 85% 15%, rgba(201,161,119,0.16), transparent 55%), var(--cream);
+    text-align:center;
+  }
+  .cat-banner h1{ font-size:clamp(36px,5vw,58px); color:var(--espresso); margin:16px 0 14px; }
+  .cat-banner h1 em{ font-style:italic; color:var(--brown-mid); font-weight:400; }
+  .cat-banner p{ font-size:15.5px; color:var(--brown-deep); max-width:480px; margin:0 auto; line-height:1.7; }
+  .cat-notfound{ padding:180px 20px 120px; text-align:center; }
+  .cat-notfound h1{ font-size:32px; color:var(--espresso); margin:16px 0 14px; }
+  .cat-notfound p{ color:var(--brown-mid); margin-bottom:26px; }
+</style>
 </head>
 <body>
-
-<!-- ============ HEADER / NAV ============ -->
 <header id="siteHeader">
   <div class="container">
-    <a href="#home" class="logo">LOOK<em>book.</em></a>
+    <a href="index.html#home" class="logo">LOOK<em>book.</em></a>
     <nav class="primary-nav">
       <ul>
-        <li><a href="#home">Home</a></li>
+        <li><a href="index.html#home">Home</a></li>
         <li class="nav-dropdown">
-          <a href="#shop" class="nav-dropdown-trigger">Shop <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></a>
-          <div class="nav-dropdown-menu" id="navCatMenu"><a href="#shop">All</a></div>
+          <a href="index.html#shop" class="nav-dropdown-trigger">Shop <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></a>
+          <div class="nav-dropdown-menu" id="navCatMenu"><a href="index.html#shop">All</a></div>
         </li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#services">Services</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
       </ul>
     </nav>
     <div class="nav-actions">
@@ -662,186 +669,38 @@
 </header>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#home">Home</a>
-  <a href="#shop">Shop</a>
+  <a href="index.html#home">Home</a>
+  <a href="index.html#shop">Shop</a>
   <div class="mobile-cat-list" id="mobileCatMenu"></div>
-  <a href="#about">About</a>
-  <a href="#services">Services</a>
-  <a href="#contact">Contact</a>
+  <a href="index.html#about">About</a>
+  <a href="index.html#services">Services</a>
+  <a href="index.html#contact">Contact</a>
 </div>
 
-<!-- ============ HERO ============ -->
-<section class="hero" id="home">
+<!-- ============ CATEGORY NOT FOUND (hidden unless needed) ============ -->
+<section class="cat-notfound" id="notFoundState" style="display:none;">
   <div class="container">
-    <div class="hero-copy reveal in">
-      <p class="eyebrow">Autumn / Winter Edit</p>
-      <h1>Wear your <em>story</em>,<br>one look at a time.</h1>
-      <p class="lede">Look Book is a contemporary fashion house for people who dress with intention — considered silhouettes, honest fabrics, and pieces built to outlast a season.</p>
-      <div class="hero-cta">
-        <a href="#shop" class="btn btn-primary">Shop New Arrivals</a>
-        <a href="#services" class="btn btn-outline">View The Edit</a>
-      </div>
-      <div class="hero-meta">
-        <div><strong>120+</strong><span>Curated Looks</span></div>
-        <div><strong>18k</strong><span>Happy Wardrobes</span></div>
-        <div><strong>4.9★</strong><span>Average Rating</span></div>
-      </div>
-    </div>
-    <div class="hero-visual">
-      <div class="hero-frame">
-        <img src="https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=1000&auto=format&fit=crop" alt="Model wearing a tailored brown coat, Look Book autumn collection">
-        <span class="hero-badge"><span>New Season Edit</span></span>
-      </div>
-      <div class="hero-tag">"Effortless, editorial, and made to last." — Studio Notes</div>
-    </div>
+    <p class="eyebrow" style="justify-content:center;">Page Not Found</p>
+    <h1 id="notFoundTitle">We couldn't find that category.</h1>
+    <p id="notFoundDesc">It may have been renamed or removed.</p>
+    <a href="index.html" class="btn btn-primary">Back to Look Book</a>
   </div>
 </section>
 
-<!-- ============ MARQUEE ============ -->
-<div class="marquee-strip">
-  <div class="marquee-track">
-    <span>Free Shipping Over $120</span><span>New Season Arrivals</span><span>Curated Seasonal Edits</span><span>30-Day Easy Returns</span><span>Personal Styling</span>
-    <span>Free Shipping Over $120</span><span>New Season Arrivals</span><span>Curated Seasonal Edits</span><span>30-Day Easy Returns</span><span>Personal Styling</span>
-  </div>
-</div>
-
-<!-- ============ ABOUT ============ -->
-<section class="section" id="about">
-  <div class="container about-grid">
-    <div class="about-media reveal-scale">
-      <div class="img-a"><img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=900&auto=format&fit=crop" alt="Look Book atelier, garments on a rail"></div>
-      <div class="img-b"><img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=600&auto=format&fit=crop" alt="Detail of tailored fabric and stitching"></div>
-    </div>
-    <div class="about-copy reveal">
-      <p class="eyebrow">Our Story</p>
-      <h2 style="margin:16px 0 22px; font-size:clamp(30px,3.6vw,42px); color:var(--espresso);">Founded on the belief that style is <em style="color:var(--brown-mid); font-style:italic;">personal</em>, not seasonal.</h2>
-      <p>Look Book began in a small studio with one idea: build a wardrobe you actually reach for. Every piece we release is developed over months, fit-tested on real bodies, and cut from fabrics we'd wear ourselves.</p>
-      <p>Today we work with a small circle of ethical mills and independent ateliers, releasing considered capsule collections rather than chasing every trend.</p>
-      <ul class="about-list">
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg> Responsibly sourced, low-waste fabrics</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg> Small-batch production, zero overstock</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg> Fit-checked across 12 body types</li>
-      </ul>
-      <a href="#services" class="btn btn-primary" style="margin-top:36px;">Discover Our Process</a>
-    </div>
+<!-- ============ CATEGORY BANNER ============ -->
+<section class="cat-banner" id="catBannerSection" style="display:none;">
+  <div class="container">
+    <p class="eyebrow" style="justify-content:center;">Collection</p>
+    <h1 id="catBannerTitle">Category</h1>
+    <p id="catBannerDesc">Browse this collection below.</p>
   </div>
 </section>
 
-<!-- ============ SERVICES — THE EDIT ============ -->
-<section class="section bg-paper" id="services">
+<!-- ============ PRODUCTS ============ -->
+<section class="section bg-paper" id="catProductsSection" style="display:none;">
   <div class="container">
-    <div class="section-head reveal">
-      <p class="eyebrow">What We Offer</p>
-      <h2>The Edit — <em>four ways</em> we take care of your wardrobe.</h2>
-      <p>From first fitting to final delivery, every service is designed around one goal: getting dressed should feel easy.</p>
-    </div>
-    <div class="edit-list">
-      <div class="edit-row reveal">
-        <span class="edit-num">Look 01</span>
-        <h3>Personal Styling</h3>
-        <p>One-on-one sessions with a stylist to build a capsule wardrobe around your body, budget, and life.</p>
-        <span class="edit-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-      </div>
-      <div class="edit-row reveal">
-        <span class="edit-num">Look 02</span>
-        <h3>Express Shipping</h3>
-        <p>Orders placed before 2pm ship same day, with tracked delivery in 24–48 hours across major cities.</p>
-        <span class="edit-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-      </div>
-      <div class="edit-row reveal">
-        <span class="edit-num">Look 03</span>
-        <h3>Size Concierge</h3>
-        <p>Not sure about fit? Our concierge team compares measurements against past orders before you buy.</p>
-        <span class="edit-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-      </div>
-      <div class="edit-row reveal">
-        <span class="edit-num">Look 04</span>
-        <h3>Easy Returns &amp; Exchanges</h3>
-        <p>30 days to change your mind. Free returns, instant exchange credit, no restocking fees.</p>
-        <span class="edit-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ WHY CHOOSE US ============ -->
-<section class="section" id="why">
-  <div class="container">
-    <div class="section-head reveal">
-      <p class="eyebrow">Why Look Book</p>
-      <h2>Considered details, <em>at every step</em>.</h2>
-    </div>
-    <div class="why-grid stagger">
-      <div class="why-card reveal" style="--i:0">
-        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l2.9 6.3L21 9.3l-4.5 4.4L17.8 21 12 17.8 6.2 21l1.3-7.3L3 9.3l6.1-1z"/></svg></div>
-        <h3>Premium Quality</h3>
-        <p>Every fabric is hand-tested for drape, durability, and feel before it ever reaches a pattern table.</p>
-      </div>
-      <div class="why-card reveal" style="--i:1">
-        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/></svg></div>
-        <h3>Secure Checkout</h3>
-        <p>Encrypted payments and buyer protection on every order, from card to confirmation.</p>
-      </div>
-      <div class="why-card reveal" style="--i:2">
-        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
-        <h3>Fast Fulfilment</h3>
-        <p>In-house warehousing means shorter lead times and fewer delays between click and doorstep.</p>
-      </div>
-      <div class="why-card reveal" style="--i:3">
-        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></div>
-        <h3>Made With Care</h3>
-        <p>Small-batch runs from partner ateliers we've worked with for years, not anonymous factories.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ DEALS & OFFERS ============ -->
-<section class="section" id="deals">
-  <div class="container">
-    <div class="section-head reveal">
-      <p class="eyebrow">Deals &amp; Offers</p>
-      <h2>Ways to <em>save</em>, right now.</h2>
-      <p>Three live offers running across the store — stack a coupon code at checkout for even more.</p>
-    </div>
-    <div class="deals-grid stagger" id="dealsGrid">
-      <div class="deal-card deal-flash reveal" id="dealFlash" style="--i:0">
-        <p class="deal-kicker"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg> <span class="dk-text">Flash Sale · Ends Soon</span></p>
-        <h3 class="dk-title">Up to 40% Off Outerwear</h3>
-        <div class="countdown" id="countdown">
-          <div><span id="cdH">00</span><small>Hrs</small></div>
-          <div><span id="cdM">00</span><small>Min</small></div>
-          <div><span id="cdS">00</span><small>Sec</small></div>
-        </div>
-        <a href="#shop" class="deal-cta">Shop the sale <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      </div>
-      <div class="deal-card deal-bogo reveal" id="dealBogo" style="--i:1">
-        <p class="deal-kicker dk-text">Buy One, Get One</p>
-        <h3 class="dk-title">BOGO 50% Off</h3>
-        <p class="dk-body">Buy any full-price top or knitwear piece, get a second at half price. Mix and match, no code needed.</p>
-        <a href="#shop" class="deal-cta">Browse eligible items <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      </div>
-      <div class="deal-card deal-bundle reveal" id="dealBundle" style="--i:2">
-        <p class="deal-kicker dk-text">Bundle &amp; Save</p>
-        <h3 class="dk-title">3 Pieces, 20% Off</h3>
-        <p class="dk-body">Add any three items from the same edit to your bag and the discount applies automatically at checkout.</p>
-        <a href="#shop" class="deal-cta">Build a bundle <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ SHOP / E-COMMERCE ============ -->
-<section class="section bg-paper" id="shop">
-  <div class="container">
-    <div class="section-head reveal">
-      <p class="eyebrow">Shop The Collection</p>
-      <h2>New arrivals, <em>ready to wear</em>.</h2>
-      <p>Browse the current edit and add pieces straight to your bag — filter by category to find your look faster.</p>
-    </div>
-
     <div class="shop-toolbar">
-      <div class="filter-tabs" id="filterTabs"><!-- injected by JS --></div>
+      <div class="filter-tabs" id="filterTabs"></div>
       <div class="shop-controls">
         <select class="sub-select" id="subSelect">
           <option value="all">All Types</option>
@@ -861,148 +720,45 @@
       Tip: drag any product straight onto the bag icon to add it
     </p>
 
-    <div class="product-grid" id="productGrid"><!-- injected by JS --></div>
-
-    <div class="shop-more reveal">
-      <a href="#contact" class="btn btn-outline">View Full Catalogue</a>
-    </div>
+    <div class="product-grid" id="productGrid"></div>
   </div>
 </section>
 
-<!-- ============ TESTIMONIALS ============ -->
-<section class="testi-section" id="testimonials">
-  <div class="container">
-    <div class="section-head center" style="margin-bottom:0;">
-      <p class="eyebrow">Client Notes</p>
-      <h2 style="color:var(--cream);">What our <em style="color:var(--camel-light); font-style:italic;">community</em> is saying</h2>
-    </div>
-    <div class="testi-slider" id="testiSlider">
-      <div class="testi-slide active">
-        <p>"Look Book completely changed how I shop for clothes. Everything fits like it was made for me, and the styling session saved me from buying things I'd never wear."</p>
-        <div class="testi-person">
-          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" alt="Amara Osei">
-          <div><strong>Amara Osei</strong><span>Verified Buyer, Toronto</span></div>
-        </div>
-      </div>
-      <div class="testi-slide">
-        <p>"The quality is genuinely a step above the fast-fashion brands I used to buy from. Two years on, my coat still looks brand new."</p>
-        <div class="testi-person">
-          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" alt="Daniel Reyes">
-          <div><strong>Daniel Reyes</strong><span>Verified Buyer, Austin</span></div>
-        </div>
-      </div>
-      <div class="testi-slide">
-        <p>"Fast shipping, effortless returns, and a website that actually feels premium. Look Book is my go-to for every new season now."</p>
-        <div class="testi-person">
-          <img src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?q=80&w=200&auto=format&fit=crop" alt="Priya Nair">
-          <div><strong>Priya Nair</strong><span>Verified Buyer, London</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="testi-dots" id="testiDots"></div>
-  </div>
-</section>
-
-<!-- ============ NEWSLETTER ============ -->
-<section class="newsletter reveal">
-  <div class="container">
-    <h2>Join the <em>inner circle</em>.</h2>
-    <p>Get early access to new drops, styling notes, and subscriber-only pricing — one email a week, nothing more.</p>
-    <form class="newsletter-form" id="newsletterForm">
-      <input type="email" placeholder="Enter your email address" required aria-label="Email address">
-      <button type="submit">Subscribe <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-    </form>
-  </div>
-</section>
-
-<!-- ============ CONTACT ============ -->
-<section class="section" id="contact">
-  <div class="container contact-grid">
-    <div class="contact-info reveal">
-      <p class="eyebrow">Get In Touch</p>
-      <h2>We'd love to hear from you.</h2>
-      <p>Questions about an order, a fit, or a future collaboration — our team responds within one business day.</p>
-
-      <div class="contact-detail">
-        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5a2 2 0 0 1 2-2h3l2 5-2.5 1.5a11 11 0 0 0 5 5L14 12l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 5z"/></svg></div>
-        <div><strong>Call Us</strong><span>+1 (555) 021-4487</span></div>
-      </div>
-      <div class="contact-detail">
-        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></div>
-        <div><strong>Email</strong><span>hello@lookbook-store.com</span></div>
-      </div>
-      <div class="contact-detail">
-        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
-        <div><strong>Studio</strong><span>221 Bellwoods Ave, Toronto, ON</span></div>
-      </div>
-
-      <div class="social-row">
-        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1"/></svg></a>
-        <a href="#" aria-label="Pinterest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M9 17c1-3 2-9 2-9m0 0a3 3 0 1 1 3 3c-1 0-2 1-2.5 2.5"/></svg></a>
-        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 4v10.5a3.5 3.5 0 1 1-3-3.46"/><path d="M14 4c0 2.5 2 4.5 4.5 4.5"/></svg></a>
-      </div>
-    </div>
-
-    <form class="contact-form reveal" id="contactForm">
-      <div class="form-row">
-        <div class="field"><label for="fname">First Name</label><input id="fname" type="text" required placeholder="Jordan"></div>
-        <div class="field"><label for="lname">Last Name</label><input id="lname" type="text" required placeholder="Blake"></div>
-      </div>
-      <div class="field"><label for="email">Email</label><input id="email" type="email" required placeholder="jordan@email.com"></div>
-      <div class="field"><label for="topic">Topic</label>
-        <select id="topic">
-          <option>Order Enquiry</option>
-          <option>Sizing &amp; Fit</option>
-          <option>Returns &amp; Exchanges</option>
-          <option>Press &amp; Collaborations</option>
-        </select>
-      </div>
-      <div class="field"><label for="msg">Message</label><textarea id="msg" required placeholder="Tell us how we can help..."></textarea></div>
-      <button type="submit" class="btn btn-primary" style="width:100%;">Send Message</button>
-      <p class="form-msg" id="formMsg">Thank you — your message has been sent. We'll be in touch within one business day.</p>
-    </form>
-  </div>
-</section>
-
-<!-- ============ FOOTER ============ -->
 <footer>
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="#home" class="logo">LOOK<em>book.</em></a>
+        <a href="index.html#home" class="logo">LOOK<em>book.</em></a>
         <p>A contemporary fashion house for people who dress with intention. Curated edits, considered essentials, made to last.</p>
       </div>
       <div>
         <h4>Shop</h4>
-        <ul>
-          <li><a href="#shop">Women</a></li>
-          <li><a href="#shop">Men</a></li>
-          <li><a href="#shop">Accessories</a></li>
-          <li><a href="#shop">New Arrivals</a></li>
+        <ul id="footerCatLinks">
+          <li><a href="index.html#shop">All Categories</a></li>
         </ul>
       </div>
       <div>
         <h4>Company</h4>
         <ul>
-          <li><a href="#about">About Us</a></li>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#testimonials">Reviews</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="index.html#about">About Us</a></li>
+          <li><a href="index.html#services">Services</a></li>
+          <li><a href="index.html#testimonials">Reviews</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
         </ul>
       </div>
       <div>
         <h4>Support</h4>
         <ul>
-          <li><a href="#">Shipping Info</a></li>
-          <li><a href="#">Returns &amp; Exchanges</a></li>
-          <li><a href="#">Size Guide</a></li>
-          <li><a href="#">FAQs</a></li>
+          <li><a href="index.html#">Shipping Info</a></li>
+          <li><a href="index.html#">Returns &amp; Exchanges</a></li>
+          <li><a href="index.html#">Size Guide</a></li>
+          <li><a href="index.html#">FAQs</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
       <span>© <span id="year"></span> Look Book. All rights reserved.</span>
-      <span><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a></span>
+      <span><a href="index.html#">Privacy Policy</a> · <a href="index.html#">Terms of Service</a></span>
     </div>
   </div>
 </footer>
@@ -1078,19 +834,6 @@
     });
   });
 
-  /* ---------- SCROLL REVEAL ---------- */
-  var revealEls = document.querySelectorAll('.reveal, .reveal-scale');
-  if('IntersectionObserver' in window){
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        if(entry.isIntersecting){ entry.target.classList.add('in'); io.unobserve(entry.target); }
-      });
-    }, {threshold:0.15});
-    revealEls.forEach(function(el){ io.observe(el); });
-  } else {
-    revealEls.forEach(function(el){ el.classList.add('in'); });
-  }
-
   /* ---------- TOAST ---------- */
   var toast = document.getElementById('toast');
   var toastMsg = document.getElementById('toastMsg');
@@ -1102,116 +845,128 @@
     toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2400);
   }
 
-  /* ---------- CATEGORY TAXONOMY (fallback defaults; live site loads from Supabase) ---------- */
-  var DEFAULT_CATEGORIES = [
-    { id:'women', label:'Women' },
-    { id:'men', label:'Men' },
-    { id:'footwear', label:'Footwear' },
-    { id:'accessories', label:'Accessories' }
-  ];
-  var DEFAULT_SUBCATEGORIES = {
-    women: ['Outerwear','Dresses','Tops','Trousers','Knitwear'],
-    men: ['Outerwear','Shirts','Denim','Knitwear'],
-    footwear: ['Boots','Sneakers','Heels','Loafers'],
-    accessories: ['Bags','Jewelry','Belts','Scarves']
-  };
-  var categories = [{ id:'all', label:'All' }].concat(DEFAULT_CATEGORIES);   // populated live by loadStoreData()
-  var pageCategories = [];        // categories flagged "separate page" — linked from the menu, kept off the Shop grid
-  var separatePageCatIds = [];    // just the ids from pageCategories, for quick filtering
-  var subcategories = Object.assign({}, DEFAULT_SUBCATEGORIES);              // populated live by loadStoreData()
-  var apparelSizes = ['XS','S','M','L','XL'];
-  var shoeSizes = ['38','39','40','41','42','43'];
-  var oneSize = ['One Size'];
+  /* ---------- READ ?cat= FROM THE URL ---------- */
+  var params = new URLSearchParams(location.search);
+  var catKey = params.get('cat') || '';
 
-  /* ---------- PRODUCT DATA (fallback defaults; live site loads products.json) ---------- */
-  var DEFAULT_PRODUCTS = [
-    { id:1,  name:'Tailored Camel Coat',        cat:'women', sub:'Outerwear', price:248, was:298, img:'https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=700&auto=format&fit=crop', tag:'Flash Sale', rating:5, sizes:apparelSizes, added:24 },
-    { id:2,  name:'Belted Wool Trench',         cat:'women', sub:'Outerwear', price:265, img:'https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=700&auto=format&fit=crop', tag:'Flash Sale', rating:5, sizes:apparelSizes, added:11 },
-    { id:3,  name:'Silk Slip Dress',            cat:'women', sub:'Dresses', price:132, img:'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=700&auto=format&fit=crop', tag:'Bestseller', rating:5, sizes:apparelSizes, added:9 },
-    { id:4,  name:'Wrap Midi Dress',            cat:'women', sub:'Dresses', price:118, was:145, img:'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=700&auto=format&fit=crop', tag:'Sale', rating:4, sizes:apparelSizes, added:3 },
-    { id:5,  name:'Cropped Silk Blouse',        cat:'women', sub:'Tops', price:74, img:'https://images.unsplash.com/photo-1485462537746-965f33f7f6a7?q=80&w=700&auto=format&fit=crop', tag:'BOGO', rating:4, sizes:apparelSizes, added:15 },
-    { id:6,  name:'Ribbed Knit Tank',           cat:'women', sub:'Tops', price:48, img:'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=700&auto=format&fit=crop', tag:'BOGO', rating:4, sizes:apparelSizes, added:20 },
-    { id:7,  name:'Linen Wide-Leg Trouser',     cat:'women', sub:'Trousers', price:96, img:'https://images.unsplash.com/photo-1551163943-3f6a855d1153?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:apparelSizes, added:18 },
-    { id:8,  name:'Merino Crewneck Sweater',    cat:'women', sub:'Knitwear', price:108, img:'https://images.unsplash.com/photo-1571945153237-4929e783af4a?q=80&w=700&auto=format&fit=crop', tag:'New', rating:5, sizes:apparelSizes, added:2 },
-
-    { id:9,  name:'Oversized Wool Blazer',      cat:'men', sub:'Outerwear', price:212, img:'https://images.unsplash.com/photo-1520975954732-35dd22299614?q=80&w=700&auto=format&fit=crop', tag:'New', rating:5, sizes:apparelSizes, added:5 },
-    { id:10, name:'Relaxed Denim Jacket',       cat:'men', sub:'Outerwear', price:118, was:145, img:'https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?q=80&w=700&auto=format&fit=crop', tag:'Sale', rating:4, sizes:apparelSizes, added:16 },
-    { id:11, name:'Classic Cotton Shirt',       cat:'men', sub:'Shirts', price:78, img:'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:apparelSizes, added:13 },
-    { id:12, name:'Brushed Flannel Shirt',      cat:'men', sub:'Shirts', price:82, img:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:apparelSizes, added:7 },
-    { id:13, name:'Straight Fit Selvedge Denim',cat:'men', sub:'Denim', price:134, img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=700&auto=format&fit=crop', tag:'Bundle', rating:5, sizes:apparelSizes, added:21 },
-    { id:14, name:'Tapered Chino Trouser',      cat:'men', sub:'Denim', price:88, img:'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=700&auto=format&fit=crop', tag:'Bundle', rating:4, sizes:apparelSizes, added:19 },
-    { id:15, name:'Cable Knit Cardigan',        cat:'men', sub:'Knitwear', price:126, img:'https://images.unsplash.com/photo-1516257984-b1b4d707412e?q=80&w=700&auto=format&fit=crop', tag:'New', rating:5, sizes:apparelSizes, added:1 },
-
-    { id:16, name:'Chelsea Leather Boot',       cat:'footwear', sub:'Boots', price:198, img:'https://images.unsplash.com/photo-1608256246200-53e635b5b65f?q=80&w=700&auto=format&fit=crop', tag:'Bestseller', rating:5, sizes:shoeSizes, added:6 },
-    { id:17, name:'Suede Ankle Boot',           cat:'footwear', sub:'Boots', price:176, was:210, img:'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=700&auto=format&fit=crop', tag:'Sale', rating:4, sizes:shoeSizes, added:22 },
-    { id:18, name:'Minimal Leather Sneaker',    cat:'footwear', sub:'Sneakers', price:142, img:'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=700&auto=format&fit=crop', tag:'New', rating:5, sizes:shoeSizes, added:4 },
-    { id:19, name:'Court Canvas Sneaker',       cat:'footwear', sub:'Sneakers', price:92, img:'https://images.unsplash.com/photo-1560769629-975ec94e6a86?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:shoeSizes, added:17 },
-    { id:20, name:'Pointed Block Heel',         cat:'footwear', sub:'Heels', price:154, img:'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:shoeSizes, added:14 },
-    { id:21, name:'Woven Leather Loafer',       cat:'footwear', sub:'Loafers', price:168, img:'https://images.unsplash.com/photo-1533867617858-e7b97e060509?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:shoeSizes, added:10 },
-
-    { id:22, name:'Leather Crossbody Bag',      cat:'accessories', sub:'Bags', price:165, img:'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=700&auto=format&fit=crop', tag:'', rating:5, sizes:oneSize, added:8 },
-    { id:23, name:'Structured Tote',            cat:'accessories', sub:'Bags', price:188, img:'https://images.unsplash.com/photo-1591561954557-26941169b49e?q=80&w=700&auto=format&fit=crop', tag:'New', rating:5, sizes:oneSize, added:0 },
-    { id:24, name:'Minimal Gold Hoops',         cat:'accessories', sub:'Jewelry', price:42, img:'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:oneSize, added:23 },
-    { id:25, name:'Layered Chain Necklace',     cat:'accessories', sub:'Jewelry', price:56, img:'https://images.unsplash.com/photo-1465101162946-4377e57745c3?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:oneSize, added:12 },
-    { id:26, name:'Full-Grain Leather Belt',    cat:'accessories', sub:'Belts', price:64, img:'https://images.unsplash.com/photo-1601924994987-69e26d50dc26?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:['S','M','L'], added:25 },
-    { id:27, name:'Merino Wool Scarf',          cat:'accessories', sub:'Scarves', price:58, was:72, img:'https://images.unsplash.com/photo-1520006403909-838d6b92c22e?q=80&w=700&auto=format&fit=crop', tag:'Sale', rating:5, sizes:oneSize, added:26 }
-  ];
-
-  var DEFAULT_DEALS = {
-    flashSale: { enabled:true, title:'Up to 40% Off Outerwear', kicker:'Flash Sale · Ends Soon', countdownHours:7, countdownMinutes:24 },
-    bogo:      { enabled:true, title:'BOGO 50% Off', kicker:'Buy One, Get One', text:'Buy any full-price top or knitwear piece, get a second at half price. Mix and match, no code needed.' },
-    bundle:    { enabled:true, title:'3 Pieces, 20% Off', kicker:'Bundle & Save', text:'Add any three items from the same edit to your bag and the discount applies automatically at checkout.' }
-  };
-  var DEFAULT_COUPONS = {
-    'WELCOME10': { type:'percent', value:10, label:'10% off your first order', enabled:true },
-    'FLASH20':   { type:'percent', value:20, label:'20% off — flash sale', enabled:true },
-    'SAVE25':    { type:'flat',    value:25, label:'$25 off orders over $150', min:150, enabled:true },
-    'FREESHIP':  { type:'shipping', value:0, label:'Free shipping applied', enabled:true }
-  };
-
-  var products = [];       // populated by loadStoreData()
-  var coupons = {};        // populated by loadStoreData()
-  var dealsConfig = {};    // populated by loadStoreData()
+  /* ---------- STATE ---------- */
+  var allCategories = [];      // every category (for nav)
+  var allSubcategories = {};   // every category's subcategories (for nav flyouts)
+  var thisCategory = null;     // the category this page is showing
+  var products = [];           // this category's products only
+  var coupons = {};
+  var state = { sub:'all', sort:'featured' };
+  var sb = null;
 
   var starSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3L21 9.3l-4.5 4.4L17.8 21 12 17.8 6.2 21l1.3-7.3L3 9.3l6.1-1z"/></svg>';
-  var state = { cat:'all', sub:'all', sort:'featured' };
 
-  /* ---------- BUILD FILTER TABS WITH LIVE COUNTS ---------- */
-  function buildTabs(){
-    var wrap = document.getElementById('filterTabs');
-    wrap.innerHTML = categories.map(function(c){
-      var n = c.id === 'all' ? products.length : products.filter(function(p){ return p.cat === c.id; }).length;
-      return '<button data-filter="'+c.id+'" class="'+(c.id === state.cat ? 'active' : '')+'">'+c.label+' <span class="count">'+n+'</span></button>';
+  /* ---------- NAV: SHOP DROPDOWN + SEPARATE-PAGE LINKS ---------- */
+  function buildNavCategoryMenu(){
+    var desktopHtml = allCategories.map(function(c){
+      var subs = allSubcategories[c.id] || [];
+      var catLink = '<a href="index.html#shop-'+c.id+'">'+c.label+'</a>';
+      if(subs.length === 0){
+        return '<div class="cat-item"><div class="cat-item-row">'+catLink+'</div></div>';
+      }
+      var flyout = '<div class="sub-flyout">' +
+        '<a href="index.html#shop-'+c.id+'">All ' + c.label + '</a>' +
+        subs.map(function(s){ return '<a href="index.html#shop-'+c.id+'~'+encodeURIComponent(s)+'">'+s+'</a>'; }).join('') +
+      '</div>';
+      return '<div class="cat-item"><div class="cat-item-row">'+catLink+'<span class="sub-caret">▸</span></div>'+flyout+'</div>';
     }).join('');
+    document.getElementById('navCatMenu').innerHTML = '<a href="index.html#shop">All</a>' + desktopHtml;
+
+    var mobileHtml = allCategories.map(function(c){
+      var subs = allSubcategories[c.id] || [];
+      var catLink = '<a href="index.html#shop-'+c.id+'">'+c.label+'</a>';
+      if(subs.length === 0){
+        return '<div class="mobile-cat-item"><div class="mobile-cat-row">'+catLink+'</div></div>';
+      }
+      var subList = '<div class="mobile-sub-list" data-sublist="'+c.id+'">' +
+        '<a href="index.html#shop-'+c.id+'">All '+c.label+'</a>' +
+        subs.map(function(s){ return '<a href="index.html#shop-'+c.id+'~'+encodeURIComponent(s)+'">'+s+'</a>'; }).join('') +
+      '</div>';
+      return '<div class="mobile-cat-item"><div class="mobile-cat-row">'+catLink+
+        '<button type="button" class="mobile-sub-toggle" data-toggle="'+c.id+'" aria-label="Show '+c.label+' types">' +
+          '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>' +
+        '</button></div>'+subList+'</div>';
+    }).join('');
+    document.getElementById('mobileCatMenu').innerHTML = '<div class="mobile-cat-item"><div class="mobile-cat-row"><a href="index.html#shop">All</a></div></div>' + mobileHtml;
   }
 
-  /* ---------- BUILD SUBCATEGORY DROPDOWN FOR CURRENT CATEGORY ---------- */
-  function buildSubSelect(preselect){
+  document.addEventListener('click', function(e){
+    var toggle = e.target.closest('[data-toggle]');
+    if(toggle){
+      var key = toggle.dataset.toggle;
+      var list = document.querySelector('.mobile-sub-list[data-sublist="'+key+'"]');
+      toggle.classList.toggle('open');
+      if(list) list.classList.toggle('open');
+    }
+  });
+
+  function buildPageCategoryNav(pageCategories){
+    document.querySelectorAll('.primary-nav .page-cat-nav-item').forEach(function(el){ el.remove(); });
+    var shopLi = document.querySelector('.primary-nav .nav-dropdown');
+    if(shopLi){
+      var html = pageCategories.map(function(c){
+        var isCurrent = c.id === catKey;
+        return '<li class="page-cat-nav-item"><a href="category.html?cat='+encodeURIComponent(c.id)+'"'+(isCurrent ? ' style="color:var(--brown-mid);"' : '')+'>'+c.label+'</a></li>';
+      }).join('');
+      shopLi.insertAdjacentHTML('afterend', html);
+    }
+    document.querySelectorAll('#mobileMenu .page-cat-mobile-item').forEach(function(el){ el.remove(); });
+    var mobileCatList = document.getElementById('mobileCatMenu');
+    if(mobileCatList){
+      var mobileHtml = pageCategories.map(function(c){
+        return '<a href="category.html?cat='+encodeURIComponent(c.id)+'" class="page-cat-mobile-item">'+c.label+'</a>';
+      }).join('');
+      mobileCatList.insertAdjacentHTML('afterend', mobileHtml);
+    }
+  }
+
+  /* ---------- SUBCATEGORY FILTER + SORT (for this one category) ---------- */
+  function buildFilterTabs(subs){
+    var tabs = [{ id:'all', label:'All' }].concat(subs.map(function(s){ return { id:s, label:s }; }));
+    var wrap = document.getElementById('filterTabs');
+    wrap.innerHTML = tabs.map(function(t){
+      return '<button data-sub="'+t.id+'" class="'+(state.sub===t.id?'active':'')+'">'+t.label+'</button>';
+    }).join('');
+    wrap.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        state.sub = b.dataset.sub;
+        buildFilterTabs(subs);
+        renderProducts();
+      });
+    });
+  }
+
+  function buildSubSelect(subs){
     var sel = document.getElementById('subSelect');
-    var subs = subcategories[state.cat];
-    if(!subs){
+    if(!subs.length){
       sel.innerHTML = '<option value="all">All Types</option>';
       sel.disabled = true;
-      sel.value = 'all';
-      state.sub = 'all';
       return;
     }
     sel.disabled = false;
-    sel.innerHTML = '<option value="all">All ' + categories.find(function(c){return c.id===state.cat;}).label + '</option>' +
+    sel.innerHTML = '<option value="all">All '+(thisCategory ? thisCategory.label : '')+'</option>' +
       subs.map(function(s){ return '<option value="'+s+'">'+s+'</option>'; }).join('');
-    if(preselect && subs.indexOf(preselect) > -1){
-      sel.value = preselect;
-      state.sub = preselect;
-    } else {
-      sel.value = 'all';
-      state.sub = 'all';
-    }
+  }
+  document.getElementById('subSelect').addEventListener('change', function(){
+    state.sub = this.value;
+    renderProducts();
+  });
+  document.getElementById('sortSelect').addEventListener('change', function(){
+    state.sort = this.value;
+    renderProducts();
+  });
+
+  function tagClass(tag){
+    var map = { 'New':'tag-new', 'Bestseller':'tag-bestseller', 'Sale':'tag-sale', 'BOGO':'tag-bogo', 'Bundle':'tag-bundle', 'Flash Sale':'tag-flash' };
+    return map[tag] || '';
   }
 
   function getFiltered(){
     var list = products.filter(function(p){
-      if(separatePageCatIds.indexOf(p.cat) > -1) return false; // kept off the main Shop entirely
-      if(state.cat !== 'all' && p.cat !== state.cat) return false;
       if(state.sub !== 'all' && p.sub !== state.sub) return false;
       return true;
     });
@@ -1227,68 +982,40 @@
     var list = getFiltered();
     document.getElementById('resultCount').innerHTML = list.length ?
       'Showing <strong>'+list.length+'</strong> of <strong>'+products.length+'</strong> pieces' :
-      'No pieces match this filter yet';
+      'Nothing here yet';
     grid.innerHTML = '';
     if(list.length === 0){
-      grid.innerHTML = '<div class="no-results">Nothing here yet — try a different category or type.</div>';
+      grid.innerHTML = '<div class="no-results">Nothing here yet — check back soon.</div>';
       return;
     }
     list.forEach(function(p){
       var card = document.createElement('div');
-      card.className = 'product-card reveal in';
+      card.className = 'product-card';
       card.setAttribute('draggable', 'true');
       card.dataset.id = p.id;
       card.innerHTML =
         '<div class="product-media">' +
-          '<img src="'+p.img+'" alt="'+p.name+' — Look Book '+p.cat+' '+p.sub+' collection" loading="lazy" draggable="false">' +
+          '<img src="'+p.img+'" alt="'+p.name+'" loading="lazy" draggable="false">' +
           (p.tag ? '<span class="product-tag '+tagClass(p.tag)+'">'+p.tag+'</span>' : '') +
           '<span class="drag-handle" title="Drag to bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></svg></span>' +
           '<div class="product-quick"><button data-id="'+p.id+'" class="add-cart-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L22 8H6"/></svg> Add to Bag</button></div>' +
         '</div>' +
         '<div class="product-info">' +
-          '<span class="cat">'+p.cat+' <span class="product-sub">/ '+p.sub+'</span></span>' +
+          '<span class="cat">'+(thisCategory ? thisCategory.label : '')+' <span class="product-sub">/ '+p.sub+'</span></span>' +
           '<h3>'+p.name+'</h3>' +
           '<div class="stars">'+Array(p.rating).fill(starSvg).join('')+'</div>' +
           '<div class="product-price"><span class="now">$'+p.price.toFixed(2)+'</span>'+(p.was ? '<span class="was">$'+p.was.toFixed(2)+'</span>' : '')+'</div>' +
-          '<div class="product-sizes">'+p.sizes.map(function(s){ return '<span>'+s+'</span>'; }).join('')+'</div>' +
+          '<div class="product-sizes">'+(p.sizes||[]).map(function(s){ return '<span>'+s+'</span>'; }).join('')+'</div>' +
         '</div>';
       grid.appendChild(card);
     });
     bindDragEvents();
   }
 
-  function tagClass(tag){
-    var map = { 'New':'tag-new', 'Bestseller':'tag-bestseller', 'Sale':'tag-sale', 'BOGO':'tag-bogo', 'Bundle':'tag-bundle', 'Flash Sale':'tag-flash' };
-    return map[tag] || '';
-  }
-
-  /* ---------- FILTER TABS ---------- */
-  document.getElementById('filterTabs').addEventListener('click', function(e){
-    var btn = e.target.closest('button');
-    if(!btn) return;
-    state.cat = btn.dataset.filter;
-    buildTabs();
-    buildSubSelect();
-    renderProducts();
-  });
-
-  /* ---------- SUBCATEGORY + SORT ---------- */
-  document.getElementById('subSelect').addEventListener('change', function(){
-    state.sub = this.value;
-    renderProducts();
-  });
-  document.getElementById('sortSelect').addEventListener('change', function(){
-    state.sort = this.value;
-    renderProducts();
-  });
-
-  /* ---------- CART LOGIC (persisted across pages via localStorage) ---------- */
+  /* ---------- CART LOGIC (shared/persisted via localStorage across pages) ---------- */
   var CART_KEY = 'lookbook_cart_v1';
   function loadCartFromStorage(){
-    try{
-      var raw = localStorage.getItem(CART_KEY);
-      return raw ? JSON.parse(raw) : {};
-    }catch(e){ return {}; }
+    try{ var raw = localStorage.getItem(CART_KEY); return raw ? JSON.parse(raw) : {}; }catch(e){ return {}; }
   }
   function saveCartToStorage(){
     try{ localStorage.setItem(CART_KEY, JSON.stringify(cart)); }catch(e){}
@@ -1326,13 +1053,8 @@
     }
     renderCart();
   }
-
-  document.getElementById('couponApply').addEventListener('click', function(){
-    applyCoupon(document.getElementById('couponInput').value);
-  });
-  document.getElementById('couponInput').addEventListener('keydown', function(e){
-    if(e.key === 'Enter'){ e.preventDefault(); applyCoupon(this.value); }
-  });
+  document.getElementById('couponApply').addEventListener('click', function(){ applyCoupon(document.getElementById('couponInput').value); });
+  document.getElementById('couponInput').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); applyCoupon(this.value); } });
   document.querySelectorAll('.coupon-chips button').forEach(function(btn){
     btn.addEventListener('click', function(){
       document.getElementById('couponInput').value = this.dataset.code;
@@ -1350,17 +1072,15 @@
     cart[id] = (cart[id] || 0) + 1;
     renderCart();
     var p = products.find(function(x){ return x.id === id; });
-    showToast(p.name + ' added to your bag');
+    showToast((p ? p.name : 'Item') + ' added to your bag');
     openCart();
   }
-
   function changeQty(id, delta){
     if(!cart[id]) return;
     cart[id] += delta;
     if(cart[id] <= 0) delete cart[id];
     renderCart();
   }
-
   function removeItem(id){ delete cart[id]; renderCart(); }
 
   function getSubtotal(){
@@ -1384,44 +1104,29 @@
     } else {
       cartItemsEl.innerHTML = ids.map(function(id){
         var p = products.find(function(x){ return x.id === id; });
+        if(!p) return '';
         var lineTotal = p.price * cart[id];
         subtotal += lineTotal;
         return '<div class="cart-item">' +
           '<img src="'+p.img+'" alt="'+p.name+'">' +
-          '<div>' +
-            '<h4>'+p.name+'</h4>' +
-            '<div class="cat">'+p.cat+'</div>' +
+          '<div><h4>'+p.name+'</h4><div class="cat">'+p.sub+'</div>' +
             '<div class="qty-control">' +
-              '<button data-act="dec" data-id="'+p.id+'">−</button>' +
-              '<span>'+cart[id]+'</span>' +
-              '<button data-act="inc" data-id="'+p.id+'">+</button>' +
+              '<button data-act="dec" data-id="'+p.id+'">−</button><span>'+cart[id]+'</span><button data-act="inc" data-id="'+p.id+'">+</button>' +
             '</div>' +
           '</div>' +
-          '<div>' +
-            '<div class="price">$'+lineTotal.toFixed(2)+'</div>' +
-            '<button class="cart-item-remove" data-act="remove" data-id="'+p.id+'">Remove</button>' +
-          '</div>' +
+          '<div><div class="price">$'+lineTotal.toFixed(2)+'</div><button class="cart-item-remove" data-act="remove" data-id="'+p.id+'">Remove</button></div>' +
         '</div>';
       }).join('');
     }
     cartSubtotalEl.textContent = '$' + subtotal.toFixed(2);
 
-    /* ---- discount + total ---- */
-    var discount = 0, label = 'Discount', shippingNote = '';
+    var discount = 0, label = 'Discount';
     if(appliedCoupon && coupons[appliedCoupon] && subtotal > 0){
       var deal = coupons[appliedCoupon];
-      if(deal.min && subtotal < deal.min){
-        appliedCoupon = null;
-      } else if(deal.type === 'percent'){
-        discount = subtotal * (deal.value / 100);
-        label = appliedCoupon + ' (' + deal.value + '% off)';
-      } else if(deal.type === 'flat'){
-        discount = Math.min(deal.value, subtotal);
-        label = appliedCoupon + ' ($' + deal.value + ' off)';
-      } else if(deal.type === 'shipping'){
-        discount = 0;
-        label = appliedCoupon + ' — free shipping';
-      }
+      if(deal.min && subtotal < deal.min){ appliedCoupon = null; }
+      else if(deal.type === 'percent'){ discount = subtotal * (deal.value / 100); label = appliedCoupon + ' (' + deal.value + '% off)'; }
+      else if(deal.type === 'flat'){ discount = Math.min(deal.value, subtotal); label = appliedCoupon + ' ($' + deal.value + ' off)'; }
+      else if(deal.type === 'shipping'){ discount = 0; label = appliedCoupon + ' — free shipping'; }
     }
     if(discount > 0 || (appliedCoupon && coupons[appliedCoupon] && coupons[appliedCoupon].type === 'shipping' && subtotal > 0)){
       cartDiscountRow.style.display = 'flex';
@@ -1433,114 +1138,9 @@
     cartTotalEl.textContent = '$' + Math.max(0, subtotal - discount).toFixed(2);
   }
 
-  /* ---------- DRAG & DROP TO CART ---------- */
-  var dropGhost = document.createElement('div');
-  dropGhost.className = 'drop-ghost';
-  document.body.appendChild(dropGhost);
-
-  function bindDragEvents(){
-    document.querySelectorAll('.product-card[draggable="true"]').forEach(function(card){
-      card.addEventListener('dragstart', function(e){
-        card.classList.add('dragging');
-        e.dataTransfer.setData('text/plain', card.dataset.id);
-        e.dataTransfer.effectAllowed = 'copy';
-        var img = card.querySelector('img');
-        if(img){
-          var crt = img.cloneNode(true);
-          crt.style.width = '80px'; crt.style.height = '100px'; crt.style.objectFit = 'cover';
-          crt.style.borderRadius = '4px';
-          document.body.appendChild(crt);
-          e.dataTransfer.setDragImage(crt, 40, 50);
-          setTimeout(function(){ document.body.removeChild(crt); }, 0);
-        }
-      });
-      card.addEventListener('dragend', function(){
-        card.classList.remove('dragging');
-        cartBtnEl.classList.remove('drop-hover');
-      });
-    });
-  }
-
-  var cartBtnEl = document.getElementById('cartBtn');
-  cartBtnEl.addEventListener('dragover', function(e){
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy';
-    cartBtnEl.classList.add('drop-hover');
-  });
-  cartBtnEl.addEventListener('dragleave', function(){
-    cartBtnEl.classList.remove('drop-hover');
-  });
-  cartBtnEl.addEventListener('drop', function(e){
-    e.preventDefault();
-    cartBtnEl.classList.remove('drop-hover');
-    var id = e.dataTransfer.getData('text/plain');
-    if(id){
-      addToCart(id);
-      cartBtnEl.classList.add('drop-pulse');
-      setTimeout(function(){ cartBtnEl.classList.remove('drop-pulse'); }, 500);
-    }
-  });
-
-  /* also allow dropping anywhere on the fixed header for a bigger target */
-  header.addEventListener('dragover', function(e){ e.preventDefault(); });
-  header.addEventListener('drop', function(e){
-    e.preventDefault();
-    var id = e.dataTransfer.getData('text/plain');
-    if(id) addToCart(id);
-  });
-
-  /* ---------- FLASH SALE COUNTDOWN ---------- */
-  var countdownTarget = Date.now() + (1000 * 60 * 60 * 7) + (1000 * 60 * 24);
-  var countdownTimer = null;
-  function initCountdown(){
-    var cfg = (dealsConfig.flashSale) || DEFAULT_DEALS.flashSale;
-    var hrs = (typeof cfg.countdownHours === 'number') ? cfg.countdownHours : 7;
-    var mins = (typeof cfg.countdownMinutes === 'number') ? cfg.countdownMinutes : 24;
-    countdownTarget = Date.now() + (hrs * 3600000) + (mins * 60000);
-    updateCountdown();
-    if(countdownTimer) clearInterval(countdownTimer);
-    countdownTimer = setInterval(updateCountdown, 1000);
-  }
-  function updateCountdown(){
-    var diff = countdownTarget - Date.now();
-    if(diff < 0) diff = 0;
-    var h = Math.floor(diff / 3600000);
-    var m = Math.floor((diff % 3600000) / 60000);
-    var s = Math.floor((diff % 60000) / 1000);
-    var pad = function(n){ return String(n).padStart(2,'0'); };
-    var elH = document.getElementById('cdH'), elM = document.getElementById('cdM'), elS = document.getElementById('cdS');
-    if(elH){ elH.textContent = pad(h); elM.textContent = pad(m); elS.textContent = pad(s); }
-  }
-
-  /* ---------- APPLY DEAL TOGGLES FROM SETTINGS ---------- */
-  function applyDealsSettings(){
-    var cfg = Object.keys(dealsConfig).length ? dealsConfig : DEFAULT_DEALS;
-    var map = { flashSale:'dealFlash', bogo:'dealBogo', bundle:'dealBundle' };
-    Object.keys(map).forEach(function(key){
-      var el = document.getElementById(map[key]);
-      var d = cfg[key];
-      if(!el || !d) return;
-      el.style.display = (d.enabled === false) ? 'none' : '';
-      var kicker = el.querySelector('.dk-text');
-      var title = el.querySelector('.dk-title');
-      var body = el.querySelector('.dk-body');
-      if(kicker && d.kicker) kicker.textContent = d.kicker;
-      if(title && d.title) title.textContent = d.title;
-      if(body && d.text) body.textContent = d.text;
-    });
-    var grid = document.getElementById('dealsGrid');
-    var anyVisible = Object.keys(map).some(function(key){
-      var d = cfg[key];
-      return !d || d.enabled !== false;
-    });
-    document.getElementById('deals').style.display = anyVisible ? '' : 'none';
-    if(cfg.flashSale && cfg.flashSale.enabled !== false){ initCountdown(); }
-  }
-
   document.addEventListener('click', function(e){
     var addBtn = e.target.closest('.add-cart-btn');
     if(addBtn){ addToCart(addBtn.dataset.id); return; }
-
     var qtyBtn = e.target.closest('[data-act]');
     if(qtyBtn){
       var id = qtyBtn.dataset.id;
@@ -1551,204 +1151,42 @@
     }
   });
 
-  /* ---------- TESTIMONIAL SLIDER ---------- */
-  var slides = document.querySelectorAll('.testi-slide');
-  var dotsWrap = document.getElementById('testiDots');
-  var current = 0, autoTimer;
-
-  slides.forEach(function(_, i){
-    var dot = document.createElement('button');
-    if(i === 0) dot.classList.add('active');
-    dot.addEventListener('click', function(){ goToSlide(i); resetAuto(); });
-    dotsWrap.appendChild(dot);
-  });
-  var dots = dotsWrap.querySelectorAll('button');
-
-  function goToSlide(i){
-    slides[current].classList.remove('active');
-    dots[current].classList.remove('active');
-    current = i;
-    slides[current].classList.add('active');
-    dots[current].classList.add('active');
-  }
-  function nextSlide(){ goToSlide((current + 1) % slides.length); }
-  function resetAuto(){ clearInterval(autoTimer); autoTimer = setInterval(nextSlide, 5500); }
-  resetAuto();
-
-  /* ---------- FORMS ---------- */
-  document.getElementById('contactForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    document.getElementById('formMsg').classList.add('show');
-    showToast('Message sent — we\'ll be in touch soon');
-    this.reset();
-    setTimeout(function(){ document.getElementById('formMsg').classList.remove('show'); }, 5000);
-  });
-
-  document.getElementById('newsletterForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    showToast('You\'re on the list — welcome to Look Book');
-    this.reset();
-  });
-
-  /* ---------- LOAD LIVE STORE DATA FROM SUPABASE ---------- */
-  /* Falls back to the embedded defaults above if Supabase isn't configured yet, */
-  /* the project has no data seeded, or the read fails for any reason.          */
-  function init(){
-    buildTabs();
-    buildSubSelect();
-    renderProducts();
-    applyDealsSettings();
-    renderCart();
-    buildNavCategoryMenu();
-    buildPageCategoryNav();
-    applyCategoryFromHash();
-  }
-
-  /* ---------- NAV: SEPARATE-PAGE CATEGORY LINKS ---------- */
-  function buildPageCategoryNav(){
-    // Desktop: insert as extra top-level <li> items right after the Shop dropdown
-    document.querySelectorAll('.primary-nav .page-cat-nav-item').forEach(function(el){ el.remove(); });
-    var shopLi = document.querySelector('.primary-nav .nav-dropdown');
-    if(shopLi){
-      var html = pageCategories.map(function(c){
-        return '<li class="page-cat-nav-item"><a href="category.html?cat='+encodeURIComponent(c.id)+'">'+c.label+'</a></li>';
-      }).join('');
-      shopLi.insertAdjacentHTML('afterend', html);
-    }
-
-    // Mobile: insert as extra links right after the category dropdown list
-    document.querySelectorAll('#mobileMenu .page-cat-mobile-item').forEach(function(el){ el.remove(); });
-    var mobileCatList = document.getElementById('mobileCatMenu');
-    if(mobileCatList){
-      var mobileHtml = pageCategories.map(function(c){
-        return '<a href="category.html?cat='+encodeURIComponent(c.id)+'" class="page-cat-mobile-item">'+c.label+'</a>';
-      }).join('');
-      mobileCatList.insertAdjacentHTML('afterend', mobileHtml);
-    }
-  }
-
-  /* ---------- NAV: CATEGORY + SUBCATEGORY DROPDOWN, DEEP LINKS ---------- */
-  function catHash(catId, subName){
-    if(catId === 'all') return '#shop';
-    var h = '#shop-' + catId;
-    if(subName) h += '~' + encodeURIComponent(subName);
-    return h;
-  }
-
-  function buildNavCategoryMenu(){
-    // ---- Desktop: nested flyout ----
-    var desktopHtml = categories.map(function(c){
-      if(c.id === 'all'){
-        return '<a href="#shop" data-cat="all">All</a>';
-      }
-      var subs = subcategories[c.id] || [];
-      var catLink = '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">'+c.label+'</a>';
-      if(subs.length === 0){
-        return '<div class="cat-item"><div class="cat-item-row">'+catLink+'</div></div>';
-      }
-      var flyout = '<div class="sub-flyout">' +
-        '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">All ' + c.label + '</a>' +
-        subs.map(function(s){ return '<a href="'+catHash(c.id, s)+'" data-cat="'+c.id+'" data-sub="'+s+'">'+s+'</a>'; }).join('') +
-      '</div>';
-      return '<div class="cat-item">' +
-        '<div class="cat-item-row">'+catLink+'<span class="sub-caret">▸</span></div>' +
-        flyout +
-      '</div>';
-    }).join('');
-    document.getElementById('navCatMenu').innerHTML = desktopHtml;
-
-    // ---- Mobile: accordion ----
-    var mobileHtml = categories.map(function(c){
-      if(c.id === 'all'){
-        return '<div class="mobile-cat-item"><div class="mobile-cat-row"><a href="#shop" data-cat="all">All</a></div></div>';
-      }
-      var subs = subcategories[c.id] || [];
-      var catLink = '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">'+c.label+'</a>';
-      if(subs.length === 0){
-        return '<div class="mobile-cat-item"><div class="mobile-cat-row">'+catLink+'</div></div>';
-      }
-      var subList = '<div class="mobile-sub-list" data-sublist="'+c.id+'">' +
-        '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">All '+c.label+'</a>' +
-        subs.map(function(s){ return '<a href="'+catHash(c.id, s)+'" data-cat="'+c.id+'" data-sub="'+s+'">'+s+'</a>'; }).join('') +
-      '</div>';
-      return '<div class="mobile-cat-item">' +
-        '<div class="mobile-cat-row">'+catLink+
-          '<button type="button" class="mobile-sub-toggle" data-toggle="'+c.id+'" aria-label="Show '+c.label+' types">' +
-            '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>' +
-          '</button>' +
-        '</div>' +
-        subList +
-      '</div>';
-    }).join('');
-    document.getElementById('mobileCatMenu').innerHTML = mobileHtml;
-  }
-
-  document.addEventListener('click', function(e){
-    var toggle = e.target.closest('[data-toggle]');
-    if(toggle){
-      var key = toggle.dataset.toggle;
-      var list = document.querySelector('.mobile-sub-list[data-sublist="'+key+'"]');
-      toggle.classList.toggle('open');
-      if(list) list.classList.toggle('open');
-      return;
-    }
-    var link = e.target.closest('[data-cat]');
-    if(!link) return;
-    e.preventDefault();
-    applyCategoryFilter(link.dataset.cat, link.dataset.sub || null, true);
-  });
-
-  function applyCategoryFilter(catId, subName, scroll){
-    state.cat = catId;
-    buildTabs();
-    buildSubSelect(subName);
-    renderProducts();
-    var newHash = catHash(catId, subName);
-    if(location.hash !== newHash) history.replaceState(null, '', newHash);
-    if(scroll){
-      var shopSection = document.getElementById('shop');
-      if(shopSection) shopSection.scrollIntoView({ behavior:'smooth' });
-    }
-    hamburger.classList.remove('open');
-    mobileMenu.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  function applyCategoryFromHash(){
-    var hash = location.hash || '';
-    var match = hash.match(/^#shop-([^~]+)(?:~(.+))?$/);
-    if(match){
-      var catId = match[1];
-      var subName = match[2] ? decodeURIComponent(match[2]) : null;
-      if(categories.some(function(c){ return c.id === catId; })){
-        applyCategoryFilter(catId, subName, false);
-      }
-    }
-  }
-
-  function useFallbackData(){
-    products = DEFAULT_PRODUCTS;
-    coupons = DEFAULT_COUPONS;
-    dealsConfig = DEFAULT_DEALS;
-    categories = [{ id:'all', label:'All' }].concat(DEFAULT_CATEGORIES);
-    subcategories = Object.assign({}, DEFAULT_SUBCATEGORIES);
-    init();
-  }
-
-  function dealsRowsToConfig(rows){
-    var out = {};
-    (rows || []).forEach(function(r){
-      out[r.key] = {
-        enabled: r.enabled !== false,
-        title: r.title || '',
-        kicker: r.kicker || '',
-        text: r.description || '',
-        countdownHours: (typeof r.countdown_hours === 'number') ? r.countdown_hours : 7,
-        countdownMinutes: (typeof r.countdown_minutes === 'number') ? r.countdown_minutes : 24
-      };
+  /* ---------- DRAG & DROP TO CART ---------- */
+  function bindDragEvents(){
+    document.querySelectorAll('.product-card[draggable="true"]').forEach(function(card){
+      card.addEventListener('dragstart', function(e){
+        card.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', card.dataset.id);
+        e.dataTransfer.effectAllowed = 'copy';
+        var img = card.querySelector('img');
+        if(img){
+          var crt = img.cloneNode(true);
+          crt.style.width = '80px'; crt.style.height = '100px'; crt.style.objectFit = 'cover'; crt.style.borderRadius = '4px';
+          document.body.appendChild(crt);
+          e.dataTransfer.setDragImage(crt, 40, 50);
+          setTimeout(function(){ document.body.removeChild(crt); }, 0);
+        }
+      });
+      card.addEventListener('dragend', function(){ card.classList.remove('dragging'); cartBtnEl.classList.remove('drop-hover'); });
     });
-    return out;
   }
+  var cartBtnEl = document.getElementById('cartBtn');
+  cartBtnEl.addEventListener('dragover', function(e){ e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; cartBtnEl.classList.add('drop-hover'); });
+  cartBtnEl.addEventListener('dragleave', function(){ cartBtnEl.classList.remove('drop-hover'); });
+  cartBtnEl.addEventListener('drop', function(e){
+    e.preventDefault();
+    cartBtnEl.classList.remove('drop-hover');
+    var id = e.dataTransfer.getData('text/plain');
+    if(id){ addToCart(id); cartBtnEl.classList.add('drop-pulse'); setTimeout(function(){ cartBtnEl.classList.remove('drop-pulse'); }, 500); }
+  });
+  header.addEventListener('dragover', function(e){ e.preventDefault(); });
+  header.addEventListener('drop', function(e){
+    e.preventDefault();
+    var id = e.dataTransfer.getData('text/plain');
+    if(id) addToCart(id);
+  });
+
+  /* ---------- DATA LOADING ---------- */
   function couponRowsToConfig(rows){
     var out = {};
     (rows || []).forEach(function(r){
@@ -1756,113 +1194,81 @@
     });
     return out;
   }
-  function categoryRowsToList(rows){
-    if(!rows || !rows.length) return [{ id:'all', label:'All' }].concat(DEFAULT_CATEGORIES);
-    var shopRows = rows.filter(function(r){ return !r.separate_page; });
-    var sorted = shopRows.slice().sort(function(a,b){ return (a.sort_order||0) - (b.sort_order||0); });
-    return [{ id:'all', label:'All' }].concat(sorted.map(function(r){ return { id:r.key, label:r.label }; }));
-  }
-  function pageCategoryRowsToList(rows){
-    if(!rows || !rows.length) return [];
-    var pageRows = rows.filter(function(r){ return !!r.separate_page; });
-    var sorted = pageRows.slice().sort(function(a,b){ return (a.sort_order||0) - (b.sort_order||0); });
-    return sorted.map(function(r){ return { id:r.key, label:r.label }; });
-  }
-  function subcategoryRowsToMap(rows){
-    if(!rows || !rows.length) return Object.assign({}, DEFAULT_SUBCATEGORIES);
-    var out = {};
-    rows.forEach(function(r){
-      if(!out[r.cat]) out[r.cat] = [];
-      out[r.cat].push(r.name);
-    });
-    return out;
+
+  function showNotFound(){
+    document.getElementById('notFoundState').style.display = 'block';
+    document.getElementById('catBannerSection').style.display = 'none';
+    document.getElementById('catProductsSection').style.display = 'none';
   }
 
-  var sb = null;
-
-  function loadStoreData(){
+  function init(){
     if(typeof supabase === 'undefined' || !window.SUPABASE_URL || SUPABASE_URL.indexOf('YOUR_') === 0){
-      // Supabase isn't set up yet — show the site with starter data so it still works.
-      useFallbackData();
+      showNotFound();
+      document.getElementById('notFoundTitle').textContent = "This page isn't connected yet.";
+      document.getElementById('notFoundDesc').textContent = 'The store database needs to be configured before this page can show products.';
       return;
     }
-    try{
-      sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      Promise.all([
-        sb.from('products').select('*').order('name'),
-        sb.from('deals').select('*'),
-        sb.from('coupons').select('*'),
-        sb.from('categories').select('*'),
-        sb.from('subcategories').select('*')
-      ]).then(function(results){
-        var prodRes = results[0], dealsRes = results[1], couponsRes = results[2], catRes = results[3], subRes = results[4];
-        products = (prodRes.data && prodRes.data.length) ? prodRes.data : DEFAULT_PRODUCTS;
-        dealsConfig = (dealsRes.data && dealsRes.data.length) ? dealsRowsToConfig(dealsRes.data) : DEFAULT_DEALS;
-        coupons = (couponsRes.data && couponsRes.data.length) ? couponRowsToConfig(couponsRes.data) : DEFAULT_COUPONS;
-        categories = categoryRowsToList(catRes.data);
-        pageCategories = pageCategoryRowsToList(catRes.data);
-        separatePageCatIds = pageCategories.map(function(c){ return c.id; });
-        subcategories = subcategoryRowsToMap(subRes.data);
-        init();
-      }).catch(function(err){
-        console.warn('Supabase load failed, using starter data:', err.message);
-        useFallbackData();
+    Promise.all([
+      sb.from('categories').select('*'),
+      sb.from('subcategories').select('*'),
+      sb.from('coupons').select('*')
+    ]).then(function(results){
+      var catRes = results[0], subRes = results[1], couponsRes = results[2];
+      var catRows = catRes.data || [];
+      allCategories = catRows.filter(function(r){ return !r.separate_page; })
+        .sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); })
+        .map(function(r){ return { id:r.key, label:r.label }; });
+      var pageCategories = catRows.filter(function(r){ return !!r.separate_page; })
+        .sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); })
+        .map(function(r){ return { id:r.key, label:r.label }; });
+      allSubcategories = {};
+      (subRes.data || []).forEach(function(r){
+        if(!allSubcategories[r.cat]) allSubcategories[r.cat] = [];
+        allSubcategories[r.cat].push(r.name);
       });
+      coupons = couponRowsToConfig(couponsRes.data);
 
-      // Live updates: if the admin changes something while a shopper is on the site,
-      // the page updates automatically without a refresh.
-      sb.channel('public:products-site')
+      var matchedCat = catRows.find(function(r){ return r.key === catKey; });
+      buildNavCategoryMenu();
+      buildPageCategoryNav(pageCategories);
+
+      if(!matchedCat){
+        showNotFound();
+        return;
+      }
+      thisCategory = { id:matchedCat.key, label:matchedCat.label };
+      document.getElementById('pageTitle').textContent = thisCategory.label + ' — Look Book';
+      document.getElementById('catBannerTitle').innerHTML = thisCategory.label + ' <em>Collection</em>';
+      document.getElementById('catBannerSection').style.display = 'block';
+      document.getElementById('catProductsSection').style.display = 'block';
+
+      var mySubs = allSubcategories[thisCategory.id] || [];
+      buildFilterTabs(mySubs);
+      buildSubSelect(mySubs);
+
+      return sb.from('products').select('*').eq('cat', thisCategory.id).order('name');
+    }).then(function(prodRes){
+      if(!prodRes) { renderCart(); return; }
+      products = prodRes.data || [];
+      renderProducts();
+      renderCart();
+
+      sb.channel('public:cat-products')
         .on('postgres_changes', { event:'*', schema:'public', table:'products' }, function(){
-          sb.from('products').select('*').order('name').then(function(res){
-            if(res.data){ products = res.data; buildTabs(); buildSubSelect(); renderProducts(); }
-          });
-        }).subscribe();
-
-      sb.channel('public:deals-site')
-        .on('postgres_changes', { event:'*', schema:'public', table:'deals' }, function(){
-          sb.from('deals').select('*').then(function(res){
-            dealsConfig = dealsRowsToConfig(res.data);
-            applyDealsSettings();
-          });
-        }).subscribe();
-
-      sb.channel('public:coupons-site')
-        .on('postgres_changes', { event:'*', schema:'public', table:'coupons' }, function(){
-          sb.from('coupons').select('*').then(function(res){
-            coupons = couponRowsToConfig(res.data);
-          });
-        }).subscribe();
-
-      sb.channel('public:categories-site')
-        .on('postgres_changes', { event:'*', schema:'public', table:'categories' }, function(){
-          sb.from('categories').select('*').then(function(res){
-            categories = categoryRowsToList(res.data);
-            pageCategories = pageCategoryRowsToList(res.data);
-            separatePageCatIds = pageCategories.map(function(c){ return c.id; });
-            buildTabs();
-            buildSubSelect();
-            buildNavCategoryMenu();
-            buildPageCategoryNav();
+          sb.from('products').select('*').eq('cat', thisCategory.id).order('name').then(function(res){
+            products = res.data || [];
             renderProducts();
           });
         }).subscribe();
-
-      sb.channel('public:subcategories-site')
-        .on('postgres_changes', { event:'*', schema:'public', table:'subcategories' }, function(){
-          sb.from('subcategories').select('*').then(function(res){
-            subcategories = subcategoryRowsToMap(res.data);
-            buildSubSelect();
-          });
-        }).subscribe();
-    }catch(err){
-      console.warn('Supabase init failed, using starter data:', err.message);
-      useFallbackData();
-    }
+    }).catch(function(err){
+      console.error(err);
+      showNotFound();
+    });
   }
 
-  loadStoreData();
-
+  init();
 })();
 </script>
 </body>

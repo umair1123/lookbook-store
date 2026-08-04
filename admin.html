@@ -326,7 +326,7 @@
     <!-- ============ CATEGORIES PANEL ============ -->
     <section class="panel" id="panel-categories">
       <div class="section-title"><h2>Categories</h2></div>
-      <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:22px; max-width:560px;">These are the top-level sections shoppers filter by — shown as tabs on your Shop page. Each one needs a size type so the product form knows which sizes to offer.</p>
+      <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:22px; max-width:560px;">These are the top-level sections shoppers filter by — shown as tabs on your Shop page. Each one needs a size type so the product form knows which sizes to offer. Mark a category as its own separate page if you want it kept off the main Shop listing entirely and linked directly from the menu instead.</p>
 
       <div class="card" style="padding:22px 22px 6px; margin-bottom:22px;">
         <div class="coupon-add-row" style="grid-template-columns:1fr 1fr auto;">
@@ -340,11 +340,15 @@
           </div>
           <button class="btn btn-primary btn-sm" id="addCatBtn" style="margin-bottom:18px;">Add</button>
         </div>
+        <label class="size-check" style="margin:-6px 0 18px;">
+          <input type="checkbox" id="newCat-separate">
+          Keep off the main Shop page — link it directly from the menu as its own page instead
+        </label>
       </div>
 
       <div class="card">
         <table>
-          <thead><tr><th>Category</th><th>Size Type</th><th>Products</th><th></th></tr></thead>
+          <thead><tr><th>Category</th><th>Size Type</th><th>Page</th><th>Products</th><th></th></tr></thead>
           <tbody id="categoriesTbody"></tbody>
         </table>
         <div class="empty-state" id="catEmptyState" style="display:none;">No categories yet — add one above.</div>
@@ -546,7 +550,8 @@ create table categories (
   key text primary key,
   label text not null,
   size_type text not null default 'apparel',
-  sort_order int default 0
+  sort_order int default 0,
+  separate_page boolean not null default false
 );
 
 alter table categories enable row level security;
@@ -585,7 +590,8 @@ alter publication supabase_realtime add table subcategories;</div>
   key text primary key,
   label text not null,
   size_type text not null default 'apparel',
-  sort_order int default 0
+  sort_order int default 0,
+  separate_page boolean not null default false
 );
 
 alter table categories enable row level security;
@@ -596,6 +602,10 @@ create policy "Admins write categories" on categories for all
 
 alter publication supabase_realtime add table categories;</div>
         <button class="btn btn-outline btn-sm copy-btn" id="copyCatRulesBtn">Copy Addition</button>
+
+        <p class="hint" style="margin-top:16px;">Already created the categories table before "separate page" existed? Run just this instead:</p>
+        <div class="code-block" id="catAlterBlock">alter table categories add column if not exists separate_page boolean not null default false;</div>
+        <button class="btn btn-outline btn-sm copy-btn" id="copyCatAlterBtn">Copy Column Addition</button>
       </div>
 
       <div class="instructions">
@@ -1189,9 +1199,13 @@ alter publication supabase_realtime add table categories;</div>
     document.getElementById('catEmptyState').style.display = list.length ? 'none' : 'block';
     document.getElementById('categoriesTbody').innerHTML = list.map(function(c){
       var count = state.products.filter(function(p){ return p.cat === c.key; }).length;
+      var pageLabel = c.separate_page
+        ? '<span class="tag-chip tag-Bundle" title="Linked from the menu, kept off the main Shop page">Separate Page</span>'
+        : '<span class="tag-chip tag-none">In Shop</span>';
       return '<tr data-key="'+c.key+'">' +
         '<td><strong>'+c.label+'</strong></td>' +
         '<td>'+(SIZE_TYPE_LABEL[c.size_type] || c.size_type)+'</td>' +
+        '<td><button class="icon-action" data-act="toggle-page" title="Toggle separate page" style="width:auto; padding:0; border:none;">'+pageLabel+'</button></td>' +
         '<td>'+count+' '+(count === 1 ? 'product' : 'products')+'</td>' +
         '<td><button class="icon-action" data-act="delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger);"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td>' +
       '</tr>';
@@ -1205,32 +1219,48 @@ alter publication supabase_realtime add table categories;</div>
   document.getElementById('addCatBtn').addEventListener('click', function(){
     var label = document.getElementById('newCat-label').value.trim();
     var sizeType = document.getElementById('newCat-sizetype').value;
+    var separatePage = document.getElementById('newCat-separate').checked;
     if(!label){ showToast('Enter a category name'); return; }
     var key = slugify(label);
     if(state.categories.some(function(c){ return c.key === key; })){ showToast('A category with that name already exists'); return; }
     var sortOrder = state.categories.length ? Math.max.apply(null, state.categories.map(function(c){ return c.sort_order || 0; })) + 1 : 1;
-    sb.from('categories').insert({ key:key, label:label, size_type:sizeType, sort_order:sortOrder }).then(function(res){
+    sb.from('categories').insert({ key:key, label:label, size_type:sizeType, sort_order:sortOrder, separate_page:separatePage }).then(function(res){
       if(res.error){ showToast('Add failed: ' + res.error.message); return; }
       document.getElementById('newCat-label').value = '';
-      showToast(label + ' added');
+      document.getElementById('newCat-separate').checked = false;
+      showToast(label + ' added' + (separatePage ? ' as a separate page' : ''));
       refreshCategories();
     });
   });
 
   document.getElementById('categoriesTbody').addEventListener('click', function(e){
-    var btn = e.target.closest('[data-act="delete"]');
-    if(!btn) return;
-    var key = btn.closest('tr').dataset.key;
-    var cat = state.categories.find(function(c){ return c.key === key; });
-    var count = state.products.filter(function(p){ return p.cat === key; }).length;
-    var msg = count > 0
-      ? 'Delete "'+(cat ? cat.label : key)+'"? '+count+' existing product(s) still using it will keep that value, but it will disappear from the category tabs on your site.'
-      : 'Delete "'+(cat ? cat.label : key)+'"?';
-    if(!confirm(msg)) return;
-    sb.from('categories').delete().eq('key', key).then(function(res){
-      if(res.error){ showToast('Delete failed: ' + res.error.message); }
-      else{ showToast('Category deleted'); refreshCategories(); }
-    });
+    var delBtn = e.target.closest('[data-act="delete"]');
+    if(delBtn){
+      var key = delBtn.closest('tr').dataset.key;
+      var cat = state.categories.find(function(c){ return c.key === key; });
+      var count = state.products.filter(function(p){ return p.cat === key; }).length;
+      var msg = count > 0
+        ? 'Delete "'+(cat ? cat.label : key)+'"? '+count+' existing product(s) still using it will keep that value, but it will disappear from the menu on your site.'
+        : 'Delete "'+(cat ? cat.label : key)+'"?';
+      if(!confirm(msg)) return;
+      sb.from('categories').delete().eq('key', key).then(function(res){
+        if(res.error){ showToast('Delete failed: ' + res.error.message); }
+        else{ showToast('Category deleted'); refreshCategories(); }
+      });
+      return;
+    }
+    var toggleBtn = e.target.closest('[data-act="toggle-page"]');
+    if(toggleBtn){
+      var tkey = toggleBtn.closest('tr').dataset.key;
+      var tcat = state.categories.find(function(c){ return c.key === tkey; });
+      if(!tcat) return;
+      var newVal = !tcat.separate_page;
+      sb.from('categories').update({ separate_page:newVal }).eq('key', tkey).then(function(res){
+        if(res.error){ showToast('Update failed: ' + res.error.message); return; }
+        showToast(tcat.label + (newVal ? ' moved to its own separate page' : ' moved back into the main Shop'));
+        refreshCategories();
+      });
+    }
   });
 
   function populateSubSelect(cat, selected){
@@ -1736,6 +1766,14 @@ alter publication supabase_realtime add table categories;</div>
     var text = document.getElementById('catRulesBlock').textContent;
     navigator.clipboard.writeText(text).then(function(){
       showToast('Addition copied to clipboard');
+    }).catch(function(){
+      showToast('Could not copy — select the text manually');
+    });
+  });
+  document.getElementById('copyCatAlterBtn').addEventListener('click', function(){
+    var text = document.getElementById('catAlterBlock').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      showToast('Column addition copied to clipboard');
     }).catch(function(){
       showToast('Could not copy — select the text manually');
     });
