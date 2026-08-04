@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Look Book — Store Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,450;0,9..144,600;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF6F0; --paper:#F3ECE1; --espresso:#2A1D14; --ink:#241A12;
+    --brown-deep:#4A3324; --brown-mid:#8A6A4E; --camel:#C9A177; --camel-light:#E7D3B8;
+    --line:#E3D6C3; --white:#FFFFFF; --success:#3E5C3A; --danger:#A6432F;
+    --shadow-soft:0 10px 30px -12px rgba(42,29,20,0.18); --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  body{ margin:0; font-family:'Manrope',sans-serif; background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,h4{ font-family:'Fraunces',serif; font-weight:450; margin:0; }
+  button{ font-family:inherit; cursor:pointer; }
+  input,select,textarea{ font-family:inherit; }
+  a{ color:inherit; }
+
+  /* ---------- LAYOUT ---------- */
+  .app{ display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
+  .sidebar{ background:var(--espresso); color:var(--camel-light); padding:28px 20px; position:sticky; top:0; height:100vh; }
+  .sidebar .brand{ font-family:'Fraunces',serif; font-size:20px; color:var(--cream); margin-bottom:4px; }
+  .sidebar .brand em{ font-style:italic; color:var(--camel); }
+  .sidebar .subtitle{ font-size:11.5px; color:rgba(231,211,184,0.6); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:36px; display:block; }
+  .nav-item{
+    display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:6px; margin-bottom:4px;
+    font-size:14px; font-weight:600; color:rgba(250,246,240,0.75); background:none; border:none; width:100%; text-align:left;
+    transition:background .3s var(--ease), color .3s var(--ease);
+  }
+  .nav-item svg{ width:17px; height:17px; flex-shrink:0; }
+  .nav-item:hover{ background:rgba(250,246,240,0.06); color:var(--cream); }
+  .nav-item.active{ background:var(--camel); color:var(--espresso); }
+  .sidebar-foot{ margin-top:40px; padding-top:20px; border-top:1px solid rgba(250,246,240,0.12); font-size:12px; color:rgba(250,246,240,0.5); line-height:1.6; }
+  .sidebar-foot a{ color:var(--camel-light); text-decoration:underline; }
+
+  .main{ padding:36px 44px 90px; max-width:1180px; }
+  .topbar{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap:20px; flex-wrap:wrap; }
+  .topbar h1{ font-size:28px; color:var(--espresso); }
+  .topbar p{ font-size:13.5px; color:var(--brown-mid); margin-top:6px; max-width:520px; }
+  .status-pill{
+    display:inline-flex; align-items:center; gap:7px; background:var(--white); border:1px solid var(--line);
+    padding:8px 14px; border-radius:20px; font-size:12px; font-weight:700; color:var(--brown-deep);
+  }
+  .status-pill .dot{ width:7px; height:7px; border-radius:50%; background:var(--success); }
+  .status-pill.warn .dot{ background:#C08A2E; }
+
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+  .section-title{ display:flex; justify-content:space-between; align-items:center; margin:36px 0 18px; }
+  .section-title:first-of-type{ margin-top:24px; }
+  .section-title h2{ font-size:19px; color:var(--espresso); }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; padding:11px 20px; font-size:12.5px; font-weight:700;
+    letter-spacing:0.04em; text-transform:uppercase; border-radius:4px; border:1px solid transparent; transition:all .3s var(--ease);
+  }
+  .btn svg{ width:15px; height:15px; }
+  .btn-primary{ background:var(--espresso); color:var(--cream); }
+  .btn-primary:hover{ background:var(--brown-deep); }
+  .btn-outline{ background:var(--white); color:var(--espresso); border-color:var(--line); }
+  .btn-outline:hover{ border-color:var(--espresso); }
+  .btn-danger{ background:transparent; color:var(--danger); border-color:transparent; padding:8px 10px; }
+  .btn-danger:hover{ background:rgba(166,67,47,0.08); }
+  .btn-sm{ padding:8px 14px; font-size:11.5px; }
+
+  /* ---------- CARD / TABLE ---------- */
+  .card{ background:var(--white); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  table{ width:100%; border-collapse:collapse; }
+  th{ text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--brown-mid); padding:14px 16px; border-bottom:1px solid var(--line); background:var(--paper); }
+  td{ padding:12px 16px; border-bottom:1px solid var(--line); font-size:13.5px; vertical-align:middle; }
+  tr:last-child td{ border-bottom:none; }
+  tr:hover td{ background:rgba(201,161,119,0.05); }
+  .prod-thumb{ width:44px; height:56px; object-fit:cover; border-radius:3px; background:var(--paper); }
+  .prod-name{ font-family:'Fraunces',serif; font-size:14.5px; color:var(--espresso); }
+  .prod-sub{ font-size:11.5px; color:var(--brown-mid); }
+  .tag-chip{ font-size:10.5px; font-weight:700; padding:4px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:0.03em; color:var(--cream); }
+  .tag-chip.tag-New{ background:var(--espresso); }
+  .tag-chip.tag-Bestseller{ background:#3E5C3A; }
+  .tag-chip.tag-Sale{ background:var(--danger); }
+  .tag-chip.tag-BOGO{ background:var(--camel); color:var(--espresso); }
+  .tag-chip.tag-Bundle{ background:var(--brown-mid); }
+  .tag-chip.tag-FlashSale{ background:var(--danger); }
+  .tag-chip.tag-none{ background:var(--line); color:var(--brown-mid); }
+  .row-actions{ display:flex; gap:4px; }
+  .icon-action{ width:30px; height:30px; border-radius:5px; border:1px solid var(--line); background:var(--white); display:flex; align-items:center; justify-content:center; transition:all .25s var(--ease); }
+  .icon-action:hover{ background:var(--paper); border-color:var(--brown-mid); }
+  .icon-action svg{ width:14px; height:14px; color:var(--brown-deep); }
+  .price-was{ text-decoration:line-through; color:var(--brown-mid); font-size:11.5px; margin-left:6px; }
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--brown-mid); font-size:13.5px; }
+
+  .toolbar-row{ display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
+  .search-box{ position:relative; max-width:280px; flex:1; min-width:200px; }
+  .search-box input{ width:100%; padding:10px 14px 10px 36px; border:1px solid var(--line); border-radius:5px; font-size:13px; background:var(--white); }
+  .search-box svg{ position:absolute; left:12px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--brown-mid); }
+  .cat-filter{ display:flex; gap:6px; flex-wrap:wrap; }
+  .cat-filter button{ background:var(--white); border:1px solid var(--line); color:var(--brown-deep); padding:8px 14px; font-size:11.5px; font-weight:700; text-transform:uppercase; border-radius:20px; }
+  .cat-filter button.active{ background:var(--espresso); color:var(--cream); border-color:var(--espresso); }
+
+  /* ---------- MODAL / FORM ---------- */
+  .modal-overlay{ position:fixed; inset:0; background:rgba(36,26,18,0.55); z-index:1000; display:none; align-items:center; justify-content:center; padding:24px; }
+  .modal-overlay.open{ display:flex; }
+  .modal{ background:var(--cream); border-radius:8px; width:100%; max-width:640px; max-height:90vh; overflow-y:auto; box-shadow:0 30px 80px rgba(0,0,0,0.3); }
+  .modal-head{ display:flex; justify-content:space-between; align-items:center; padding:22px 28px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--cream); }
+  .modal-head h3{ font-size:19px; color:var(--espresso); }
+  .modal-close{ width:32px; height:32px; border-radius:50%; border:none; background:var(--paper); display:flex; align-items:center; justify-content:center; }
+  .modal-body{ padding:26px 28px 30px; }
+  .form-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--brown-deep); margin-bottom:8px; }
+  .field input, .field select{ width:100%; border:1px solid var(--line); background:var(--white); padding:12px 14px; font-size:14px; border-radius:4px; color:var(--ink); }
+  .field input:focus, .field select:focus{ outline:none; border-color:var(--brown-deep); }
+  .field .hint{ font-size:11px; color:var(--brown-mid); margin-top:6px; }
+  .size-check-group{ display:flex; gap:8px; flex-wrap:wrap; }
+  .size-check{ display:flex; align-items:center; gap:6px; border:1px solid var(--line); border-radius:20px; padding:6px 12px; font-size:12px; cursor:pointer; }
+  .size-check input{ width:auto; margin:0; }
+  .thumb-preview{ width:70px; height:88px; object-fit:cover; border-radius:4px; border:1px solid var(--line); background:var(--paper); margin-top:10px; }
+  .image-tabs{ display:flex; gap:8px; margin-bottom:12px; }
+  .image-tab{ background:var(--white); border:1px solid var(--line); color:var(--brown-mid); padding:8px 14px; font-size:11.5px; font-weight:700; text-transform:uppercase; border-radius:20px; }
+  .image-tab.active{ background:var(--espresso); color:var(--cream); border-color:var(--espresso); }
+  .image-tab-panel{ display:none; }
+  .image-tab-panel.active{ display:block; }
+  .upload-progress{ font-size:11.5px; color:var(--brown-mid); margin-top:8px; display:none; }
+  .modal-foot{ display:flex; justify-content:flex-end; gap:10px; padding-top:8px; }
+  .rating-picker{ display:flex; gap:6px; }
+  .rating-picker button{ width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:var(--white); font-size:13px; font-weight:700; color:var(--brown-mid); }
+  .rating-picker button.active{ background:var(--camel); border-color:var(--camel); color:var(--espresso); }
+
+  /* ---------- TOGGLES ---------- */
+  .toggle{ position:relative; width:44px; height:24px; flex-shrink:0; }
+  .toggle input{ opacity:0; width:0; height:0; }
+  .toggle .track{ position:absolute; inset:0; background:var(--line); border-radius:20px; transition:background .3s var(--ease); cursor:pointer; }
+  .toggle .track::before{ content:''; position:absolute; width:18px; height:18px; left:3px; top:3px; background:var(--white); border-radius:50%; transition:transform .3s var(--ease); box-shadow:0 1px 3px rgba(0,0,0,0.25); }
+  .toggle input:checked + .track{ background:var(--success); }
+  .toggle input:checked + .track::before{ transform:translateX(20px); }
+
+  /* ---------- LOCK SCREEN ---------- */
+  .lock-screen{
+    position:fixed; inset:0; background:var(--espresso); z-index:5000; display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .lock-card{ background:var(--cream); border-radius:10px; padding:44px 40px; max-width:380px; width:100%; box-shadow:0 30px 90px rgba(0,0,0,0.4); text-align:center; }
+  .lock-card .lock-icon{ width:46px; height:46px; border-radius:50%; background:var(--paper); display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+  .lock-card .lock-icon svg{ width:20px; height:20px; color:var(--brown-deep); }
+  .lock-card .brand{ font-family:'Fraunces',serif; font-size:19px; color:var(--espresso); margin-bottom:4px; }
+  .lock-card .brand em{ font-style:italic; color:var(--brown-mid); }
+  .lock-card p.sub{ font-size:12.5px; color:var(--brown-mid); margin-bottom:26px; }
+  .lock-card input{ width:100%; border:1px solid var(--line); background:var(--white); padding:13px 16px; font-size:15px; border-radius:5px; text-align:center; letter-spacing:0.05em; margin-bottom:14px; }
+  .lock-card input:focus{ outline:none; border-color:var(--brown-deep); }
+  .lock-card .btn{ width:100%; justify-content:center; }
+  .lock-error{ font-size:12.5px; color:var(--danger); margin-top:12px; display:none; }
+  .lock-error.show{ display:block; }
+  .lock-hint{ font-size:11.5px; color:var(--brown-mid); margin-top:16px; line-height:1.6; display:none; }
+  .lock-hint.show{ display:block; }
+  .lock-card.shake{ animation:shakeLock .4s; }
+  @keyframes shakeLock{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-8px); } 75%{ transform:translateX(8px); } }
+  .app{ display:none; }
+  .app.unlocked{ display:grid; }
+
+  /* ---------- DEALS TAB ---------- */
+  .deal-manage-card{ background:var(--white); border:1px solid var(--line); border-radius:8px; padding:24px 26px; margin-bottom:18px; }
+  .deal-manage-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .deal-manage-head h3{ font-size:17px; color:var(--espresso); display:flex; align-items:center; gap:10px; }
+  .deal-badge{ font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; padding:4px 10px; border-radius:20px; background:var(--paper); color:var(--brown-mid); }
+  .deal-manage-body{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .deal-manage-body.disabled{ opacity:0.4; pointer-events:none; }
+  .deal-manage-body .field{ margin-bottom:0; }
+  .countdown-inputs{ display:flex; gap:10px; }
+  .countdown-inputs .field{ flex:1; }
+
+  /* ---------- COUPONS TAB ---------- */
+  .coupon-add-row{ display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:10px; align-items:end; margin-bottom:24px; }
+  .coupon-add-row .field{ margin-bottom:0; }
+
+  /* ---------- EXPORT BAR ---------- */
+  .export-bar{
+    position:fixed; bottom:0; left:240px; right:0; background:var(--white); border-top:1px solid var(--line);
+    padding:16px 44px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+    box-shadow:0 -8px 24px rgba(42,29,20,0.06); z-index:200;
+  }
+  .export-bar p{ font-size:12.5px; color:var(--brown-mid); }
+  .export-actions{ display:flex; gap:10px; }
+
+  /* ---------- TOAST ---------- */
+  .toast{
+    position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); z-index:2000;
+    background:var(--espresso); color:var(--cream); padding:14px 24px; border-radius:30px; font-size:13px;
+    opacity:0; pointer-events:none; transition:all .35s var(--ease); box-shadow:var(--shadow-soft);
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .instructions{ background:var(--white); border:1px solid var(--line); border-radius:8px; padding:24px 26px; margin-bottom:30px; }
+  .instructions h3{ font-size:15px; color:var(--espresso); margin-bottom:12px; }
+  .instructions ol{ margin:0; padding-left:20px; font-size:13px; line-height:1.9; color:var(--brown-deep); }
+  .instructions code{ background:var(--paper); padding:2px 6px; border-radius:3px; font-size:12px; }
+
+  .import-row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .file-btn{ position:relative; overflow:hidden; }
+  .file-btn input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+
+  .seed-banner{
+    display:flex; justify-content:space-between; align-items:center; gap:16px; background:var(--camel-light);
+    border:1px solid var(--camel); border-radius:8px; padding:16px 20px; margin-bottom:22px; font-size:13px; color:var(--espresso);
+  }
+  .code-block{ background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:16px 18px; font-family:monospace; font-size:12px; line-height:1.7; white-space:pre-wrap; word-break:break-word; color:var(--brown-deep); margin-top:10px; }
+  .copy-btn{ font-size:11px; margin-top:8px; }
+
+  @media (max-width:900px){
+    .app{ grid-template-columns:1fr; }
+    .sidebar{ position:static; height:auto; display:flex; align-items:center; gap:16px; padding:18px 20px; }
+    .sidebar .brand-block{ display:none; }
+    .nav-item span{ display:none; }
+    .sidebar-foot{ display:none; }
+    .main{ padding:24px 20px 100px; }
+    .export-bar{ left:0; padding:14px 20px; }
+    .form-row, .deal-manage-body{ grid-template-columns:1fr; }
+    .coupon-add-row{ grid-template-columns:1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-card" id="lockCard">
+    <div class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+    <div class="brand">LOOK<em>book.</em></div>
+    <p class="sub" id="lockSub">Store Manager — sign in to continue</p>
+    <form id="lockForm">
+      <input type="email" id="lockEmail" placeholder="Admin email" autocomplete="username">
+      <input type="password" id="lockPassword" placeholder="Password" autocomplete="current-password">
+      <button type="submit" class="btn btn-primary" id="lockSubmitBtn">Sign In</button>
+    </form>
+    <p class="lock-error" id="lockError"></p>
+    <p class="lock-hint" id="lockConfigHint"></p>
+  </div>
+</div>
+
+<div class="app" id="appRoot">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand-block">
+      <div class="brand">LOOK<em>book.</em></div>
+      <span class="subtitle">Store Manager</span>
+    </div>
+    <button class="nav-item active" data-panel="products">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L22 8H6"/></svg>
+      <span>Products</span>
+    </button>
+    <button class="nav-item" data-panel="deals">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>
+      <span>Deals &amp; Discounts</span>
+    </button>
+    <button class="nav-item" data-panel="coupons">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>
+      <span>Coupon Codes</span>
+    </button>
+    <button class="nav-item" data-panel="publish">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+      <span>Setup &amp; Backup</span>
+    </button>
+    <div class="sidebar-foot">
+      <span id="sidebarWho">Signed in</span> · Changes go live on your site instantly.<br>
+      <a href="#" id="lockLink">Sign out</a>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>Store Manager</h1>
+        <p>Add products, toggle discounts and deals, and manage coupon codes — then publish the files to update your live site.</p>
+      </div>
+      <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">Loading…</span></span>
+    </div>
+
+    <!-- ============ PRODUCTS PANEL ============ -->
+    <section class="panel active" id="panel-products">
+      <div class="seed-banner" id="seedBanner" style="display:none;">
+        <span>Your database is empty. Load a starter catalog to get going, or just start adding your own products.</span>
+        <button class="btn btn-primary btn-sm" id="seedBtn">Load Starter Catalog</button>
+      </div>
+      <div class="section-title">
+        <h2>Catalog <span style="color:var(--brown-mid); font-weight:400; font-size:14px;" id="prodCountLabel"></span></h2>
+        <button class="btn btn-primary" id="addProductBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> Add Product
+        </button>
+      </div>
+
+      <div class="toolbar-row">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="prodSearch" placeholder="Search products…">
+        </div>
+        <div class="cat-filter" id="prodCatFilter"></div>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th></th><th>Product</th><th>Category</th><th>Price</th><th>Discount</th><th>Sizes</th><th></th></tr>
+          </thead>
+          <tbody id="productsTbody"></tbody>
+        </table>
+        <div class="empty-state" id="prodEmptyState" style="display:none;">No products match this search or filter.</div>
+      </div>
+    </section>
+
+    <!-- ============ DEALS PANEL ============ -->
+    <section class="panel" id="panel-deals">
+      <div class="section-title"><h2>Deals &amp; Discounts</h2></div>
+      <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:22px; max-width:560px;">Turn storewide offers on or off. Disabled deals disappear from the live site's Deals section entirely.</p>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head">
+          <h3><span class="deal-badge">Flash Sale</span> Countdown offer</h3>
+          <label class="toggle"><input type="checkbox" id="toggle-flashSale"><span class="track"></span></label>
+        </div>
+        <div class="deal-manage-body" id="body-flashSale">
+          <div class="field"><label>Kicker Label</label><input type="text" id="flashSale-kicker" placeholder="Flash Sale · Ends Soon"></div>
+          <div class="field"><label>Title</label><input type="text" id="flashSale-title" placeholder="Up to 40% Off Outerwear"></div>
+          <div class="countdown-inputs" style="grid-column:1/-1;">
+            <div class="field"><label>Countdown — Hours</label><input type="number" id="flashSale-hours" min="0" max="999"></div>
+            <div class="field"><label>Countdown — Minutes</label><input type="number" id="flashSale-minutes" min="0" max="59"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head">
+          <h3><span class="deal-badge">BOGO</span> Buy one, get one</h3>
+          <label class="toggle"><input type="checkbox" id="toggle-bogo"><span class="track"></span></label>
+        </div>
+        <div class="deal-manage-body" id="body-bogo">
+          <div class="field"><label>Kicker Label</label><input type="text" id="bogo-kicker" placeholder="Buy One, Get One"></div>
+          <div class="field"><label>Title</label><input type="text" id="bogo-title" placeholder="BOGO 50% Off"></div>
+          <div class="field" style="grid-column:1/-1;"><label>Description</label><input type="text" id="bogo-text" placeholder="Buy any full-price top…"></div>
+        </div>
+      </div>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head">
+          <h3><span class="deal-badge">Bundle</span> Bundle &amp; save</h3>
+          <label class="toggle"><input type="checkbox" id="toggle-bundle"><span class="track"></span></label>
+        </div>
+        <div class="deal-manage-body" id="body-bundle">
+          <div class="field"><label>Kicker Label</label><input type="text" id="bundle-kicker" placeholder="Bundle & Save"></div>
+          <div class="field"><label>Title</label><input type="text" id="bundle-title" placeholder="3 Pieces, 20% Off"></div>
+          <div class="field" style="grid-column:1/-1;"><label>Description</label><input type="text" id="bundle-text" placeholder="Add any three items…"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COUPONS PANEL ============ -->
+    <section class="panel" id="panel-coupons">
+      <div class="section-title"><h2>Coupon Codes</h2></div>
+      <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:22px; max-width:560px;">Codes shoppers can enter in the cart drawer. Turn a code off without deleting it if you want to reuse it later.</p>
+
+      <div class="card" style="padding:22px 22px 6px; margin-bottom:22px;">
+        <div class="coupon-add-row">
+          <div class="field"><label>Code</label><input type="text" id="newCoupon-code" placeholder="SUMMER15" style="text-transform:uppercase;"></div>
+          <div class="field"><label>Type</label>
+            <select id="newCoupon-type">
+              <option value="percent">% Percent off</option>
+              <option value="flat">$ Flat amount off</option>
+              <option value="shipping">Free shipping</option>
+            </select>
+          </div>
+          <div class="field"><label>Value</label><input type="number" id="newCoupon-value" placeholder="15" min="0"></div>
+          <div class="field"><label>Min. Spend (optional)</label><input type="number" id="newCoupon-min" placeholder="0" min="0"></div>
+          <button class="btn btn-primary btn-sm" id="addCouponBtn" style="margin-bottom:18px;">Add Code</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min. Spend</th><th>Active</th><th></th></tr></thead>
+          <tbody id="couponsTbody"></tbody>
+        </table>
+        <div class="empty-state" id="couponEmptyState" style="display:none;">No coupon codes yet — add one above.</div>
+      </div>
+    </section>
+
+    <!-- ============ SETUP & BACKUP PANEL ============ -->
+    <section class="panel" id="panel-publish">
+      <div class="section-title"><h2>Setup &amp; Backup</h2></div>
+
+      <div class="instructions">
+        <h3>One-time Supabase setup</h3>
+        <ol>
+          <li>Go to <a href="https://supabase.com/dashboard" target="_blank" rel="noopener">supabase.com/dashboard</a>, sign up (no card needed), and create a new project. Pick any name and a database password (save it somewhere — you likely won't need it again, but it's your project's master password).</li>
+          <li>In the left sidebar, click the <strong>SQL Editor</strong> icon → <strong>New query</strong>. Paste in the schema below and click <strong>Run</strong>. This creates your tables and locks them down so only you can edit them.</li>
+          <li>In the left sidebar, click <strong>Authentication → Users → Add user</strong>. Enter the email and password you'll use to log into this Store Manager, and set "Auto Confirm User" to on. This is your real admin login.</li>
+          <li>Still in Authentication, click <strong>Providers → Email</strong> and turn <strong>off</strong> "Allow new users to sign up" — this stops anyone else from creating their own account.</li>
+          <li>Click the gear icon (bottom left) → <strong>Project Settings → API</strong>. Copy the <strong>Project URL</strong> and the <strong>anon public</strong> key (not the <code>service_role</code> key).</li>
+          <li>Open <code>supabase-config.js</code> (in the same folder as this file) and paste those two values in, replacing the <code>YOUR_…</code> placeholders.</li>
+          <li>Upload <code>index.html</code>, <code>admin.html</code>, and <code>supabase-config.js</code> to your GitHub repo (overwrite the old versions), commit, then reload this page and sign in.</li>
+        </ol>
+      </div>
+
+      <div class="instructions">
+        <h3>Database schema &amp; security rules (paste into SQL Editor)</h3>
+        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">This creates your three tables, turns on Row Level Security, and adds policies so anyone can read your catalog (so your site works) but only your signed-in admin account can change anything. It also switches on realtime sync.</p>
+        <div class="code-block" id="rulesBlock">create table products (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  cat text not null,
+  sub text,
+  price numeric not null,
+  was numeric,
+  img text,
+  tag text,
+  rating int default 4,
+  sizes text[] default '{}',
+  added bigint default (extract(epoch from now()) * 1000)
+);
+
+create table deals (
+  key text primary key,
+  enabled boolean default true,
+  title text,
+  kicker text,
+  description text,
+  countdown_hours int,
+  countdown_minutes int
+);
+
+create table coupons (
+  code text primary key,
+  type text not null,
+  value numeric default 0,
+  label text,
+  min numeric,
+  enabled boolean default true
+);
+
+alter table products enable row level security;
+alter table deals enable row level security;
+alter table coupons enable row level security;
+
+create policy "Public read products" on products for select using (true);
+create policy "Public read deals" on deals for select using (true);
+create policy "Public read coupons" on coupons for select using (true);
+
+create policy "Admins write products" on products for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "Admins write deals" on deals for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "Admins write coupons" on coupons for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+alter publication supabase_realtime add table products;
+alter publication supabase_realtime add table deals;
+alter publication supabase_realtime add table coupons;</div>
+        <button class="btn btn-outline btn-sm copy-btn" id="copyRulesBtn">Copy Schema</button>
+      </div>
+
+      <div class="instructions">
+        <h3>Starter catalog</h3>
+        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8; margin-bottom:14px;">Loads 27 sample products plus starter deals and coupon codes into a fresh, empty database. Safe to skip if you'd rather start from scratch.</p>
+        <button class="btn btn-primary btn-sm" id="seedBtnSetup">Load Starter Catalog</button>
+      </div>
+
+      <div class="section-title"><h2>Backup</h2></div>
+      <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:18px; max-width:560px;">Your data lives in Firestore now, so nothing here needs uploading to GitHub — but it's smart to keep an occasional local backup, and handy if you're migrating from the old file-based version of this tool.</p>
+      <div class="card" style="padding:24px 26px; display:flex; gap:14px; flex-wrap:wrap;">
+        <button class="btn btn-outline" id="exportProductsBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg> Backup products.json
+        </button>
+        <button class="btn btn-outline" id="exportSettingsBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg> Backup settings.json
+        </button>
+        <label class="btn btn-outline file-btn">Restore products.json into database<input type="file" id="importProducts" accept=".json"></label>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ PRODUCT MODAL ============ -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Add Product</h3>
+      <button class="modal-close" id="modalClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pf-id">
+      <div class="field"><label>Product Name</label><input type="text" id="pf-name" placeholder="e.g. Tailored Camel Coat"></div>
+      <div class="form-row">
+        <div class="field"><label>Category</label>
+          <select id="pf-cat">
+            <option value="women">Women</option>
+            <option value="men">Men</option>
+            <option value="footwear">Footwear</option>
+            <option value="accessories">Accessories</option>
+          </select>
+        </div>
+        <div class="field"><label>Subcategory</label><select id="pf-sub"></select></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Price ($)</label><input type="number" id="pf-price" min="0" step="0.01" placeholder="120.00"></div>
+        <div class="field"><label>Compare-at / "Was" Price ($) <span style="text-transform:none; font-weight:500;">— optional, shows a strike-through</span></label><input type="number" id="pf-was" min="0" step="0.01" placeholder="Leave blank if none"></div>
+      </div>
+      <div class="field">
+        <label>Product Image</label>
+        <div class="image-tabs">
+          <button type="button" class="image-tab active" data-tab="url">Paste Image URL</button>
+          <button type="button" class="image-tab" data-tab="upload">Upload From Device</button>
+        </div>
+        <div class="image-tab-panel active" id="imgtab-url">
+          <input type="text" id="pf-img" placeholder="https://images.unsplash.com/…">
+        </div>
+        <div class="image-tab-panel" id="imgtab-upload">
+          <label class="btn btn-outline btn-sm file-btn" style="width:100%; justify-content:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            Choose a photo…
+            <input type="file" id="pf-upload" accept="image/*">
+          </label>
+          <p class="hint" id="uploadHint">JPG, PNG or WEBP. Photos are resized and compressed automatically to keep your catalog file small.</p>
+        </div>
+      </div>
+      <img id="pf-thumb" class="thumb-preview" style="display:none;">
+      <p class="hint" id="thumbSizeHint" style="display:none;"></p>
+      <div class="field" style="margin-top:16px;"><label>Discount / Badge</label>
+        <select id="pf-tag">
+          <option value="">None</option>
+          <option value="New">New</option>
+          <option value="Bestseller">Bestseller</option>
+          <option value="Sale">Sale</option>
+          <option value="BOGO">BOGO</option>
+          <option value="Bundle">Bundle</option>
+          <option value="Flash Sale">Flash Sale</option>
+        </select>
+        <p class="hint">Choosing a discount badge doesn't calculate pricing automatically — pair it with a "Was" price above if it should show a markdown, or with a coupon code for BOGO/Bundle rules.</p>
+      </div>
+      <div class="field"><label>Rating</label>
+        <div class="rating-picker" id="pf-rating">
+          <button type="button" data-val="1">1</button>
+          <button type="button" data-val="2">2</button>
+          <button type="button" data-val="3">3</button>
+          <button type="button" data-val="4">4</button>
+          <button type="button" data-val="5">5</button>
+        </div>
+      </div>
+      <div class="field"><label>Available Sizes</label><div class="size-check-group" id="pf-sizes"></div></div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" id="modalCancel">Cancel</button>
+        <button class="btn btn-primary" id="modalSave">Save Product</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SYNC BAR ============ -->
+<div class="export-bar">
+  <p id="exportBarNote"><span class="dot" style="display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--success); margin-right:7px;"></span>Every change here saves straight to your database — your live site updates automatically, no publishing step needed.</p>
+  <div class="export-actions">
+    <button class="btn btn-outline btn-sm" id="gotoSetupBtn">Setup &amp; Backup</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- CATEGORY / SIZE CONSTANTS ---------- */
+  var apparelSizes = ['XS','S','M','L','XL'];
+  var shoeSizes = ['38','39','40','41','42','43'];
+  var oneSize = ['One Size'];
+  var subcategories = {
+    women: ['Outerwear','Dresses','Tops','Trousers','Knitwear'],
+    men: ['Outerwear','Shirts','Denim','Knitwear'],
+    footwear: ['Boots','Sneakers','Heels','Loafers'],
+    accessories: ['Bags','Jewelry','Belts','Scarves']
+  };
+  var sizePresets = { women:apparelSizes, men:apparelSizes, footwear:shoeSizes, accessories:oneSize.concat(['S','M','L']) };
+
+  /* ---------- STARTER DATA — used only to seed a brand-new, empty database ---------- */
+  var STARTER_PRODUCTS = [
+    { name:'Tailored Camel Coat',        cat:'women', sub:'Outerwear', price:248, was:298, img:'https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=700&auto=format&fit=crop', tag:'Flash Sale', rating:5, sizes:apparelSizes, added:Date.now()-24*86400000 },
+    { name:'Belted Wool Trench',         cat:'women', sub:'Outerwear', price:265, img:'https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=700&auto=format&fit=crop', tag:'Flash Sale', rating:5, sizes:apparelSizes, added:Date.now()-11*86400000 },
+    { name:'Silk Slip Dress',            cat:'women', sub:'Dresses', price:132, img:'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=700&auto=format&fit=crop', tag:'Bestseller', rating:5, sizes:apparelSizes, added:Date.now()-9*86400000 },
+    { name:'Wrap Midi Dress',            cat:'women', sub:'Dresses', price:118, was:145, img:'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=700&auto=format&fit=crop', tag:'Sale', rating:4, sizes:apparelSizes, added:Date.now()-3*86400000 },
+    { name:'Cropped Silk Blouse',        cat:'women', sub:'Tops', price:74, img:'https://images.unsplash.com/photo-1485462537746-965f33f7f6a7?q=80&w=700&auto=format&fit=crop', tag:'BOGO', rating:4, sizes:apparelSizes, added:Date.now()-15*86400000 },
+    { name:'Ribbed Knit Tank',           cat:'women', sub:'Tops', price:48, img:'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=700&auto=format&fit=crop', tag:'BOGO', rating:4, sizes:apparelSizes, added:Date.now()-20*86400000 },
+    { name:'Linen Wide-Leg Trouser',     cat:'women', sub:'Trousers', price:96, img:'https://images.unsplash.com/photo-1551163943-3f6a855d1153?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:apparelSizes, added:Date.now()-18*86400000 },
+    { name:'Merino Crewneck Sweater',    cat:'women', sub:'Knitwear', price:108, img:'https://images.unsplash.com/photo-1571945153237-4929e783af4a?q=80&w=700&auto=format&fit=crop', tag:'New', rating:5, sizes:apparelSizes, added:Date.now()-2*86400000 },
+    { name:'Oversized Wool Blazer',      cat:'men', sub:'Outerwear', price:212, img:'https://images.unsplash.com/photo-1520975954732-35dd22299614?q=80&w=700&auto=format&fit=crop', tag:'New', rating:5, sizes:apparelSizes, added:Date.now()-5*86400000 },
+    { name:'Relaxed Denim Jacket',       cat:'men', sub:'Outerwear', price:118, was:145, img:'https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?q=80&w=700&auto=format&fit=crop', tag:'Sale', rating:4, sizes:apparelSizes, added:Date.now()-16*86400000 },
+    { name:'Classic Cotton Shirt',       cat:'men', sub:'Shirts', price:78, img:'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:apparelSizes, added:Date.now()-13*86400000 },
+    { name:'Brushed Flannel Shirt',      cat:'men', sub:'Shirts', price:82, img:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:apparelSizes, added:Date.now()-7*86400000 },
+    { name:'Straight Fit Selvedge Denim',cat:'men', sub:'Denim', price:134, img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=700&auto=format&fit=crop', tag:'Bundle', rating:5, sizes:apparelSizes, added:Date.now()-21*86400000 },
+    { name:'Tapered Chino Trouser',      cat:'men', sub:'Denim', price:88, img:'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=700&auto=format&fit=crop', tag:'Bundle', rating:4, sizes:apparelSizes, added:Date.now()-19*86400000 },
+    { name:'Cable Knit Cardigan',        cat:'men', sub:'Knitwear', price:126, img:'https://images.unsplash.com/photo-1516257984-b1b4d707412e?q=80&w=700&auto=format&fit=crop', tag:'New', rating:5, sizes:apparelSizes, added:Date.now()-1*86400000 },
+    { name:'Chelsea Leather Boot',       cat:'footwear', sub:'Boots', price:198, img:'https://images.unsplash.com/photo-1608256246200-53e635b5b65f?q=80&w=700&auto=format&fit=crop', tag:'Bestseller', rating:5, sizes:shoeSizes, added:Date.now()-6*86400000 },
+    { name:'Suede Ankle Boot',           cat:'footwear', sub:'Boots', price:176, was:210, img:'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=700&auto=format&fit=crop', tag:'Sale', rating:4, sizes:shoeSizes, added:Date.now()-22*86400000 },
+    { name:'Minimal Leather Sneaker',    cat:'footwear', sub:'Sneakers', price:142, img:'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=700&auto=format&fit=crop', tag:'New', rating:5, sizes:shoeSizes, added:Date.now()-4*86400000 },
+    { name:'Court Canvas Sneaker',       cat:'footwear', sub:'Sneakers', price:92, img:'https://images.unsplash.com/photo-1560769629-975ec94e6a86?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:shoeSizes, added:Date.now()-17*86400000 },
+    { name:'Pointed Block Heel',         cat:'footwear', sub:'Heels', price:154, img:'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:shoeSizes, added:Date.now()-14*86400000 },
+    { name:'Woven Leather Loafer',       cat:'footwear', sub:'Loafers', price:168, img:'https://images.unsplash.com/photo-1533867617858-e7b97e060509?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:shoeSizes, added:Date.now()-10*86400000 },
+    { name:'Leather Crossbody Bag',      cat:'accessories', sub:'Bags', price:165, img:'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=700&auto=format&fit=crop', tag:'', rating:5, sizes:oneSize, added:Date.now()-8*86400000 },
+    { name:'Structured Tote',            cat:'accessories', sub:'Bags', price:188, img:'https://images.unsplash.com/photo-1591561954557-26941169b49e?q=80&w=700&auto=format&fit=crop', tag:'New', rating:5, sizes:oneSize, added:Date.now() },
+    { name:'Minimal Gold Hoops',         cat:'accessories', sub:'Jewelry', price:42, img:'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:oneSize, added:Date.now()-23*86400000 },
+    { name:'Layered Chain Necklace',     cat:'accessories', sub:'Jewelry', price:56, img:'https://images.unsplash.com/photo-1465101162946-4377e57745c3?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:oneSize, added:Date.now()-12*86400000 },
+    { name:'Full-Grain Leather Belt',    cat:'accessories', sub:'Belts', price:64, img:'https://images.unsplash.com/photo-1601924994987-69e26d50dc26?q=80&w=700&auto=format&fit=crop', tag:'', rating:4, sizes:['S','M','L'], added:Date.now()-25*86400000 },
+    { name:'Merino Wool Scarf',          cat:'accessories', sub:'Scarves', price:58, was:72, img:'https://images.unsplash.com/photo-1520006403909-838d6b92c22e?q=80&w=700&auto=format&fit=crop', tag:'Sale', rating:5, sizes:oneSize, added:Date.now()-26*86400000 }
+  ];
+
+  var STARTER_DEALS = [
+    { key:'flashSale', enabled:true, title:'Up to 40% Off Outerwear', kicker:'Flash Sale · Ends Soon', description:null, countdown_hours:7, countdown_minutes:24 },
+    { key:'bogo', enabled:true, title:'BOGO 50% Off', kicker:'Buy One, Get One', description:'Buy any full-price top or knitwear piece, get a second at half price. Mix and match, no code needed.', countdown_hours:null, countdown_minutes:null },
+    { key:'bundle', enabled:true, title:'3 Pieces, 20% Off', kicker:'Bundle & Save', description:'Add any three items from the same edit to your bag and the discount applies automatically at checkout.', countdown_hours:null, countdown_minutes:null }
+  ];
+  var STARTER_COUPONS = [
+    { code:'WELCOME10', type:'percent', value:10, label:'10% off your first order', min:null, enabled:true },
+    { code:'FLASH20',   type:'percent', value:20, label:'20% off — flash sale', min:null, enabled:true },
+    { code:'SAVE25',    type:'flat',    value:25, label:'$25 off orders over $150', min:150, enabled:true },
+    { code:'FREESHIP',  type:'shipping',value:0,  label:'Free shipping applied', min:null, enabled:true }
+  ];
+
+  /* ---------- STATE ---------- */
+  var state = { products:[], deals:{}, coupons:{} };
+  var prodFilter = { cat:'all', search:'' };
+  var sb = null;
+  var channels = [];
+  var seedOffered = false;
+
+  function setStatus(text, warn){
+    document.getElementById('statusText').textContent = text;
+    document.getElementById('statusPill').classList.toggle('warn', !!warn);
+  }
+
+  var toastTimer;
+  function showToast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+  }
+
+  /* ---------- DEAL / COUPON ROW <-> UI SHAPE HELPERS ---------- */
+  function dealsRowsToState(rows){
+    var out = {};
+    (rows || []).forEach(function(r){
+      out[r.key] = {
+        enabled: r.enabled !== false,
+        title: r.title || '',
+        kicker: r.kicker || '',
+        text: r.description || '',
+        countdownHours: (typeof r.countdown_hours === 'number') ? r.countdown_hours : 7,
+        countdownMinutes: (typeof r.countdown_minutes === 'number') ? r.countdown_minutes : 24
+      };
+    });
+    return out;
+  }
+  function couponRowsToState(rows){
+    var out = {};
+    (rows || []).forEach(function(r){
+      out[r.code] = { type:r.type, value:r.value, label:r.label, min: (r.min === null ? undefined : r.min), enabled:r.enabled !== false };
+    });
+    return out;
+  }
+
+  /* ---------- SUPABASE INIT + AUTH ---------- */
+  function supabaseReady(){
+    return typeof supabase !== 'undefined' && window.SUPABASE_URL && SUPABASE_URL.indexOf('YOUR_') !== 0 && window.SUPABASE_ANON_KEY;
+  }
+
+  function friendlyAuthError(err){
+    var msg = (err && err.message) || 'Sign-in failed';
+    if(/invalid login credentials/i.test(msg)) return 'Incorrect email or password.';
+    if(/email not confirmed/i.test(msg)) return 'That account needs to be confirmed — enable "Auto Confirm User" when adding it in Supabase, or confirm it manually in the dashboard.';
+    if(/rate limit/i.test(msg)) return 'Too many attempts — wait a moment and try again.';
+    return 'Sign-in failed: ' + msg;
+  }
+
+  function initSupabase(){
+    if(!supabaseReady()){
+      setStatus('Supabase not configured', true);
+      document.getElementById('lockSub').textContent = "Supabase isn't configured yet";
+      document.getElementById('lockForm').style.display = 'none';
+      var hint = document.getElementById('lockConfigHint');
+      hint.innerHTML = 'Edit <code>supabase-config.js</code> with your Supabase project\'s URL and anon key, then reload this page. Full setup steps are in the Setup &amp; Backup tab, or in the comments inside supabase-config.js.';
+      hint.classList.add('show');
+      return;
+    }
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    sb.auth.onAuthStateChange(function(event, session){
+      if(session && session.user){ unlockApp(session.user); } else { lockApp(); }
+    });
+    sb.auth.getSession().then(function(res){
+      var session = res.data && res.data.session;
+      if(session && session.user){ unlockApp(session.user); } else { lockApp(); }
+    });
+
+    document.getElementById('lockForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      var email = document.getElementById('lockEmail').value.trim();
+      var pass = document.getElementById('lockPassword').value;
+      var errEl = document.getElementById('lockError');
+      errEl.classList.remove('show');
+      var btn = document.getElementById('lockSubmitBtn');
+      btn.disabled = true; btn.textContent = 'Signing in…';
+      sb.auth.signInWithPassword({ email:email, password:pass }).then(function(res){
+        if(res.error){
+          errEl.textContent = friendlyAuthError(res.error);
+          errEl.classList.add('show');
+          var card = document.getElementById('lockCard');
+          card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+        }
+      }).finally(function(){
+        btn.disabled = false; btn.textContent = 'Sign In';
+      });
+    });
+  }
+
+  function unlockApp(user){
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('appRoot').classList.add('unlocked');
+    document.getElementById('sidebarWho').textContent = user.email;
+    buildCatFilter();
+    startRealtimeSync();
+  }
+
+  function lockApp(){
+    document.getElementById('lockScreen').style.display = 'flex';
+    document.getElementById('appRoot').classList.remove('unlocked');
+    channels.forEach(function(ch){ sb.removeChannel(ch); });
+    channels = [];
+  }
+
+  document.getElementById('lockLink').addEventListener('click', function(e){
+    e.preventDefault();
+    if(sb) sb.auth.signOut();
+  });
+
+  /* ---------- REALTIME SYNC ---------- */
+  function isEditingDeals(){
+    var active = document.activeElement;
+    return !!(active && active.closest && active.closest('.deal-manage-card'));
+  }
+
+  function refreshProducts(){
+    return sb.from('products').select('*').order('name').then(function(res){
+      if(res.error){
+        setStatus('Connection error — check your schema/policies', true);
+        showToast('Could not load products: ' + res.error.message);
+        return;
+      }
+      state.products = res.data || [];
+      renderProductsTable();
+      setStatus('Synced — ' + state.products.length + (state.products.length === 1 ? ' product live' : ' products live'));
+      document.getElementById('seedBanner').style.display = (state.products.length === 0 && !seedOffered) ? 'flex' : 'none';
+    });
+  }
+  function refreshDeals(){
+    return sb.from('deals').select('*').then(function(res){
+      if(res.error){ console.error(res.error); return; }
+      state.deals = dealsRowsToState(res.data);
+      if(!isEditingDeals()) renderDeals();
+    });
+  }
+  function refreshCoupons(){
+    return sb.from('coupons').select('*').then(function(res){
+      if(res.error){ console.error(res.error); return; }
+      state.coupons = couponRowsToState(res.data);
+      renderCoupons();
+    });
+  }
+
+  function startRealtimeSync(){
+    setStatus('Connecting…');
+    Promise.all([refreshProducts(), refreshDeals(), refreshCoupons()]);
+
+    var pCh = sb.channel('admin-products')
+      .on('postgres_changes', { event:'*', schema:'public', table:'products' }, refreshProducts)
+      .subscribe();
+    var dCh = sb.channel('admin-deals')
+      .on('postgres_changes', { event:'*', schema:'public', table:'deals' }, refreshDeals)
+      .subscribe();
+    var cCh = sb.channel('admin-coupons')
+      .on('postgres_changes', { event:'*', schema:'public', table:'coupons' }, refreshCoupons)
+      .subscribe();
+    channels = [pCh, dCh, cCh];
+  }
+
+  /* ---------- SEED STARTER CATALOG ---------- */
+  function seedDatabase(){
+    if(!confirm('Load the starter catalog (27 sample products + starter deals/coupons)? This is meant for a fresh, empty database.')) return;
+    seedOffered = true;
+    document.getElementById('seedBanner').style.display = 'none';
+    Promise.all([
+      sb.from('products').insert(STARTER_PRODUCTS),
+      sb.from('deals').upsert(STARTER_DEALS, { onConflict:'key' }),
+      sb.from('coupons').upsert(STARTER_COUPONS, { onConflict:'code' })
+    ]).then(function(results){
+      var err = results.find(function(r){ return r.error; });
+      if(err){ showToast('Seed failed: ' + err.error.message); }
+      else{ showToast('Starter catalog loaded'); }
+    });
+  }
+  document.getElementById('seedBtn').addEventListener('click', seedDatabase);
+  document.getElementById('seedBtnSetup').addEventListener('click', seedDatabase);
+
+  /* ---------- NAV ---------- */
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.nav-item').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+    });
+  });
+  document.getElementById('gotoSetupBtn').addEventListener('click', function(){
+    document.querySelector('.nav-item[data-panel="publish"]').click();
+  });
+
+  /* ---------- PRODUCTS: FILTER BAR ---------- */
+  function buildCatFilter(){
+    var cats = [['all','All'],['women','Women'],['men','Men'],['footwear','Footwear'],['accessories','Accessories']];
+    var wrap = document.getElementById('prodCatFilter');
+    wrap.innerHTML = cats.map(function(c){
+      return '<button data-cat="'+c[0]+'" class="'+(prodFilter.cat===c[0]?'active':'')+'">'+c[1]+'</button>';
+    }).join('');
+    wrap.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        prodFilter.cat = b.dataset.cat;
+        buildCatFilter();
+        renderProductsTable();
+      });
+    });
+  }
+  document.getElementById('prodSearch').addEventListener('input', function(){
+    prodFilter.search = this.value.toLowerCase();
+    renderProductsTable();
+  });
+
+  /* ---------- PRODUCTS: TABLE ---------- */
+  function tagClassName(tag){ return tag ? ('tag-' + tag.replace(/\s+/g,'')) : 'tag-none'; }
+
+  function renderProductsTable(){
+    var tbody = document.getElementById('productsTbody');
+    var list = state.products.filter(function(p){
+      if(prodFilter.cat !== 'all' && p.cat !== prodFilter.cat) return false;
+      if(prodFilter.search && p.name.toLowerCase().indexOf(prodFilter.search) === -1) return false;
+      return true;
+    });
+    document.getElementById('prodCountLabel').textContent = '(' + state.products.length + ' total)';
+    document.getElementById('prodEmptyState').style.display = list.length ? 'none' : 'block';
+    tbody.innerHTML = list.map(function(p){
+      return '<tr data-id="'+p.id+'">' +
+        '<td><img class="prod-thumb" src="'+p.img+'" alt=""></td>' +
+        '<td><div class="prod-name">'+p.name+'</div><div class="prod-sub">'+p.sub+'</div></td>' +
+        '<td style="text-transform:capitalize;">'+p.cat+'</td>' +
+        '<td>$'+Number(p.price).toFixed(2)+(p.was ? '<span class="price-was">$'+Number(p.was).toFixed(2)+'</span>' : '')+'</td>' +
+        '<td>'+(p.tag ? '<span class="tag-chip '+tagClassName(p.tag)+'">'+p.tag+'</span>' : '<span class="tag-chip tag-none">None</span>')+'</td>' +
+        '<td style="font-size:11.5px; color:var(--brown-mid);">'+(p.sizes||[]).join(', ')+'</td>' +
+        '<td><div class="row-actions">' +
+          '<button class="icon-action" data-act="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>' +
+          '<button class="icon-action" data-act="duplicate" title="Duplicate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>' +
+          '<button class="icon-action" data-act="delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger);"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  document.getElementById('productsTbody').addEventListener('click', function(e){
+    var btn = e.target.closest('.icon-action');
+    if(!btn) return;
+    var id = btn.closest('tr').dataset.id;
+    var act = btn.dataset.act;
+    if(act === 'edit') openProductForm(state.products.find(function(p){ return p.id === id; }));
+    if(act === 'delete') deleteProduct(id);
+    if(act === 'duplicate') duplicateProduct(id);
+  });
+
+  function deleteProduct(id){
+    var p = state.products.find(function(x){ return x.id === id; });
+    if(!p) return;
+    if(!confirm('Delete "' + p.name + '"? This can\'t be undone.')) return;
+    sb.from('products').delete().eq('id', id).then(function(res){
+      if(res.error){ showToast('Delete failed: ' + res.error.message); }
+      else{ showToast('Product deleted'); }
+    });
+  }
+
+  function duplicateProduct(id){
+    var p = state.products.find(function(x){ return x.id === id; });
+    if(!p) return;
+    var copy = JSON.parse(JSON.stringify(p));
+    delete copy.id;
+    copy.name = copy.name + ' (Copy)';
+    copy.added = Date.now();
+    sb.from('products').insert(copy).then(function(res){
+      if(res.error){ showToast('Duplicate failed: ' + res.error.message); }
+      else{ showToast('Product duplicated'); }
+    });
+  }
+
+  /* ---------- PRODUCT FORM MODAL ---------- */
+  var modal = document.getElementById('productModal');
+  var currentRating = 4;
+
+  function populateSubSelect(cat, selected){
+    var sel = document.getElementById('pf-sub');
+    var subs = subcategories[cat] || [];
+    sel.innerHTML = subs.map(function(s){ return '<option value="'+s+'"'+(s===selected?' selected':'')+'>'+s+'</option>'; }).join('');
+  }
+  function populateSizeChecks(cat, selectedSizes){
+    var presets = sizePresets[cat] || oneSize;
+    var wrap = document.getElementById('pf-sizes');
+    var uniq = Array.from(new Set(presets));
+    wrap.innerHTML = uniq.map(function(s){
+      var checked = (selectedSizes || []).indexOf(s) > -1 ? ' checked' : '';
+      return '<label class="size-check"><input type="checkbox" value="'+s+'"'+checked+'> '+s+'</label>';
+    }).join('');
+  }
+  function setRating(val){
+    currentRating = val;
+    document.querySelectorAll('#pf-rating button').forEach(function(b){
+      b.classList.toggle('active', Number(b.dataset.val) === val);
+    });
+  }
+  document.getElementById('pf-rating').addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if(b) setRating(Number(b.dataset.val));
+  });
+  document.getElementById('pf-cat').addEventListener('change', function(){
+    populateSubSelect(this.value, null);
+    populateSizeChecks(this.value, null);
+  });
+
+  document.getElementById('pf-img').addEventListener('input', function(){
+    var thumb = document.getElementById('pf-thumb');
+    if(this.value){ thumb.src = this.value; thumb.style.display = 'block'; } else { thumb.style.display = 'none'; }
+    document.getElementById('thumbSizeHint').style.display = 'none';
+  });
+
+  /* ---------- IMAGE TABS (URL vs. Upload) ---------- */
+  document.querySelectorAll('.image-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.image-tab').forEach(function(t){ t.classList.remove('active'); });
+      document.querySelectorAll('.image-tab-panel').forEach(function(p){ p.classList.remove('active'); });
+      tab.classList.add('active');
+      document.getElementById('imgtab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ---------- IMAGE UPLOAD: resize + compress to a data URL ---------- */
+  function resizeImageFile(file, maxDim, quality){
+    return new Promise(function(resolve, reject){
+      if(!file.type.match(/^image\//)){ reject(new Error('Not an image file')); return; }
+      var reader = new FileReader();
+      reader.onerror = function(){ reject(new Error('Could not read file')); };
+      reader.onload = function(){
+        var img = new Image();
+        img.onerror = function(){ reject(new Error('Could not decode image')); };
+        img.onload = function(){
+          var w = img.width, h = img.height;
+          if(w > maxDim || h > maxDim){
+            if(w >= h){ h = Math.round(h * (maxDim / w)); w = maxDim; }
+            else{ w = Math.round(w * (maxDim / h)); h = maxDim; }
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          var dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('pf-upload').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var hint = document.getElementById('uploadHint');
+    hint.textContent = 'Processing image…';
+    resizeImageFile(file, 1000, 0.82).then(function(dataUrl){
+      document.getElementById('pf-img').value = dataUrl;
+      var thumb = document.getElementById('pf-thumb');
+      thumb.src = dataUrl;
+      thumb.style.display = 'block';
+      var kb = Math.round((dataUrl.length * 0.75) / 1024);
+      var sizeHint = document.getElementById('thumbSizeHint');
+      sizeHint.textContent = 'Embedded image size: ~' + kb + ' KB' + (kb > 700 ? ' — quite large for a database field; consider a smaller photo.' : '.');
+      sizeHint.style.display = 'block';
+      hint.textContent = 'JPG, PNG or WEBP. Photos are resized and compressed automatically.';
+      showToast('Image ready — it will be saved with this product');
+    }).catch(function(err){
+      hint.textContent = 'Couldn\'t process that file — try a different image.';
+      showToast('Image upload failed: ' + err.message);
+    });
+  });
+
+  function openProductForm(product){
+    document.getElementById('modalTitle').textContent = product ? 'Edit Product' : 'Add Product';
+    document.getElementById('pf-id').value = product ? product.id : '';
+    document.getElementById('pf-name').value = product ? product.name : '';
+    document.getElementById('pf-cat').value = product ? product.cat : 'women';
+    populateSubSelect(product ? product.cat : 'women', product ? product.sub : null);
+    document.getElementById('pf-price').value = product ? product.price : '';
+    document.getElementById('pf-was').value = (product && product.was) ? product.was : '';
+    document.getElementById('pf-img').value = product ? product.img : '';
+    document.getElementById('pf-tag').value = product ? (product.tag || '') : '';
+    setRating(product ? product.rating : 4);
+    populateSizeChecks(product ? product.cat : 'women', product ? product.sizes : null);
+    var thumb = document.getElementById('pf-thumb');
+    if(product && product.img){ thumb.src = product.img; thumb.style.display = 'block'; } else { thumb.style.display = 'none'; }
+
+    document.getElementById('pf-upload').value = '';
+    document.getElementById('thumbSizeHint').style.display = 'none';
+    document.getElementById('uploadHint').textContent = 'JPG, PNG or WEBP. Photos are resized and compressed automatically.';
+    var isDataImg = product && product.img && product.img.indexOf('data:') === 0;
+    document.querySelectorAll('.image-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab === (isDataImg ? 'upload' : 'url')); });
+    document.querySelectorAll('.image-tab-panel').forEach(function(p){ p.classList.toggle('active', p.id === 'imgtab-' + (isDataImg ? 'upload' : 'url')); });
+
+    modal.classList.add('open');
+  }
+
+  document.getElementById('addProductBtn').addEventListener('click', function(){ openProductForm(null); });
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalCancel').addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e){ if(e.target === modal) closeModal(); });
+  function closeModal(){ modal.classList.remove('open'); }
+
+  document.getElementById('modalSave').addEventListener('click', function(){
+    var name = document.getElementById('pf-name').value.trim();
+    var price = parseFloat(document.getElementById('pf-price').value);
+    if(!name){ showToast('Give the product a name first'); return; }
+    if(isNaN(price) || price < 0){ showToast('Enter a valid price'); return; }
+
+    var idVal = document.getElementById('pf-id').value;
+    var was = document.getElementById('pf-was').value;
+    var sizes = Array.from(document.querySelectorAll('#pf-sizes input:checked')).map(function(i){ return i.value; });
+    if(sizes.length === 0) sizes = ['One Size'];
+
+    var existing = idVal ? state.products.find(function(p){ return p.id === idVal; }) : null;
+
+    var data = {
+      name: name,
+      cat: document.getElementById('pf-cat').value,
+      sub: document.getElementById('pf-sub').value,
+      price: price,
+      was: was ? parseFloat(was) : null,
+      img: document.getElementById('pf-img').value.trim() || 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=700&auto=format&fit=crop',
+      tag: document.getElementById('pf-tag').value,
+      rating: currentRating,
+      sizes: sizes,
+      added: existing ? (existing.added || Date.now()) : Date.now()
+    };
+
+    var saveBtn = document.getElementById('modalSave');
+    saveBtn.disabled = true;
+    var op = idVal ? sb.from('products').update(data).eq('id', idVal) : sb.from('products').insert(data);
+    op.then(function(res){
+      if(res.error){
+        showToast('Save failed: ' + res.error.message);
+      } else {
+        showToast(idVal ? 'Product updated' : 'Product added');
+        closeModal();
+      }
+    }).finally(function(){
+      saveBtn.disabled = false;
+    });
+  });
+
+  /* ---------- DEALS PANEL ---------- */
+  function renderDeals(){
+    ['flashSale','bogo','bundle'].forEach(function(key){
+      var d = state.deals[key] || {};
+      document.getElementById('toggle-' + key).checked = d.enabled !== false;
+      document.getElementById('body-' + key).classList.toggle('disabled', d.enabled === false);
+      document.getElementById(key + '-kicker').value = d.kicker || '';
+      document.getElementById(key + '-title').value = d.title || '';
+      if(key === 'flashSale'){
+        document.getElementById('flashSale-hours').value = (typeof d.countdownHours === 'number') ? d.countdownHours : 7;
+        document.getElementById('flashSale-minutes').value = (typeof d.countdownMinutes === 'number') ? d.countdownMinutes : 24;
+      } else {
+        document.getElementById(key + '-text').value = d.text || '';
+      }
+    });
+  }
+
+  var DEAL_FIELD_TO_COLUMN = {
+    enabled:'enabled', kicker:'kicker', title:'title', text:'description',
+    countdownHours:'countdown_hours', countdownMinutes:'countdown_minutes'
+  };
+
+  function updateDealField(key, field, value){
+    if(!sb) return;
+    var column = DEAL_FIELD_TO_COLUMN[field] || field;
+    var payload = {};
+    payload[column] = value;
+    sb.from('deals').update(payload).eq('key', key).then(function(res){
+      if(res.error) showToast('Save failed: ' + res.error.message);
+    });
+  }
+
+  ['flashSale','bogo','bundle'].forEach(function(key){
+    document.getElementById('toggle-' + key).addEventListener('change', function(){
+      document.getElementById('body-' + key).classList.toggle('disabled', !this.checked);
+      updateDealField(key, 'enabled', this.checked);
+      showToast((key === 'flashSale' ? 'Flash Sale' : key === 'bogo' ? 'BOGO' : 'Bundle deal') + (this.checked ? ' enabled' : ' disabled'));
+    });
+    ['kicker','title'].forEach(function(field){
+      document.getElementById(key + '-' + field).addEventListener('change', function(){
+        updateDealField(key, field, this.value);
+      });
+    });
+    if(key === 'flashSale'){
+      document.getElementById('flashSale-hours').addEventListener('change', function(){
+        updateDealField('flashSale', 'countdownHours', parseInt(this.value, 10) || 0);
+      });
+      document.getElementById('flashSale-minutes').addEventListener('change', function(){
+        updateDealField('flashSale', 'countdownMinutes', parseInt(this.value, 10) || 0);
+      });
+    } else {
+      document.getElementById(key + '-text').addEventListener('change', function(){
+        updateDealField(key, 'text', this.value);
+      });
+    }
+  });
+
+  /* ---------- COUPONS PANEL ---------- */
+  function renderCoupons(){
+    var codes = Object.keys(state.coupons);
+    document.getElementById('couponEmptyState').style.display = codes.length ? 'none' : 'block';
+    document.getElementById('couponsTbody').innerHTML = codes.map(function(code){
+      var c = state.coupons[code];
+      var valueLabel = c.type === 'percent' ? c.value + '%' : c.type === 'flat' ? '$' + c.value : '—';
+      return '<tr data-code="'+code+'">' +
+        '<td><strong>'+code+'</strong></td>' +
+        '<td style="text-transform:capitalize;">'+(c.type === 'flat' ? 'Flat amount' : c.type === 'shipping' ? 'Free shipping' : 'Percent')+'</td>' +
+        '<td>'+valueLabel+'</td>' +
+        '<td>'+(c.min ? '$'+c.min : '—')+'</td>' +
+        '<td><label class="toggle"><input type="checkbox" data-act="toggle" '+(c.enabled !== false ? 'checked' : '')+'><span class="track"></span></label></td>' +
+        '<td><button class="icon-action" data-act="delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger);"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  document.getElementById('couponsTbody').addEventListener('click', function(e){
+    var tr = e.target.closest('tr');
+    if(!tr) return;
+    var code = tr.dataset.code;
+    var actBtn = e.target.closest('[data-act="delete"]');
+    if(actBtn){
+      if(confirm('Delete coupon "' + code + '"?')){
+        sb.from('coupons').delete().eq('code', code).then(function(res){
+          if(res.error) showToast('Delete failed: ' + res.error.message);
+          else showToast('Coupon deleted');
+        });
+      }
+    }
+  });
+  document.getElementById('couponsTbody').addEventListener('change', function(e){
+    var input = e.target.closest('[data-act="toggle"]');
+    if(!input) return;
+    var code = e.target.closest('tr').dataset.code;
+    sb.from('coupons').update({ enabled: input.checked }).eq('code', code).then(function(res){
+      if(res.error) showToast('Save failed: ' + res.error.message);
+      else showToast(code + (input.checked ? ' enabled' : ' disabled'));
+    });
+  });
+
+  document.getElementById('addCouponBtn').addEventListener('click', function(){
+    var code = document.getElementById('newCoupon-code').value.trim().toUpperCase();
+    var type = document.getElementById('newCoupon-type').value;
+    var value = parseFloat(document.getElementById('newCoupon-value').value);
+    var min = parseFloat(document.getElementById('newCoupon-min').value);
+    if(!code){ showToast('Enter a coupon code'); return; }
+    if(state.coupons[code]){ showToast('That code already exists'); return; }
+    if(type !== 'shipping' && (isNaN(value) || value <= 0)){ showToast('Enter a valid value'); return; }
+    var label = type === 'percent' ? value + '% off' : type === 'flat' ? '$' + value + ' off' : 'Free shipping';
+    var coupon = { code:code, type: type, value: isNaN(value) ? 0 : value, label: label, min: (!isNaN(min) && min > 0) ? min : null, enabled: true };
+
+    sb.from('coupons').insert(coupon).then(function(res){
+      if(res.error){ showToast('Add failed: ' + res.error.message); return; }
+      document.getElementById('newCoupon-code').value = '';
+      document.getElementById('newCoupon-value').value = '';
+      document.getElementById('newCoupon-min').value = '';
+      showToast('Coupon ' + code + ' added');
+    });
+  });
+
+  /* ---------- RESTORE FROM BACKUP JSON ---------- */
+  document.getElementById('importProducts').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var data = JSON.parse(reader.result);
+        if(!Array.isArray(data)) throw new Error('not an array');
+        if(!confirm('Import ' + data.length + ' products into your live database? This adds them alongside anything already there.')) return;
+        var clean = data.map(function(p){
+          var c = Object.assign({}, p);
+          delete c.id;
+          return c;
+        });
+        sb.from('products').insert(clean).then(function(res){
+          if(res.error){ showToast('Import failed: ' + res.error.message); }
+          else{ showToast('Imported ' + clean.length + ' products'); }
+        });
+      }catch(err){ showToast("That file doesn't look like a valid products.json"); }
+    };
+    reader.readAsText(file);
+  });
+
+  /* ---------- BACKUP EXPORT ---------- */
+  function downloadJSON(obj, filename){
+    var blob = new Blob([JSON.stringify(obj, null, 2)], { type:'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  document.getElementById('exportProductsBtn').addEventListener('click', function(){
+    downloadJSON(state.products, 'products.json');
+    showToast('products.json downloaded');
+  });
+  document.getElementById('exportSettingsBtn').addEventListener('click', function(){
+    downloadJSON({ deals: state.deals, coupons: state.coupons }, 'settings.json');
+    showToast('settings.json downloaded');
+  });
+
+  /* ---------- COPY SCHEMA ---------- */
+  document.getElementById('copyRulesBtn').addEventListener('click', function(){
+    var text = document.getElementById('rulesBlock').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      showToast('Schema copied to clipboard');
+    }).catch(function(){
+      showToast('Could not copy — select the text manually');
+    });
+  });
+
+  initSupabase();
+})();
+</script>
+</body>
+</html>
