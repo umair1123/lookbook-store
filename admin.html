@@ -294,6 +294,11 @@
       <span>Orders</span>
       <span class="nav-badge" id="ordersBadge" style="display:none;">0</span>
     </button>
+    <button class="nav-item" data-panel="leads">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+      <span>Leads</span>
+      <span class="nav-badge" id="leadsBadge" style="display:none;">0</span>
+    </button>
     <button class="nav-item" data-panel="publish">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
       <span>Setup &amp; Backup</span>
@@ -534,6 +539,26 @@
       </div>
     </section>
 
+    <!-- ============ LEADS PANEL ============ -->
+    <section class="panel" id="panel-leads">
+      <div class="section-title">
+        <h2>Leads <span style="color:var(--brown-mid); font-weight:400; font-size:14px;" id="leadCountLabel"></span></h2>
+      </div>
+      <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:22px; max-width:620px;">Visitors who shared their WhatsApp or email — from the exit-intent discount popup, the newsletter signup, or anywhere else you add lead capture later. Follow up with a discount code to turn them into a sale.</p>
+
+      <div class="toolbar-row">
+        <div class="cat-filter" id="leadSourceFilter"></div>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead><tr><th>Date</th><th>Name</th><th>WhatsApp</th><th>Email</th><th>Interested In</th><th>Source</th><th></th></tr></thead>
+          <tbody id="leadsTbody"></tbody>
+        </table>
+        <div class="empty-state" id="leadsEmptyState" style="display:none;">No leads yet — they'll show up here once someone submits the exit-intent popup or newsletter form.</div>
+      </div>
+    </section>
+
     <!-- ============ SETUP & BACKUP PANEL ============ -->
     <section class="panel" id="panel-publish">
       <div class="section-title"><h2>Setup &amp; Backup</h2></div>
@@ -760,6 +785,33 @@ insert into shipping_settings (id, enabled, flat_rate, free_threshold)
 
 alter table orders add column if not exists shipping_cost numeric not null default 0;</div>
         <button class="btn btn-outline btn-sm copy-btn" id="copyShippingRulesBtn">Copy Addition</button>
+      </div>
+
+      <div class="instructions">
+        <h3>Also new: lead capture (exit-intent popup &amp; newsletter)</h3>
+        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">Run this once to store visitors who share their WhatsApp/email for a discount code or newsletter signup, so you can see and follow up with them from a new Leads tab.</p>
+        <div class="code-block" id="leadsRulesBlock">create table leads (
+  id uuid primary key default gen_random_uuid(),
+  name text,
+  whatsapp text,
+  email text,
+  interested_in text,
+  source text not null default 'exit_intent',
+  created_at timestamptz not null default now()
+);
+
+alter table leads enable row level security;
+
+create policy "Anyone can submit a lead" on leads for insert with check (true);
+create policy "Admins read leads" on leads for select
+  using (auth.role() = 'authenticated');
+create policy "Admins update leads" on leads for update
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "Admins delete leads" on leads for delete
+  using (auth.role() = 'authenticated');
+
+alter publication supabase_realtime add table leads;</div>
+        <button class="btn btn-outline btn-sm copy-btn" id="copyLeadsRulesBtn">Copy Addition</button>
       </div>
 
       <div class="instructions">
@@ -1055,7 +1107,7 @@ alter table orders add column if not exists shipping_cost numeric not null defau
   ];
 
   /* ---------- STATE ---------- */
-  var state = { products:[], deals:{}, coupons:{}, subcategories:[], categories:[], orders:[], shipping:{ enabled:true, flat_rate:0, free_threshold:null } };
+  var state = { products:[], deals:{}, coupons:{}, subcategories:[], categories:[], orders:[], leads:[], shipping:{ enabled:true, flat_rate:0, free_threshold:null } };
   var prodFilter = { cat:'all', search:'' };
   var subFilter = { cat:'all' };
   var sb = null;
@@ -1338,6 +1390,17 @@ alter table orders add column if not exists shipping_cost numeric not null defau
     saveShippingField('free_threshold', (this.value.trim() === '' || isNaN(val)) ? null : Math.max(0, val));
   });
 
+  function refreshLeads(){
+    return sb.from('leads').select('*').order('created_at', { ascending:false }).then(function(res){
+      if(res.error){ console.error(res.error); return; }
+      state.leads = res.data || [];
+      renderLeadsTable();
+      var badge = document.getElementById('leadsBadge');
+      badge.textContent = state.leads.length;
+      badge.style.display = state.leads.length > 0 ? 'flex' : 'none';
+    });
+  }
+
   function startRealtimeSync(){
     // Defensive: if this ever runs more than once (e.g. an auth event fires twice),
     // tear down any previous channels first — reusing a channel name after it's
@@ -1348,7 +1411,7 @@ alter table orders add column if not exists shipping_cost numeric not null defau
     }
 
     setStatus('Connecting…');
-    Promise.all([refreshProducts(), refreshDeals(), refreshCoupons(), refreshSubcategories(), refreshCategories(), refreshOrders(), refreshShipping()]);
+    Promise.all([refreshProducts(), refreshDeals(), refreshCoupons(), refreshSubcategories(), refreshCategories(), refreshOrders(), refreshShipping(), refreshLeads()]);
 
     var pCh = sb.channel('admin-products')
       .on('postgres_changes', { event:'*', schema:'public', table:'products' }, refreshProducts)
@@ -1371,7 +1434,10 @@ alter table orders add column if not exists shipping_cost numeric not null defau
     var shCh = sb.channel('admin-shipping')
       .on('postgres_changes', { event:'*', schema:'public', table:'shipping_settings' }, refreshShipping)
       .subscribe();
-    channels = [pCh, dCh, cCh, sCh, catCh, oCh, shCh];
+    var lCh = sb.channel('admin-leads')
+      .on('postgres_changes', { event:'*', schema:'public', table:'leads' }, refreshLeads)
+      .subscribe();
+    channels = [pCh, dCh, cCh, sCh, catCh, oCh, shCh, lCh];
   }
 
   /* ---------- SEED STARTER CATALOG ---------- */
@@ -2417,6 +2483,80 @@ alter table orders add column if not exists shipping_cost numeric not null defau
     window.open(url, '_blank');
   }
 
+  /* ---------- LEADS PANEL ---------- */
+  var leadFilter = { source:'all' };
+
+  function buildLeadSourceFilter(){
+    var sources = ['all'].concat(Array.from(new Set(state.leads.map(function(l){ return l.source || 'other'; }))));
+    var labels = { all:'All', exit_intent:'Exit-Intent Popup', newsletter:'Newsletter' };
+    var wrap = document.getElementById('leadSourceFilter');
+    wrap.innerHTML = sources.map(function(s){
+      return '<button data-source="'+s+'" class="'+(leadFilter.source===s?'active':'')+'">'+(labels[s] || s)+'</button>';
+    }).join('');
+    wrap.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        leadFilter.source = b.dataset.source;
+        buildLeadSourceFilter();
+        renderLeadsTable();
+      });
+    });
+  }
+
+  function renderLeadsTable(){
+    buildLeadSourceFilter();
+    var list = state.leads.filter(function(l){ return leadFilter.source === 'all' || (l.source || 'other') === leadFilter.source; });
+    var labels = { exit_intent:'Exit-Intent', newsletter:'Newsletter' };
+    document.getElementById('leadCountLabel').textContent = '(' + state.leads.length + ' total)';
+    document.getElementById('leadsEmptyState').style.display = list.length ? 'none' : 'block';
+    document.getElementById('leadsTbody').innerHTML = list.map(function(l){
+      var date = l.created_at ? new Date(l.created_at).toLocaleDateString(undefined, { month:'short', day:'numeric' }) : '—';
+      return '<tr data-id="'+l.id+'">' +
+        '<td style="font-size:12px; color:var(--brown-mid);">'+date+'</td>' +
+        '<td>'+(l.name || '—')+'</td>' +
+        '<td>'+(l.whatsapp || '—')+'</td>' +
+        '<td>'+(l.email || '—')+'</td>' +
+        '<td style="font-size:12px; color:var(--brown-mid);">'+(l.interested_in || '—')+'</td>' +
+        '<td><span class="tag-chip tag-none">'+(labels[l.source] || l.source || 'Other')+'</span></td>' +
+        '<td><div class="row-actions">' +
+          (l.whatsapp ? '<button class="icon-action" data-act="wa-lead" title="Send discount code via WhatsApp" style="color:#25D366;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.15-4.9-4.34-.14-.19-1.17-1.56-1.17-2.97 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.17.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.3-.29.47-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.29.75 1.24 1.61 2.01 1.11 1 2.04 1.31 2.33 1.46.29.14.46.12.63-.07.17-.19.72-.85.92-1.14.19-.29.38-.24.64-.14.26.1 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36z"/></svg></button>' : '') +
+          '<button class="icon-action" data-act="delete-lead" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger);"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  document.getElementById('leadsTbody').addEventListener('click', function(e){
+    var tr = e.target.closest('tr');
+    if(!tr) return;
+    var lead = state.leads.find(function(l){ return l.id === tr.dataset.id; });
+    if(!lead) return;
+    if(e.target.closest('[data-act="wa-lead"]')) openWhatsAppLead(lead);
+    if(e.target.closest('[data-act="delete-lead"]')){
+      if(confirm('Delete this lead? This can\'t be undone.')){
+        sb.from('leads').delete().eq('id', lead.id).then(function(res){
+          if(res.error) showToast('Delete failed: ' + res.error.message);
+          else{ showToast('Lead deleted'); refreshLeads(); }
+        });
+      }
+    }
+  });
+
+  function buildLeadWhatsAppMessage(lead){
+    var greeting = lead.name ? ('السلام علیکم ' + lead.name + '،') : 'السلام علیکم،';
+    return greeting + '\n\n' +
+      'Look Book میں دلچسپی لینے کا شکریہ! آپ کا 10% رعایتی کوڈ یہ ہے: WELCOME10\n\n' +
+      'ابھی خریداری کریں اور چیک آؤٹ پر یہ کوڈ استعمال کریں۔\n\n' +
+      'کسی بھی سوال کے لیے یہاں پیغام بھیجیں — شکریہ!';
+  }
+
+  function openWhatsAppLead(lead){
+    var phone = normalizePhoneForWhatsApp(lead.whatsapp);
+    if(!phone){ showToast('This lead has no usable WhatsApp number'); return; }
+    var message = buildLeadWhatsAppMessage(lead);
+    var url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
+    window.open(url, '_blank');
+  }
+
   /* ---------- RESTORE FROM BACKUP JSON ---------- */
   document.getElementById('importProducts').addEventListener('change', function(e){
     var file = e.target.files[0];
@@ -2518,6 +2658,14 @@ alter table orders add column if not exists shipping_cost numeric not null defau
   });
   document.getElementById('copyShippingRulesBtn').addEventListener('click', function(){
     var text = document.getElementById('shippingRulesBlock').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      showToast('Addition copied to clipboard');
+    }).catch(function(){
+      showToast('Could not copy — select the text manually');
+    });
+  });
+  document.getElementById('copyLeadsRulesBtn').addEventListener('click', function(){
+    var text = document.getElementById('leadsRulesBlock').textContent;
     navigator.clipboard.writeText(text).then(function(){
       showToast('Addition copied to clipboard');
     }).catch(function(){
