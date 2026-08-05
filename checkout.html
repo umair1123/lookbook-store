@@ -739,6 +739,8 @@
         </div>
         <div class="cart-subtotal"><span>Subtotal</span><strong id="cartSubtotal">$0.00</strong></div>
         <div class="cart-subtotal line-discount" id="cartDiscountRow" style="display:none;"><span id="cartDiscountLabel">Discount</span><strong id="cartDiscount">−$0.00</strong></div>
+        <div class="cart-subtotal" id="cartShippingRow" style="display:none;"><span>Shipping</span><strong id="cartShipping">$0.00</strong></div>
+        <p class="hint" id="freeShippingNudge" style="display:none; margin:-4px 0 12px;"></p>
         <div class="cart-subtotal line-total"><span>Total (Cash on Delivery)</span><strong id="cartTotal">$0.00</strong></div>
         <button class="btn btn-primary" id="confirmOrderBtn" style="width:100%; margin-top:18px;">Confirm Order</button>
       </div>
@@ -870,6 +872,7 @@
     cartSubtotalEl.textContent = '$' + subtotal.toFixed(2);
 
     var discount = 0, label = 'Discount';
+    var hasFreeShippingCoupon = false;
     if(appliedCoupon && coupons[appliedCoupon] && subtotal > 0){
       var deal = coupons[appliedCoupon];
       if(deal.min && subtotal < deal.min){
@@ -882,6 +885,7 @@
         label = appliedCoupon + ' ($' + deal.value + ' off)';
       } else if(deal.type === 'shipping'){
         discount = 0;
+        hasFreeShippingCoupon = true;
         label = appliedCoupon + ' — free shipping';
       }
     }
@@ -892,7 +896,29 @@
     } else {
       cartDiscountRow.style.display = 'none';
     }
-    cartTotalEl.textContent = '$' + Math.max(0, subtotal - discount).toFixed(2);
+
+    /* ---- shipping ---- */
+    var shippingCost = 0;
+    var nudge = document.getElementById('freeShippingNudge');
+    var shipRow = document.getElementById('cartShippingRow');
+    if(shipping.enabled){
+      shippingCost = computeShippingCost(subtotal, hasFreeShippingCoupon);
+      var freeByThreshold = shipping.free_threshold != null && subtotal >= shipping.free_threshold;
+      shipRow.style.display = 'flex';
+      document.getElementById('cartShipping').textContent = shippingCost > 0 ? '$' + shippingCost.toFixed(2) : 'Free';
+      if(shipping.free_threshold != null && !hasFreeShippingCoupon && !freeByThreshold){
+        var remaining = shipping.free_threshold - subtotal;
+        nudge.textContent = 'Spend $' + remaining.toFixed(2) + ' more for free shipping!';
+        nudge.style.display = 'block';
+      } else {
+        nudge.style.display = 'none';
+      }
+    } else {
+      shipRow.style.display = 'none';
+      nudge.style.display = 'none';
+    }
+
+    cartTotalEl.textContent = '$' + Math.max(0, subtotal - discount + shippingCost).toFixed(2);
   }
 
   document.getElementById('checkoutItems').addEventListener('click', function(e){
@@ -1094,12 +1120,15 @@
 
       var subtotal = getSubtotal();
       var discount = 0;
+      var hasFreeShippingCoupon = false;
       if(appliedCoupon && coupons[appliedCoupon]){
         var deal = coupons[appliedCoupon];
         if(deal.type === 'percent') discount = subtotal * (deal.value / 100);
         else if(deal.type === 'flat') discount = Math.min(deal.value, subtotal);
+        else if(deal.type === 'shipping') hasFreeShippingCoupon = true;
       }
-      var total = Math.max(0, subtotal - discount);
+      var shippingCost = computeShippingCost(subtotal, hasFreeShippingCoupon);
+      var total = Math.max(0, subtotal - discount + shippingCost);
 
       var orderItems = lines.map(function(line){
         return { id:line.id, name:line.product.name, size:line.size, qty:line.qty, price:line.product.price };
@@ -1123,6 +1152,7 @@
         subtotal: subtotal,
         discount: discount,
         coupon_code: appliedCoupon || null,
+        shipping_cost: shippingCost,
         total: total,
         status: 'pending'
       }).then(function(orderRes){
@@ -1133,7 +1163,7 @@
           customer_name:name, customer_email:email, customer_phone:phone,
           customer_address:address, customer_country:loc.country, customer_province:loc.province, customer_city:loc.city,
           items: orderItems,
-          subtotal:subtotal, discount:discount, coupon_code: appliedCoupon || null, total:total
+          subtotal:subtotal, discount:discount, coupon_code: appliedCoupon || null, shipping_cost:shippingCost, total:total
         };
         lastPlacedOrder = placedOrder;
 
@@ -1194,6 +1224,7 @@
 
     var discountRow = order.discount > 0 ?
       '<div class="inv-totals-row"><span>Discount'+(order.coupon_code ? ' ('+escapeHtml(order.coupon_code)+')' : '')+'</span><span>−$'+Number(order.discount).toFixed(2)+'</span></div>' : '';
+    var shippingRow = '<div class="inv-totals-row"><span>Shipping</span><span>'+((order.shipping_cost || 0) > 0 ? '$'+Number(order.shipping_cost).toFixed(2) : 'Free')+'</span></div>';
 
     return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
       '<title>Invoice ' + idShort + ' — Look Book</title>' +
@@ -1258,6 +1289,7 @@
           '<div class="inv-totals">' +
             '<div class="inv-totals-row"><span>Subtotal</span><span>$'+Number(order.subtotal).toFixed(2)+'</span></div>' +
             discountRow +
+            shippingRow +
             '<div class="inv-totals-row total"><span>Total Due</span><span>$'+Number(order.total).toFixed(2)+'</span></div>' +
           '</div>' +
           '<div class="inv-footer">' +
@@ -1300,6 +1332,14 @@
   }
 
   /* ---------- INIT ---------- */
+  var shipping = { enabled:true, flat_rate:0, free_threshold:null };
+
+  function computeShippingCost(subtotal, hasFreeShippingCoupon){
+    if(!shipping.enabled) return 0;
+    var freeByThreshold = shipping.free_threshold != null && subtotal >= shipping.free_threshold;
+    return (hasFreeShippingCoupon || freeByThreshold) ? 0 : (shipping.flat_rate || 0);
+  }
+
   function init(){
     if(Object.keys(cart).length === 0){ showEmptyState(); return; }
     if(typeof supabase === 'undefined' || !window.SUPABASE_URL || SUPABASE_URL.indexOf('YOUR_') === 0){
@@ -1311,7 +1351,8 @@
     var ids = Object.keys(cart).map(function(key){ return parseCartKey(key).id; });
     Promise.all([
       sb.from('products').select('*').in('id', ids),
-      sb.from('coupons').select('*')
+      sb.from('coupons').select('*'),
+      sb.from('shipping_settings').select('*').eq('id', 1).maybeSingle()
     ]).then(function(results){
       products = (results[0].data) || [];
       var couponRows = results[1].data || [];
@@ -1319,6 +1360,9 @@
       couponRows.forEach(function(r){
         coupons[r.code] = { type:r.type, value:r.value, label:r.label, min:r.min || undefined, enabled:r.enabled !== false };
       });
+      if(results[2].data){
+        shipping = { enabled: results[2].data.enabled !== false, flat_rate: results[2].data.flat_rate || 0, free_threshold: results[2].data.free_threshold };
+      }
       showCheckoutMain();
       renderSummary();
     }).catch(function(err){
