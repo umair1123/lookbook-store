@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Checkout — Look Book.pk</title>
+<title>Checkout — Look Book</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -662,7 +662,7 @@
 <body>
 <div class="checkout-topbar">
   <div class="container">
-    <a href="index.html" class="logo">LOOK<em>book.pk</em></a>
+    <a href="index.html" class="logo">LOOK<em>book.</em></a>
     <a href="index.html" class="checkout-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Back to Shop</a>
   </div>
 </div>
@@ -1035,7 +1035,7 @@
       order_id: order.id ? order.id.slice(0, 8) : '',
       items_summary: itemsSummary,
       total: 'Rs. ' + Number(order.total).toFixed(2),
-      shop_name: 'Look Book.pk'
+      shop_name: 'Look Book'
     }).catch(function(err){ console.warn('Customer email failed:', err); });
 
     if(window.VENDOR_EMAIL && VENDOR_EMAIL.indexOf('YOUR_') !== 0){
@@ -1227,7 +1227,7 @@
     var shippingRow = '<div class="inv-totals-row"><span>Shipping</span><span>'+((order.shipping_cost || 0) > 0 ? 'Rs. '+Number(order.shipping_cost).toFixed(2) : 'Free')+'</span></div>';
 
     return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
-      '<title>Invoice ' + idShort + ' — Look Book.pk</title>' +
+      '<title>Invoice ' + idShort + ' — Look Book</title>' +
       '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
       '<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,450;0,9..144,600;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">' +
       '<style>' +
@@ -1261,7 +1261,7 @@
         '<button class="inv-print-btn" onclick="window.print()">Print / Save as PDF</button>' +
         '<div class="inv-wrap">' +
           '<div class="inv-head">' +
-            '<div class="inv-logo">LOOK<em>book.pk</em></div>' +
+            '<div class="inv-logo">LOOK<em>book.</em></div>' +
             '<div class="inv-head-right">' +
               '<h1>Invoice</h1>' +
               '<p>No. ' + idShort + '</p>' +
@@ -1293,7 +1293,7 @@
             '<div class="inv-totals-row total"><span>Total Due</span><span>Rs. '+Number(order.total).toFixed(2)+'</span></div>' +
           '</div>' +
           '<div class="inv-footer">' +
-            '<p>Thank you for shopping with Look Book.pk. Please have the total amount ready in cash upon delivery.</p>' +
+            '<p>Thank you for shopping with Look Book. Please have the total amount ready in cash upon delivery.</p>' +
             '<p>This invoice was generated automatically and does not require a signature.</p>' +
           '</div>' +
         '</div>' +
