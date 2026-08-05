@@ -721,8 +721,8 @@
 <!-- ============ MARQUEE ============ -->
 <div class="marquee-strip">
   <div class="marquee-track">
-    <span>Free Shipping Over $120</span><span>New Season Arrivals</span><span>Curated Seasonal Edits</span><span>30-Day Easy Returns</span><span>Personal Styling</span>
-    <span>Free Shipping Over $120</span><span>New Season Arrivals</span><span>Curated Seasonal Edits</span><span>30-Day Easy Returns</span><span>Personal Styling</span>
+    <span>Free Shipping Over Rs. 120</span><span>New Season Arrivals</span><span>Curated Seasonal Edits</span><span>30-Day Easy Returns</span><span>Personal Styling</span>
+    <span>Free Shipping Over Rs. 120</span><span>New Season Arrivals</span><span>Curated Seasonal Edits</span><span>30-Day Easy Returns</span><span>Personal Styling</span>
   </div>
 </div>
 
@@ -1050,9 +1050,9 @@
       <button type="button" data-code="FLASH20">FLASH20</button>
       <button type="button" data-code="FREESHIP">FREESHIP</button>
     </div>
-    <div class="cart-subtotal"><span>Subtotal</span><strong id="cartSubtotal">$0.00</strong></div>
-    <div class="cart-subtotal line-discount" id="cartDiscountRow" style="display:none;"><span id="cartDiscountLabel">Discount</span><strong id="cartDiscount">−$0.00</strong></div>
-    <div class="cart-subtotal line-total"><span>Total</span><strong id="cartTotal">$0.00</strong></div>
+    <div class="cart-subtotal"><span>Subtotal</span><strong id="cartSubtotal">Rs. 0.00</strong></div>
+    <div class="cart-subtotal line-discount" id="cartDiscountRow" style="display:none;"><span id="cartDiscountLabel">Discount</span><strong id="cartDiscount">−Rs. 0.00</strong></div>
+    <div class="cart-subtotal line-total"><span>Total</span><strong id="cartTotal">Rs. 0.00</strong></div>
     <button class="btn btn-primary" id="checkoutBtn">Place Order — Cash on Delivery</button>
   </div>
 </aside>
@@ -1187,7 +1187,7 @@
   var DEFAULT_COUPONS = {
     'WELCOME10': { type:'percent', value:10, label:'10% off your first order', enabled:true },
     'FLASH20':   { type:'percent', value:20, label:'20% off — flash sale', enabled:true },
-    'SAVE25':    { type:'flat',    value:25, label:'$25 off orders over $150', min:150, enabled:true },
+    'SAVE25':    { type:'flat',    value:25, label:'Rs. 25 off orders over Rs. 150', min:150, enabled:true },
     'FREESHIP':  { type:'shipping', value:0, label:'Free shipping applied', enabled:true }
   };
 
@@ -1307,7 +1307,7 @@
           '<span class="cat">'+p.cat+' <span class="product-sub">/ '+p.sub+'</span></span>' +
           '<h3>'+p.name+'</h3>' +
           '<div class="stars">'+Array(p.rating).fill(starSvg).join('')+'</div>' +
-          '<div class="product-price"><span class="now">$'+p.price.toFixed(2)+'</span>'+(p.was ? '<span class="was">$'+p.was.toFixed(2)+'</span>' : '')+'</div>' +
+          '<div class="product-price"><span class="now">Rs. '+p.price.toFixed(2)+'</span>'+(p.was ? '<span class="was">Rs. '+p.was.toFixed(2)+'</span>' : '')+'</div>' +
           '<div class="product-sizes">'+sizesHtml+'</div>' +
           (lowStock ? '<p class="low-stock-note">Only '+stock.total+' left</p>' : '') +
         '</div>';
@@ -1391,7 +1391,7 @@
       msg.className = 'coupon-msg show err';
     } else if(deal.min && subtotal < deal.min){
       appliedCoupon = null;
-      msg.textContent = code + ' needs a $' + deal.min + '+ subtotal (you\'re at $' + subtotal.toFixed(2) + ').';
+      msg.textContent = code + ' needs a Rs. ' + deal.min + '+ subtotal (you\'re at Rs. ' + subtotal.toFixed(2) + ').';
       msg.className = 'coupon-msg show err';
     } else {
       appliedCoupon = code;
@@ -1478,13 +1478,13 @@
             '</div>' +
           '</div>' +
           '<div>' +
-            '<div class="price">$'+lineTotal.toFixed(2)+'</div>' +
+            '<div class="price">Rs. '+lineTotal.toFixed(2)+'</div>' +
             '<button class="cart-item-remove" data-act="remove" data-key="'+key+'">Remove</button>' +
           '</div>' +
         '</div>';
       }).join('');
     }
-    cartSubtotalEl.textContent = '$' + subtotal.toFixed(2);
+    cartSubtotalEl.textContent = 'Rs. ' + subtotal.toFixed(2);
 
     /* ---- discount + total ---- */
     var discount = 0, label = 'Discount', shippingNote = '';
@@ -1497,7 +1497,7 @@
         label = appliedCoupon + ' (' + deal.value + '% off)';
       } else if(deal.type === 'flat'){
         discount = Math.min(deal.value, subtotal);
-        label = appliedCoupon + ' ($' + deal.value + ' off)';
+        label = appliedCoupon + ' (Rs. ' + deal.value + ' off)';
       } else if(deal.type === 'shipping'){
         discount = 0;
         label = appliedCoupon + ' — free shipping';
@@ -1506,12 +1506,12 @@
     if(discount > 0 || (appliedCoupon && coupons[appliedCoupon] && coupons[appliedCoupon].type === 'shipping' && subtotal > 0)){
       cartDiscountRow.style.display = 'flex';
       cartDiscountLabel.textContent = label;
-      cartDiscountEl.textContent = discount > 0 ? '−$' + discount.toFixed(2) : 'Free';
+      cartDiscountEl.textContent = discount > 0 ? '−Rs. ' + discount.toFixed(2) : 'Free';
     } else {
       cartDiscountRow.style.display = 'none';
     }
     var finalTotal = Math.max(0, subtotal - discount);
-    cartTotalEl.textContent = '$' + finalTotal.toFixed(2);
+    cartTotalEl.textContent = 'Rs. ' + finalTotal.toFixed(2);
   }
 
   /* ---------- DRAG & DROP TO CART ---------- */

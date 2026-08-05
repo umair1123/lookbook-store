@@ -477,8 +477,8 @@
           <label class="toggle"><input type="checkbox" id="toggle-shipping"><span class="track"></span></label>
         </div>
         <div class="deal-manage-body" id="body-shipping">
-          <div class="field"><label>Flat Shipping Rate ($)</label><input type="number" id="shipping-rate" min="0" step="0.01" placeholder="200"></div>
-          <div class="field"><label>Free Shipping Over ($) — optional</label><input type="number" id="shipping-threshold" min="0" step="0.01" placeholder="Leave blank for no offer"></div>
+          <div class="field"><label>Flat Shipping Rate (Rs.)</label><input type="number" id="shipping-rate" min="0" step="0.01" placeholder="200"></div>
+          <div class="field"><label>Free Shipping Over (Rs.) — optional</label><input type="number" id="shipping-threshold" min="0" step="0.01" placeholder="Leave blank for no offer"></div>
         </div>
         <p class="hint" style="margin-top:14px;">Turning this off means checkout charges no shipping fee at all. Leave "Free Shipping Over" blank to never waive it automatically — the <code>FREESHIP</code> coupon still works as a manual override either way.</p>
       </div>
@@ -495,7 +495,7 @@
           <div class="field"><label>Type</label>
             <select id="newCoupon-type">
               <option value="percent">% Percent off</option>
-              <option value="flat">$ Flat amount off</option>
+              <option value="flat">Rs. Flat amount off</option>
               <option value="shipping">Free shipping</option>
             </select>
           </div>
@@ -738,7 +738,7 @@ alter table orders add column if not exists customer_city text;</div>
 
       <div class="instructions">
         <h3>Also new: shipping cost &amp; free-shipping threshold</h3>
-        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">Run this once to enable a shipping fee at checkout, with an optional "free shipping over $X" offer you control from the Deals &amp; Discounts tab.</p>
+        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">Run this once to enable a shipping fee at checkout, with an optional "free shipping over Rs. X" offer you control from the Deals &amp; Discounts tab.</p>
         <div class="code-block" id="shippingRulesBlock">create table shipping_settings (
   id int primary key default 1,
   enabled boolean not null default true,
@@ -809,8 +809,8 @@ alter table orders add column if not exists shipping_cost numeric not null defau
         </div>
       </div>
       <div class="form-row">
-        <div class="field"><label>Price ($)</label><input type="number" id="pf-price" min="0" step="0.01" placeholder="120.00"></div>
-        <div class="field"><label>Compare-at / "Was" Price ($) <span style="text-transform:none; font-weight:500;">— optional, shows a strike-through</span></label><input type="number" id="pf-was" min="0" step="0.01" placeholder="Leave blank if none"></div>
+        <div class="field"><label>Price (Rs.)</label><input type="number" id="pf-price" min="0" step="0.01" placeholder="120.00"></div>
+        <div class="field"><label>Compare-at / "Was" Price (Rs.) <span style="text-transform:none; font-weight:500;">— optional, shows a strike-through</span></label><input type="number" id="pf-was" min="0" step="0.01" placeholder="Leave blank if none"></div>
       </div>
       <div class="field">
         <label>Product Image</label>
@@ -891,8 +891,8 @@ alter table orders add column if not exists shipping_cost numeric not null defau
         </div>
       </div>
       <div class="form-row">
-        <div class="field"><label>Price ($)</label><input type="number" id="bulk-price" min="0" step="0.01" placeholder="120.00"></div>
-        <div class="field"><label>Compare-at / "Was" Price ($) — optional</label><input type="number" id="bulk-was" min="0" step="0.01" placeholder="Leave blank if none"></div>
+        <div class="field"><label>Price (Rs.)</label><input type="number" id="bulk-price" min="0" step="0.01" placeholder="120.00"></div>
+        <div class="field"><label>Compare-at / "Was" Price (Rs.) — optional</label><input type="number" id="bulk-was" min="0" step="0.01" placeholder="Leave blank if none"></div>
       </div>
       <div class="field"><label>Image URL — same photo for all of them</label><input type="text" id="bulk-img" placeholder="https://images.unsplash.com/…"></div>
       <div class="field" style="margin-top:16px;"><label>Discount / Badge</label>
@@ -1038,7 +1038,7 @@ alter table orders add column if not exists shipping_cost numeric not null defau
   var STARTER_COUPONS = [
     { code:'WELCOME10', type:'percent', value:10, label:'10% off your first order', min:null, enabled:true },
     { code:'FLASH20',   type:'percent', value:20, label:'20% off — flash sale', min:null, enabled:true },
-    { code:'SAVE25',    type:'flat',    value:25, label:'$25 off orders over $150', min:150, enabled:true },
+    { code:'SAVE25',    type:'flat',    value:25, label:'Rs. 25 off orders over Rs. 150', min:150, enabled:true },
     { code:'FREESHIP',  type:'shipping',value:0,  label:'Free shipping applied', min:null, enabled:true }
   ];
   var STARTER_SUBCATEGORIES = [
@@ -1454,7 +1454,7 @@ alter table orders add column if not exists shipping_cost numeric not null defau
         '<td><img class="prod-thumb" src="'+p.img+'" alt=""></td>' +
         '<td><div class="prod-name">'+p.name+'</div><div class="prod-sub">'+p.sub+'</div></td>' +
         '<td style="text-transform:capitalize;">'+p.cat+'</td>' +
-        '<td>$'+Number(p.price).toFixed(2)+(p.was ? '<span class="price-was">$'+Number(p.was).toFixed(2)+'</span>' : '')+'</td>' +
+        '<td>Rs. '+Number(p.price).toFixed(2)+(p.was ? '<span class="price-was">Rs. '+Number(p.was).toFixed(2)+'</span>' : '')+'</td>' +
         '<td>'+(p.tag ? '<span class="tag-chip '+tagClassName(p.tag)+'">'+p.tag+'</span>' : '<span class="tag-chip tag-none">None</span>')+'</td>' +
         '<td>'+stockPillHtml(p)+'</td>' +
         '<td><div class="row-actions">' +
@@ -2098,12 +2098,12 @@ alter table orders add column if not exists shipping_cost numeric not null defau
     document.getElementById('couponEmptyState').style.display = codes.length ? 'none' : 'block';
     document.getElementById('couponsTbody').innerHTML = codes.map(function(code){
       var c = state.coupons[code];
-      var valueLabel = c.type === 'percent' ? c.value + '%' : c.type === 'flat' ? '$' + c.value : '—';
+      var valueLabel = c.type === 'percent' ? c.value + '%' : c.type === 'flat' ? 'Rs. ' + c.value : '—';
       return '<tr data-code="'+code+'">' +
         '<td><strong>'+code+'</strong></td>' +
         '<td style="text-transform:capitalize;">'+(c.type === 'flat' ? 'Flat amount' : c.type === 'shipping' ? 'Free shipping' : 'Percent')+'</td>' +
         '<td>'+valueLabel+'</td>' +
-        '<td>'+(c.min ? '$'+c.min : '—')+'</td>' +
+        '<td>'+(c.min ? 'Rs. '+c.min : '—')+'</td>' +
         '<td><label class="toggle"><input type="checkbox" data-act="toggle" '+(c.enabled !== false ? 'checked' : '')+'><span class="track"></span></label></td>' +
         '<td><button class="icon-action" data-act="delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger);"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td>' +
       '</tr>';
@@ -2142,7 +2142,7 @@ alter table orders add column if not exists shipping_cost numeric not null defau
     if(!code){ showToast('Enter a coupon code'); return; }
     if(state.coupons[code]){ showToast('That code already exists'); return; }
     if(type !== 'shipping' && (isNaN(value) || value <= 0)){ showToast('Enter a valid value'); return; }
-    var label = type === 'percent' ? value + '% off' : type === 'flat' ? '$' + value + ' off' : 'Free shipping';
+    var label = type === 'percent' ? value + '% off' : type === 'flat' ? 'Rs. ' + value + ' off' : 'Free shipping';
     var coupon = { code:code, type: type, value: isNaN(value) ? 0 : value, label: label, min: (!isNaN(min) && min > 0) ? min : null, enabled: true };
 
     sb.from('coupons').insert(coupon).then(function(res){
@@ -2195,7 +2195,7 @@ alter table orders add column if not exists shipping_cost numeric not null defau
         '<td><div class="prod-name">'+date+'</div><div class="prod-sub" style="font-family:monospace;">'+o.id.slice(0,8)+'</div></td>' +
         '<td><div class="prod-name">'+o.customer_name+'</div><div class="prod-sub">'+o.customer_phone+(o.customer_email ? ' · '+o.customer_email : '')+'</div></td>' +
         '<td>'+itemCount+' '+(itemCount === 1 ? 'item' : 'items')+'</td>' +
-        '<td>$'+Number(o.total).toFixed(2)+'</td>' +
+        '<td>Rs. '+Number(o.total).toFixed(2)+'</td>' +
         '<td>' +
           '<select class="order-status-select" data-id="'+o.id+'" style="border:1px solid var(--line); border-radius:20px; padding:5px 10px; font-size:11.5px; font-weight:700; text-transform:capitalize;">' +
             ['pending','fulfilled','cancelled'].map(function(s){ return '<option value="'+s+'"'+(s===o.status?' selected':'')+'>'+s+'</option>'; }).join('') +
@@ -2236,7 +2236,7 @@ alter table orders add column if not exists shipping_cost numeric not null defau
       return '<div class="cart-item" style="grid-template-columns:1fr auto;">' +
         '<div><h4 style="font-family:\'Fraunces\',serif; font-size:14px; color:var(--espresso);">'+it.name+'</h4>' +
         '<div class="prod-sub">Size '+(it.size || '—')+' · Qty '+it.qty+'</div></div>' +
-        '<div class="price">$'+(it.price * it.qty).toFixed(2)+'</div>' +
+        '<div class="price">Rs. '+(it.price * it.qty).toFixed(2)+'</div>' +
       '</div>';
     }).join('');
     var date = order.created_at ? new Date(order.created_at).toLocaleString() : '—';
@@ -2246,10 +2246,10 @@ alter table orders add column if not exists shipping_cost numeric not null defau
       '<div class="field"><label>Customer</label><p style="font-size:14px; color:var(--espresso);">'+order.customer_name+'<br>'+order.customer_phone+(order.customer_email ? '<br>'+order.customer_email : '')+'</p></div>' +
       '<div class="field"><label>Delivery Address</label><p style="font-size:14px; color:var(--espresso); white-space:pre-wrap;">'+order.customer_address+(locationParts.length ? '<br>'+locationParts.join(', ') : '')+'</p></div>' +
       '<div class="field"><label>Items</label>' + itemsHtml + '</div>' +
-      '<div class="cart-subtotal" style="margin-top:16px;"><span>Subtotal</span><strong>$'+Number(order.subtotal).toFixed(2)+'</strong></div>' +
-      (order.discount > 0 ? '<div class="cart-subtotal line-discount"><span>'+(order.coupon_code || 'Discount')+'</span><strong>−$'+Number(order.discount).toFixed(2)+'</strong></div>' : '') +
-      '<div class="cart-subtotal"><span>Shipping</span><strong>'+(order.shipping_cost > 0 ? '$'+Number(order.shipping_cost).toFixed(2) : 'Free')+'</strong></div>' +
-      '<div class="cart-subtotal line-total"><span>Total (Cash on Delivery)</span><strong>$'+Number(order.total).toFixed(2)+'</strong></div>' +
+      '<div class="cart-subtotal" style="margin-top:16px;"><span>Subtotal</span><strong>Rs. '+Number(order.subtotal).toFixed(2)+'</strong></div>' +
+      (order.discount > 0 ? '<div class="cart-subtotal line-discount"><span>'+(order.coupon_code || 'Discount')+'</span><strong>−Rs. '+Number(order.discount).toFixed(2)+'</strong></div>' : '') +
+      '<div class="cart-subtotal"><span>Shipping</span><strong>'+(order.shipping_cost > 0 ? 'Rs. '+Number(order.shipping_cost).toFixed(2) : 'Free')+'</strong></div>' +
+      '<div class="cart-subtotal line-total"><span>Total (Cash on Delivery)</span><strong>Rs. '+Number(order.total).toFixed(2)+'</strong></div>' +
       '<button class="btn btn-primary" id="whatsappConfirmBtn" style="width:100%; margin-top:18px; background:#25D366; border-color:#25D366;">' +
         '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="vertical-align:-2px; margin-right:6px;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.15-4.9-4.34-.14-.19-1.17-1.56-1.17-2.97 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.17.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.3-.29.47-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.29.75 1.24 1.61 2.01 1.11 1 2.04 1.31 2.33 1.46.29.14.46.12.63-.07.17-.19.72-.85.92-1.14.19-.29.38-.24.64-.14.26.1 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36z"/></svg>' +
         'Confirm via WhatsApp' +
@@ -2289,14 +2289,14 @@ alter table orders add column if not exists shipping_cost numeric not null defau
         '<td class="inv-item-name">'+escapeHtml(it.name)+'</td>' +
         '<td class="inv-center">'+escapeHtml(it.size || '—')+'</td>' +
         '<td class="inv-center">'+it.qty+'</td>' +
-        '<td class="inv-right">$'+Number(it.price).toFixed(2)+'</td>' +
-        '<td class="inv-right">$'+lineTotal+'</td>' +
+        '<td class="inv-right">Rs. '+Number(it.price).toFixed(2)+'</td>' +
+        '<td class="inv-right">Rs. '+lineTotal+'</td>' +
       '</tr>';
     }).join('');
 
     var discountRow = order.discount > 0 ?
-      '<div class="inv-totals-row"><span>Discount'+(order.coupon_code ? ' ('+escapeHtml(order.coupon_code)+')' : '')+'</span><span>−$'+Number(order.discount).toFixed(2)+'</span></div>' : '';
-    var shippingRow = '<div class="inv-totals-row"><span>Shipping</span><span>'+((order.shipping_cost || 0) > 0 ? '$'+Number(order.shipping_cost).toFixed(2) : 'Free')+'</span></div>';
+      '<div class="inv-totals-row"><span>Discount'+(order.coupon_code ? ' ('+escapeHtml(order.coupon_code)+')' : '')+'</span><span>−Rs. '+Number(order.discount).toFixed(2)+'</span></div>' : '';
+    var shippingRow = '<div class="inv-totals-row"><span>Shipping</span><span>'+((order.shipping_cost || 0) > 0 ? 'Rs. '+Number(order.shipping_cost).toFixed(2) : 'Free')+'</span></div>';
 
     return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
       '<title>Invoice ' + idShort + ' — Look Book</title>' +
@@ -2359,10 +2359,10 @@ alter table orders add column if not exists shipping_cost numeric not null defau
             '<tbody>' + rows + '</tbody>' +
           '</table>' +
           '<div class="inv-totals">' +
-            '<div class="inv-totals-row"><span>Subtotal</span><span>$'+Number(order.subtotal).toFixed(2)+'</span></div>' +
+            '<div class="inv-totals-row"><span>Subtotal</span><span>Rs. '+Number(order.subtotal).toFixed(2)+'</span></div>' +
             discountRow +
             shippingRow +
-            '<div class="inv-totals-row total"><span>Total Due</span><span>$'+Number(order.total).toFixed(2)+'</span></div>' +
+            '<div class="inv-totals-row total"><span>Total Due</span><span>Rs. '+Number(order.total).toFixed(2)+'</span></div>' +
           '</div>' +
           '<div class="inv-footer">' +
             '<p>Thank you for shopping with Look Book. Please have the total amount ready in cash upon delivery.</p>' +
@@ -2400,7 +2400,7 @@ alter table orders add column if not exists shipping_cost numeric not null defau
     return 'السلام علیکم ' + order.customer_name + '،\n\n' +
       'آپ نے Look Book سے آرڈر نمبر #' + idShort + ' دیا ہے۔\n\n' +
       itemsList + '\n\n' +
-      'کل رقم: $' + Number(order.total).toFixed(2) + ' (ادائیگی ڈیلیوری کے وقت نقد)\n\n' +
+      'کل رقم: Rs. ' + Number(order.total).toFixed(2) + ' (ادائیگی ڈیلیوری کے وقت نقد)\n\n' +
       'کیا آپ اپنے اس آرڈر کی تصدیق کرتے ہیں؟ براہ کرم "ہاں" لکھ کر تصدیق کریں، یا "نہیں" لکھ کر آرڈر منسوخ کریں۔\n\n' +
       'شکریہ — Look Book';
   }

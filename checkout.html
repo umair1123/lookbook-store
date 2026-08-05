@@ -737,11 +737,11 @@
           <button type="button" data-code="FLASH20">FLASH20</button>
           <button type="button" data-code="FREESHIP">FREESHIP</button>
         </div>
-        <div class="cart-subtotal"><span>Subtotal</span><strong id="cartSubtotal">$0.00</strong></div>
-        <div class="cart-subtotal line-discount" id="cartDiscountRow" style="display:none;"><span id="cartDiscountLabel">Discount</span><strong id="cartDiscount">−$0.00</strong></div>
-        <div class="cart-subtotal" id="cartShippingRow" style="display:none;"><span>Shipping</span><strong id="cartShipping">$0.00</strong></div>
+        <div class="cart-subtotal"><span>Subtotal</span><strong id="cartSubtotal">Rs. 0.00</strong></div>
+        <div class="cart-subtotal line-discount" id="cartDiscountRow" style="display:none;"><span id="cartDiscountLabel">Discount</span><strong id="cartDiscount">−Rs. 0.00</strong></div>
+        <div class="cart-subtotal" id="cartShippingRow" style="display:none;"><span>Shipping</span><strong id="cartShipping">Rs. 0.00</strong></div>
         <p class="hint" id="freeShippingNudge" style="display:none; margin:-4px 0 12px;"></p>
-        <div class="cart-subtotal line-total"><span>Total (Cash on Delivery)</span><strong id="cartTotal">$0.00</strong></div>
+        <div class="cart-subtotal line-total"><span>Total (Cash on Delivery)</span><strong id="cartTotal">Rs. 0.00</strong></div>
         <button class="btn btn-primary" id="confirmOrderBtn" style="width:100%; margin-top:18px;">Confirm Order</button>
       </div>
     </div>
@@ -864,12 +864,12 @@
           '</div>' +
         '</div>' +
         '<div>' +
-          '<div class="price">$'+lineTotal.toFixed(2)+'</div>' +
+          '<div class="price">Rs. '+lineTotal.toFixed(2)+'</div>' +
           '<button class="cart-item-remove" data-act="remove" data-key="'+key+'">Remove</button>' +
         '</div>' +
       '</div>';
     }).join('');
-    cartSubtotalEl.textContent = '$' + subtotal.toFixed(2);
+    cartSubtotalEl.textContent = 'Rs. ' + subtotal.toFixed(2);
 
     var discount = 0, label = 'Discount';
     var hasFreeShippingCoupon = false;
@@ -882,7 +882,7 @@
         label = appliedCoupon + ' (' + deal.value + '% off)';
       } else if(deal.type === 'flat'){
         discount = Math.min(deal.value, subtotal);
-        label = appliedCoupon + ' ($' + deal.value + ' off)';
+        label = appliedCoupon + ' (Rs. ' + deal.value + ' off)';
       } else if(deal.type === 'shipping'){
         discount = 0;
         hasFreeShippingCoupon = true;
@@ -892,7 +892,7 @@
     if(discount > 0 || (appliedCoupon && coupons[appliedCoupon] && coupons[appliedCoupon].type === 'shipping' && subtotal > 0)){
       cartDiscountRow.style.display = 'flex';
       cartDiscountLabel.textContent = label;
-      cartDiscountEl.textContent = discount > 0 ? '−$' + discount.toFixed(2) : 'Free';
+      cartDiscountEl.textContent = discount > 0 ? '−Rs. ' + discount.toFixed(2) : 'Free';
     } else {
       cartDiscountRow.style.display = 'none';
     }
@@ -905,10 +905,10 @@
       shippingCost = computeShippingCost(subtotal, hasFreeShippingCoupon);
       var freeByThreshold = shipping.free_threshold != null && subtotal >= shipping.free_threshold;
       shipRow.style.display = 'flex';
-      document.getElementById('cartShipping').textContent = shippingCost > 0 ? '$' + shippingCost.toFixed(2) : 'Free';
+      document.getElementById('cartShipping').textContent = shippingCost > 0 ? 'Rs. ' + shippingCost.toFixed(2) : 'Free';
       if(shipping.free_threshold != null && !hasFreeShippingCoupon && !freeByThreshold){
         var remaining = shipping.free_threshold - subtotal;
-        nudge.textContent = 'Spend $' + remaining.toFixed(2) + ' more for free shipping!';
+        nudge.textContent = 'Spend Rs. ' + remaining.toFixed(2) + ' more for free shipping!';
         nudge.style.display = 'block';
       } else {
         nudge.style.display = 'none';
@@ -918,7 +918,7 @@
       nudge.style.display = 'none';
     }
 
-    cartTotalEl.textContent = '$' + Math.max(0, subtotal - discount + shippingCost).toFixed(2);
+    cartTotalEl.textContent = 'Rs. ' + Math.max(0, subtotal - discount + shippingCost).toFixed(2);
   }
 
   document.getElementById('checkoutItems').addEventListener('click', function(e){
@@ -943,7 +943,7 @@
       msg.className = 'coupon-msg show err';
     } else if(deal.min && subtotal < deal.min){
       appliedCoupon = null;
-      msg.textContent = code + ' needs a $' + deal.min + '+ subtotal (you\'re at $' + subtotal.toFixed(2) + ').';
+      msg.textContent = code + ' needs a Rs. ' + deal.min + '+ subtotal (you\'re at Rs. ' + subtotal.toFixed(2) + ').';
       msg.className = 'coupon-msg show err';
     } else {
       appliedCoupon = code;
@@ -1034,7 +1034,7 @@
       customer_name: order.customer_name,
       order_id: order.id ? order.id.slice(0, 8) : '',
       items_summary: itemsSummary,
-      total: '$' + Number(order.total).toFixed(2),
+      total: 'Rs. ' + Number(order.total).toFixed(2),
       shop_name: 'Look Book'
     }).catch(function(err){ console.warn('Customer email failed:', err); });
 
@@ -1046,9 +1046,9 @@
         customer_phone: order.customer_phone,
         customer_address: order.customer_address + ', ' + [order.customer_city, order.customer_province, order.customer_country].filter(Boolean).join(', '),
         items_summary: itemsSummary,
-        subtotal: '$' + Number(order.subtotal).toFixed(2),
-        discount: '$' + Number(order.discount).toFixed(2),
-        total: '$' + Number(order.total).toFixed(2),
+        subtotal: 'Rs. ' + Number(order.subtotal).toFixed(2),
+        discount: 'Rs. ' + Number(order.discount).toFixed(2),
+        total: 'Rs. ' + Number(order.total).toFixed(2),
         order_id: order.id ? order.id.slice(0, 8) : ''
       }).catch(function(err){ console.warn('Vendor email failed:', err); });
     }
@@ -1217,14 +1217,14 @@
         '<td class="inv-item-name">'+escapeHtml(it.name)+'</td>' +
         '<td class="inv-center">'+escapeHtml(it.size || '—')+'</td>' +
         '<td class="inv-center">'+it.qty+'</td>' +
-        '<td class="inv-right">$'+Number(it.price).toFixed(2)+'</td>' +
-        '<td class="inv-right">$'+lineTotal+'</td>' +
+        '<td class="inv-right">Rs. '+Number(it.price).toFixed(2)+'</td>' +
+        '<td class="inv-right">Rs. '+lineTotal+'</td>' +
       '</tr>';
     }).join('');
 
     var discountRow = order.discount > 0 ?
-      '<div class="inv-totals-row"><span>Discount'+(order.coupon_code ? ' ('+escapeHtml(order.coupon_code)+')' : '')+'</span><span>−$'+Number(order.discount).toFixed(2)+'</span></div>' : '';
-    var shippingRow = '<div class="inv-totals-row"><span>Shipping</span><span>'+((order.shipping_cost || 0) > 0 ? '$'+Number(order.shipping_cost).toFixed(2) : 'Free')+'</span></div>';
+      '<div class="inv-totals-row"><span>Discount'+(order.coupon_code ? ' ('+escapeHtml(order.coupon_code)+')' : '')+'</span><span>−Rs. '+Number(order.discount).toFixed(2)+'</span></div>' : '';
+    var shippingRow = '<div class="inv-totals-row"><span>Shipping</span><span>'+((order.shipping_cost || 0) > 0 ? 'Rs. '+Number(order.shipping_cost).toFixed(2) : 'Free')+'</span></div>';
 
     return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
       '<title>Invoice ' + idShort + ' — Look Book</title>' +
@@ -1287,10 +1287,10 @@
             '<tbody>' + rows + '</tbody>' +
           '</table>' +
           '<div class="inv-totals">' +
-            '<div class="inv-totals-row"><span>Subtotal</span><span>$'+Number(order.subtotal).toFixed(2)+'</span></div>' +
+            '<div class="inv-totals-row"><span>Subtotal</span><span>Rs. '+Number(order.subtotal).toFixed(2)+'</span></div>' +
             discountRow +
             shippingRow +
-            '<div class="inv-totals-row total"><span>Total Due</span><span>$'+Number(order.total).toFixed(2)+'</span></div>' +
+            '<div class="inv-totals-row total"><span>Total Due</span><span>Rs. '+Number(order.total).toFixed(2)+'</span></div>' +
           '</div>' +
           '<div class="inv-footer">' +
             '<p>Thank you for shopping with Look Book. Please have the total amount ready in cash upon delivery.</p>' +
