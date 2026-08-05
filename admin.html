@@ -2201,7 +2201,10 @@ alter table orders add column if not exists shipping_cost numeric not null defau
             ['pending','fulfilled','cancelled'].map(function(s){ return '<option value="'+s+'"'+(s===o.status?' selected':'')+'>'+s+'</option>'; }).join('') +
           '</select>' +
         '</td>' +
-        '<td><button class="icon-action" data-act="view" title="View details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></td>' +
+        '<td><div class="row-actions">' +
+          '<button class="icon-action" data-act="whatsapp" title="Confirm via WhatsApp" style="color:#25D366;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.15-4.9-4.34-.14-.19-1.17-1.56-1.17-2.97 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.17.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.3-.29.47-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.29.75 1.24 1.61 2.01 1.11 1 2.04 1.31 2.33 1.46.29.14.46.12.63-.07.17-.19.72-.85.92-1.14.19-.29.38-.24.64-.14.26.1 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36z"/></svg></button>' +
+          '<button class="icon-action" data-act="view" title="View details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>' +
+        '</div></td>' +
       '</tr>';
     }).join('');
   }
@@ -2216,10 +2219,13 @@ alter table orders add column if not exists shipping_cost numeric not null defau
   });
 
   document.getElementById('ordersTbody').addEventListener('click', function(e){
-    var btn = e.target.closest('[data-act="view"]');
-    if(!btn) return;
-    var order = state.orders.find(function(o){ return o.id === btn.closest('tr').dataset.id; });
-    if(order) openOrderModal(order);
+    var viewBtn = e.target.closest('[data-act="view"]');
+    var waBtn = e.target.closest('[data-act="whatsapp"]');
+    if(!viewBtn && !waBtn) return;
+    var order = state.orders.find(function(o){ return o.id === e.target.closest('tr').dataset.id; });
+    if(!order) return;
+    if(viewBtn) openOrderModal(order);
+    if(waBtn) openWhatsAppConfirm(order);
   });
 
   var currentModalOrder = null;
@@ -2244,10 +2250,17 @@ alter table orders add column if not exists shipping_cost numeric not null defau
       (order.discount > 0 ? '<div class="cart-subtotal line-discount"><span>'+(order.coupon_code || 'Discount')+'</span><strong>−$'+Number(order.discount).toFixed(2)+'</strong></div>' : '') +
       '<div class="cart-subtotal"><span>Shipping</span><strong>'+(order.shipping_cost > 0 ? '$'+Number(order.shipping_cost).toFixed(2) : 'Free')+'</strong></div>' +
       '<div class="cart-subtotal line-total"><span>Total (Cash on Delivery)</span><strong>$'+Number(order.total).toFixed(2)+'</strong></div>' +
-      '<button class="btn btn-outline" id="printInvoiceBtn" style="width:100%; margin-top:18px;">Print Invoice</button>';
+      '<button class="btn btn-primary" id="whatsappConfirmBtn" style="width:100%; margin-top:18px; background:#25D366; border-color:#25D366;">' +
+        '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="vertical-align:-2px; margin-right:6px;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.15-4.9-4.34-.14-.19-1.17-1.56-1.17-2.97 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.17.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.3-.29.47-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.29.75 1.24 1.61 2.01 1.11 1 2.04 1.31 2.33 1.46.29.14.46.12.63-.07.17-.19.72-.85.92-1.14.19-.29.38-.24.64-.14.26.1 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36z"/></svg>' +
+        'Confirm via WhatsApp' +
+      '</button>' +
+      '<button class="btn btn-outline" id="printInvoiceBtn" style="width:100%; margin-top:10px;">Print Invoice</button>';
     document.getElementById('orderModal').classList.add('open');
     document.getElementById('printInvoiceBtn').addEventListener('click', function(){
       openInvoice(currentModalOrder);
+    });
+    document.getElementById('whatsappConfirmBtn').addEventListener('click', function(){
+      openWhatsAppConfirm(currentModalOrder);
     });
   }
   document.getElementById('orderModalClose').addEventListener('click', function(){
@@ -2366,6 +2379,42 @@ alter table orders add column if not exists shipping_cost numeric not null defau
     win.document.open();
     win.document.write(buildInvoiceHTML(order));
     win.document.close();
+  }
+
+  /* ---------- WHATSAPP ORDER CONFIRMATION (2-tap, no automation) ---------- */
+  function normalizePhoneForWhatsApp(phone){
+    var digits = String(phone || '').replace(/\D/g, '');
+    if(!digits) return '';
+    // Common local Pakistani format starts with a single 0 (e.g. 0300...) — swap for the country code.
+    if(digits.charAt(0) === '0'){
+      digits = '92' + digits.slice(1);
+    }
+    return digits;
+  }
+
+  function buildWhatsAppMessage(order){
+    var idShort = order.id ? String(order.id).replace(/-/g,'').slice(0,8).toUpperCase() : '';
+    var itemsList = (order.items || []).map(function(it){
+      return '- ' + it.name + ' (سائز ' + (it.size || '—') + ', تعداد ' + it.qty + ')';
+    }).join('\n');
+    return 'السلام علیکم ' + order.customer_name + '،\n\n' +
+      'آپ نے Look Book سے آرڈر نمبر #' + idShort + ' دیا ہے۔\n\n' +
+      itemsList + '\n\n' +
+      'کل رقم: $' + Number(order.total).toFixed(2) + ' (ادائیگی ڈیلیوری کے وقت نقد)\n\n' +
+      'کیا آپ اپنے اس آرڈر کی تصدیق کرتے ہیں؟ براہ کرم "ہاں" لکھ کر تصدیق کریں، یا "نہیں" لکھ کر آرڈر منسوخ کریں۔\n\n' +
+      'شکریہ — Look Book';
+  }
+
+  function openWhatsAppConfirm(order){
+    if(!order){ showToast('No order to message yet'); return; }
+    var phone = normalizePhoneForWhatsApp(order.customer_phone);
+    if(!phone){
+      showToast('This order has no usable phone number');
+      return;
+    }
+    var message = buildWhatsAppMessage(order);
+    var url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
+    window.open(url, '_blank');
   }
 
   /* ---------- RESTORE FROM BACKUP JSON ---------- */
