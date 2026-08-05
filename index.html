@@ -1106,7 +1106,7 @@
       <div class="exit-success-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
       <h3>You're in!</h3>
       <p class="exit-sub">Use this code at checkout for 10% off:</p>
-      <div class="exit-code">WELCOME10</div>
+      <div class="exit-code" id="exitCodeDisplay">WELCOME10</div>
       <button class="btn btn-primary" id="exitContinueBtn" style="width:100%; margin-top:18px;">Continue Shopping</button>
     </div>
   </div>
@@ -1770,6 +1770,7 @@
   var EXIT_SHOWN_KEY = 'lookbook_exit_shown';
   var exitOverlay = document.getElementById('exitOverlay');
   var exitTimer = null;
+  var popupSettings = { enabled:true, coupon_code:'WELCOME10', delay_seconds:45 };
 
   function exitAlreadyShown(){
     try{ return sessionStorage.getItem(EXIT_SHOWN_KEY) === '1'; }catch(e){ return false; }
@@ -1779,9 +1780,10 @@
   }
 
   function showExitPopup(){
-    if(exitAlreadyShown()) return;
+    if(!popupSettings.enabled || exitAlreadyShown()) return;
     markExitShown();
     clearTimeout(exitTimer);
+    document.getElementById('exitCodeDisplay').textContent = popupSettings.coupon_code || 'WELCOME10';
     document.getElementById('exitFormView').style.display = 'block';
     document.getElementById('exitSuccessView').style.display = 'none';
     exitOverlay.classList.add('open');
@@ -1793,12 +1795,16 @@
   document.getElementById('exitContinueBtn').addEventListener('click', closeExitPopup);
   exitOverlay.addEventListener('click', function(e){ if(e.target === exitOverlay) closeExitPopup(); });
 
-  // Desktop: mouse leaving toward the top of the viewport (classic exit-intent).
-  document.addEventListener('mouseleave', function(e){
-    if(e.clientY <= 0) showExitPopup();
-  });
-  // Universal fallback (covers mobile, where mouseleave doesn't apply): after a delay.
-  exitTimer = setTimeout(showExitPopup, 45000);
+  function initExitIntentTriggers(){
+    if(!popupSettings.enabled || exitAlreadyShown()) return;
+    // Desktop: mouse leaving toward the top of the viewport (classic exit-intent).
+    document.addEventListener('mouseleave', function(e){
+      if(e.clientY <= 0) showExitPopup();
+    });
+    // Universal fallback (covers mobile, where mouseleave doesn't apply): after a delay.
+    clearTimeout(exitTimer);
+    exitTimer = setTimeout(showExitPopup, (popupSettings.delay_seconds || 45) * 1000);
+  }
 
   document.getElementById('exitSubmitBtn').addEventListener('click', function(){
     var whatsapp = document.getElementById('exit-whatsapp').value.trim();
@@ -2034,9 +2040,10 @@
         sb.from('deals').select('*'),
         sb.from('coupons').select('*'),
         sb.from('categories').select('*'),
-        sb.from('subcategories').select('*')
+        sb.from('subcategories').select('*'),
+        sb.from('popup_settings').select('*').eq('id', 1).maybeSingle()
       ]).then(function(results){
-        var prodRes = results[0], dealsRes = results[1], couponsRes = results[2], catRes = results[3], subRes = results[4];
+        var prodRes = results[0], dealsRes = results[1], couponsRes = results[2], catRes = results[3], subRes = results[4], popupRes = results[5];
         products = (prodRes.data && prodRes.data.length) ? prodRes.data : DEFAULT_PRODUCTS;
         dealsConfig = (dealsRes.data && dealsRes.data.length) ? dealsRowsToConfig(dealsRes.data) : DEFAULT_DEALS;
         coupons = (couponsRes.data && couponsRes.data.length) ? couponRowsToConfig(couponsRes.data) : DEFAULT_COUPONS;
@@ -2044,10 +2051,15 @@
         pageCategories = pageCategoryRowsToList(catRes.data);
         separatePageCatIds = pageCategories.map(function(c){ return c.id; });
         subcategories = subcategoryRowsToMap(subRes.data);
+        if(popupRes && popupRes.data){
+          popupSettings = { enabled: popupRes.data.enabled !== false, coupon_code: popupRes.data.coupon_code || 'WELCOME10', delay_seconds: popupRes.data.delay_seconds || 45 };
+        }
         init();
+        initExitIntentTriggers();
       }).catch(function(err){
         console.warn('Supabase load failed, using starter data:', err.message);
         useFallbackData();
+        initExitIntentTriggers();
       });
 
       // Live updates: if the admin changes something while a shopper is on the site,
@@ -2093,6 +2105,15 @@
           sb.from('subcategories').select('*').then(function(res){
             subcategories = subcategoryRowsToMap(res.data);
             buildSubSelect();
+          });
+        }).subscribe();
+
+      sb.channel('public:popup-site')
+        .on('postgres_changes', { event:'*', schema:'public', table:'popup_settings' }, function(){
+          sb.from('popup_settings').select('*').eq('id', 1).maybeSingle().then(function(res){
+            if(res && res.data){
+              popupSettings = { enabled: res.data.enabled !== false, coupon_code: res.data.coupon_code || 'WELCOME10', delay_seconds: res.data.delay_seconds || 45 };
+            }
           });
         }).subscribe();
     }catch(err){

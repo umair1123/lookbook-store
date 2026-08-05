@@ -487,6 +487,18 @@
         </div>
         <p class="hint" style="margin-top:14px;">Turning this off means checkout charges no shipping fee at all. Leave "Free Shipping Over" blank to never waive it automatically — the <code>FREESHIP</code> coupon still works as a manual override either way.</p>
       </div>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head">
+          <h3><span class="deal-badge">Popup</span> Exit-intent discount</h3>
+          <label class="toggle"><input type="checkbox" id="toggle-popup"><span class="track"></span></label>
+        </div>
+        <div class="deal-manage-body" id="body-popup">
+          <div class="field"><label>Coupon Code to Show</label><input type="text" id="popup-code" placeholder="WELCOME10" style="text-transform:uppercase;"></div>
+          <div class="field"><label>Show After (seconds) — mobile fallback</label><input type="number" id="popup-delay" min="5" placeholder="45"></div>
+        </div>
+        <p class="hint" style="margin-top:14px;">Turning this off hides the popup on your site entirely (both the "mouse leaving" trigger and the timed fallback). Make sure the coupon code you enter here matches a real, enabled code in the Coupon Codes tab, or shoppers will get an error trying to use it.</p>
+      </div>
     </section>
 
     <!-- ============ COUPONS PANEL ============ -->
@@ -815,6 +827,30 @@ alter publication supabase_realtime add table leads;</div>
       </div>
 
       <div class="instructions">
+        <h3>Also new: exit-intent popup controls</h3>
+        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">Run this once to control the exit-intent popup — turn it on/off, and set which coupon code and delay it uses — from the Deals &amp; Discounts tab instead of editing code.</p>
+        <div class="code-block" id="popupRulesBlock">create table popup_settings (
+  id int primary key default 1,
+  enabled boolean not null default true,
+  coupon_code text not null default 'WELCOME10',
+  delay_seconds int not null default 45
+);
+
+alter table popup_settings enable row level security;
+
+create policy "Public read popup settings" on popup_settings for select using (true);
+create policy "Admins write popup settings" on popup_settings for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+alter publication supabase_realtime add table popup_settings;
+
+insert into popup_settings (id, enabled, coupon_code, delay_seconds)
+  values (1, true, 'WELCOME10', 45)
+  on conflict (id) do nothing;</div>
+        <button class="btn btn-outline btn-sm copy-btn" id="copyPopupRulesBtn">Copy Addition</button>
+      </div>
+
+      <div class="instructions">
         <h3>Starter catalog</h3>
         <p style="font-size:13px; color:var(--brown-deep); line-height:1.8; margin-bottom:14px;">Loads 27 sample products plus starter deals and coupon codes into a fresh, empty database. Safe to skip if you'd rather start from scratch.</p>
         <button class="btn btn-primary btn-sm" id="seedBtnSetup">Load Starter Catalog</button>
@@ -1107,7 +1143,7 @@ alter publication supabase_realtime add table leads;</div>
   ];
 
   /* ---------- STATE ---------- */
-  var state = { products:[], deals:{}, coupons:{}, subcategories:[], categories:[], orders:[], leads:[], shipping:{ enabled:true, flat_rate:0, free_threshold:null } };
+  var state = { products:[], deals:{}, coupons:{}, subcategories:[], categories:[], orders:[], leads:[], shipping:{ enabled:true, flat_rate:0, free_threshold:null }, popup:{ enabled:true, coupon_code:'WELCOME10', delay_seconds:45 } };
   var prodFilter = { cat:'all', search:'' };
   var subFilter = { cat:'all' };
   var sb = null;
@@ -1401,6 +1437,48 @@ alter publication supabase_realtime add table leads;</div>
     });
   }
 
+  function refreshPopupSettings(){
+    return sb.from('popup_settings').select('*').eq('id', 1).maybeSingle().then(function(res){
+      if(res.error){ console.error(res.error); return; }
+      if(res.data){
+        state.popup = { enabled: res.data.enabled !== false, coupon_code: res.data.coupon_code || 'WELCOME10', delay_seconds: res.data.delay_seconds || 45 };
+      }
+      if(!isEditingPopup()) renderPopupSettings();
+    });
+  }
+  function isEditingPopup(){
+    var active = document.activeElement;
+    return !!(active && active.id && ['popup-code','popup-delay'].indexOf(active.id) > -1);
+  }
+  function renderPopupSettings(){
+    document.getElementById('toggle-popup').checked = state.popup.enabled !== false;
+    document.getElementById('body-popup').classList.toggle('disabled', state.popup.enabled === false);
+    document.getElementById('popup-code').value = state.popup.coupon_code || 'WELCOME10';
+    document.getElementById('popup-delay').value = state.popup.delay_seconds || 45;
+  }
+  function savePopupField(field, value){
+    if(!sb) return;
+    var payload = {};
+    payload[field] = value;
+    sb.from('popup_settings').update(payload).eq('id', 1).then(function(res){
+      if(res.error) showToast('Save failed: ' + res.error.message);
+    });
+  }
+  document.getElementById('toggle-popup').addEventListener('change', function(){
+    document.getElementById('body-popup').classList.toggle('disabled', !this.checked);
+    savePopupField('enabled', this.checked);
+    showToast('Exit-intent popup ' + (this.checked ? 'enabled' : 'disabled'));
+  });
+  document.getElementById('popup-code').addEventListener('change', function(){
+    var val = this.value.trim().toUpperCase();
+    this.value = val;
+    savePopupField('coupon_code', val || 'WELCOME10');
+  });
+  document.getElementById('popup-delay').addEventListener('change', function(){
+    var val = parseInt(this.value, 10);
+    savePopupField('delay_seconds', (isNaN(val) || val < 5) ? 45 : val);
+  });
+
   function startRealtimeSync(){
     // Defensive: if this ever runs more than once (e.g. an auth event fires twice),
     // tear down any previous channels first — reusing a channel name after it's
@@ -1411,7 +1489,7 @@ alter publication supabase_realtime add table leads;</div>
     }
 
     setStatus('Connecting…');
-    Promise.all([refreshProducts(), refreshDeals(), refreshCoupons(), refreshSubcategories(), refreshCategories(), refreshOrders(), refreshShipping(), refreshLeads()]);
+    Promise.all([refreshProducts(), refreshDeals(), refreshCoupons(), refreshSubcategories(), refreshCategories(), refreshOrders(), refreshShipping(), refreshLeads(), refreshPopupSettings()]);
 
     var pCh = sb.channel('admin-products')
       .on('postgres_changes', { event:'*', schema:'public', table:'products' }, refreshProducts)
@@ -1437,7 +1515,10 @@ alter publication supabase_realtime add table leads;</div>
     var lCh = sb.channel('admin-leads')
       .on('postgres_changes', { event:'*', schema:'public', table:'leads' }, refreshLeads)
       .subscribe();
-    channels = [pCh, dCh, cCh, sCh, catCh, oCh, shCh, lCh];
+    var poCh = sb.channel('admin-popup')
+      .on('postgres_changes', { event:'*', schema:'public', table:'popup_settings' }, refreshPopupSettings)
+      .subscribe();
+    channels = [pCh, dCh, cCh, sCh, catCh, oCh, shCh, lCh, poCh];
   }
 
   /* ---------- SEED STARTER CATALOG ---------- */
@@ -2666,6 +2747,14 @@ alter publication supabase_realtime add table leads;</div>
   });
   document.getElementById('copyLeadsRulesBtn').addEventListener('click', function(){
     var text = document.getElementById('leadsRulesBlock').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      showToast('Addition copied to clipboard');
+    }).catch(function(){
+      showToast('Could not copy — select the text manually');
+    });
+  });
+  document.getElementById('copyPopupRulesBtn').addEventListener('click', function(){
+    var text = document.getElementById('popupRulesBlock').textContent;
     navigator.clipboard.writeText(text).then(function(){
       showToast('Addition copied to clipboard');
     }).catch(function(){
