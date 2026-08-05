@@ -323,6 +323,9 @@
       <div class="section-title">
         <h2>Catalog <span style="color:var(--brown-mid); font-weight:400; font-size:14px;" id="prodCountLabel"></span></h2>
         <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" id="bulkStockBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg> Bulk Update Stock
+          </button>
           <button class="btn btn-outline" id="bulkAddBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Bulk Add
           </button>
@@ -862,6 +865,34 @@ alter table orders add column if not exists customer_city text;</div>
       <div class="modal-foot">
         <button class="btn btn-outline" id="bulkModalCancel">Cancel</button>
         <button class="btn btn-primary" id="bulkModalSave">Add Products</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BULK STOCK UPDATE MODAL ============ -->
+<div class="modal-overlay" id="bulkStockModal">
+  <div class="modal" style="max-width:760px;">
+    <div class="modal-head">
+      <h3>Bulk Update Stock</h3>
+      <button class="modal-close" id="bulkStockModalClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p class="hint" style="margin-bottom:16px;">Edit any stock numbers below, then save once — only the rows you actually change are updated. Products without tracked sizes aren't shown here; add sizes to them individually first.</p>
+      <div class="search-box" style="max-width:100%; margin-bottom:16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="bulkStockSearch" placeholder="Search products…">
+      </div>
+      <div class="card" style="max-height:48vh; overflow-y:auto;">
+        <table>
+          <thead><tr><th>Product</th><th>Size</th><th>Current</th><th>New Stock</th></tr></thead>
+          <tbody id="bulkStockTbody"></tbody>
+        </table>
+        <div class="empty-state" id="bulkStockEmptyState" style="display:none;">No tracked products match this search.</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" id="bulkStockCancel">Cancel</button>
+        <button class="btn btn-primary" id="bulkStockSave">Save Changes</button>
       </div>
     </div>
   </div>
@@ -1777,6 +1808,93 @@ alter table orders add column if not exists customer_city text;</div>
         closeBulkModal();
         refreshProducts();
       }
+    }).finally(function(){
+      saveBtn.disabled = false;
+    });
+  });
+
+  /* ---------- BULK STOCK UPDATE ---------- */
+  var bulkStockModal = document.getElementById('bulkStockModal');
+  var bulkStockSearchTerm = '';
+
+  function openBulkStockModal(){
+    bulkStockSearchTerm = '';
+    document.getElementById('bulkStockSearch').value = '';
+    renderBulkStockTable();
+    bulkStockModal.classList.add('open');
+  }
+  function closeBulkStockModal(){ bulkStockModal.classList.remove('open'); }
+
+  function renderBulkStockTable(){
+    var term = bulkStockSearchTerm.toLowerCase();
+    var rowsHtml = '';
+    var rowCount = 0;
+    state.products
+      .filter(function(p){ return p.sizes_stock && p.sizes_stock.length; })
+      .filter(function(p){ return !term || p.name.toLowerCase().indexOf(term) > -1; })
+      .sort(function(a,b){ return a.name.localeCompare(b.name); })
+      .forEach(function(p){
+        p.sizes_stock.forEach(function(s){
+          rowCount++;
+          rowsHtml += '<tr>' +
+            '<td><div class="prod-name">'+p.name+'</div><div class="prod-sub">'+p.cat+' / '+p.sub+'</div></td>' +
+            '<td>'+s.size+'</td>' +
+            '<td style="color:var(--brown-mid);">'+s.stock+'</td>' +
+            '<td><input type="number" min="0" class="bulk-stock-input" data-id="'+p.id+'" data-size="'+s.size+'" data-original="'+s.stock+'" value="'+s.stock+'" style="width:80px; border:1px solid var(--line); border-radius:4px; padding:6px 10px; font-size:13px;"></td>' +
+          '</tr>';
+        });
+      });
+    document.getElementById('bulkStockTbody').innerHTML = rowsHtml;
+    document.getElementById('bulkStockEmptyState').style.display = rowCount ? 'none' : 'block';
+  }
+
+  document.getElementById('bulkStockBtn').addEventListener('click', openBulkStockModal);
+  document.getElementById('bulkStockModalClose').addEventListener('click', closeBulkStockModal);
+  document.getElementById('bulkStockCancel').addEventListener('click', closeBulkStockModal);
+  bulkStockModal.addEventListener('click', function(e){ if(e.target === bulkStockModal) closeBulkStockModal(); });
+  document.getElementById('bulkStockSearch').addEventListener('input', function(){
+    bulkStockSearchTerm = this.value;
+    renderBulkStockTable();
+  });
+
+  document.getElementById('bulkStockSave').addEventListener('click', function(){
+    var inputs = Array.from(document.querySelectorAll('.bulk-stock-input'));
+    var changed = inputs.filter(function(inp){
+      var newVal = parseInt(inp.value, 10);
+      var origVal = parseInt(inp.dataset.original, 10);
+      return !isNaN(newVal) && newVal >= 0 && newVal !== origVal;
+    });
+
+    if(changed.length === 0){ showToast('No changes to save'); closeBulkStockModal(); return; }
+
+    var byProduct = {};
+    changed.forEach(function(inp){
+      var id = inp.dataset.id;
+      if(!byProduct[id]) byProduct[id] = {};
+      byProduct[id][inp.dataset.size] = parseInt(inp.value, 10);
+    });
+
+    var saveBtn = this;
+    saveBtn.disabled = true;
+
+    var updates = Object.keys(byProduct).map(function(id){
+      var p = state.products.find(function(x){ return x.id === id; });
+      if(!p) return Promise.resolve();
+      var updatedSizes = p.sizes_stock.map(function(s){
+        return byProduct[id].hasOwnProperty(s.size) ? { size:s.size, stock:byProduct[id][s.size] } : s;
+      });
+      return sb.from('products').update({ sizes_stock: updatedSizes }).eq('id', id);
+    });
+
+    Promise.all(updates).then(function(results){
+      var failed = results.filter(function(r){ return r && r.error; });
+      if(failed.length){
+        showToast(failed.length + ' product(s) failed to update: ' + failed[0].error.message);
+      } else {
+        showToast('Stock updated for ' + Object.keys(byProduct).length + ' product' + (Object.keys(byProduct).length === 1 ? '' : 's'));
+        closeBulkStockModal();
+      }
+      refreshProducts();
     }).finally(function(){
       saveBtn.disabled = false;
     });
