@@ -751,7 +751,10 @@
   <div class="confirm-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
   <h1>Order Placed</h1>
   <p>We'll call <strong id="confirmPhone"></strong> and email <strong id="confirmEmail"></strong> shortly to confirm your delivery. Pay in cash when it arrives — thank you!</p>
-  <a href="index.html" class="btn btn-primary">Continue Shopping</a>
+  <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+    <button class="btn btn-outline" id="downloadInvoiceBtn">Download Invoice</button>
+    <a href="index.html" class="btn btn-primary">Continue Shopping</a>
+  </div>
 </section>
 
 <div class="toast" id="toast">
@@ -803,6 +806,7 @@
   }
 
   var cart = loadCartFromStorage();
+  var lastPlacedOrder = null;
   var appliedCoupon = loadCouponFromStorage();
   var products = [];
   var coupons = {};
@@ -1104,7 +1108,10 @@
         return line.qty + 'x ' + line.product.name + ' (' + line.size + ')';
       }).join(', ');
 
+      var newOrderId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('LB-' + Date.now());
+
       sb.from('orders').insert({
+        id: newOrderId,
         customer_name: name,
         customer_email: email,
         customer_phone: phone,
@@ -1121,10 +1128,14 @@
       }).then(function(orderRes){
         if(orderRes.error){ throw orderRes.error; }
         var placedOrder = {
+          id: newOrderId,
+          created_at: new Date().toISOString(),
           customer_name:name, customer_email:email, customer_phone:phone,
           customer_address:address, customer_country:loc.country, customer_province:loc.province, customer_city:loc.city,
-          subtotal:subtotal, discount:discount, total:total
+          items: orderItems,
+          subtotal:subtotal, discount:discount, coupon_code: appliedCoupon || null, total:total
         };
+        lastPlacedOrder = placedOrder;
 
         var stockUpdates = lines.map(function(line){
           var live = liveProducts.find(function(p){ return p.id === line.id; });
@@ -1155,6 +1166,119 @@
       msg.className = 'coupon-msg show err';
       btn.disabled = false;
     });
+  });
+
+  /* ---------- INVOICE ---------- */
+  function escapeHtml(str){
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+
+  function buildInvoiceHTML(order){
+    var idShort = order.id ? String(order.id).replace(/-/g,'').slice(0,10).toUpperCase() : '—';
+    var date = order.created_at ? new Date(order.created_at) : new Date();
+    var dateStr = date.toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+    var locationLine = [order.customer_city, order.customer_province, order.customer_country].filter(Boolean).join(', ');
+
+    var rows = (order.items || []).map(function(it){
+      var lineTotal = (it.price * it.qty).toFixed(2);
+      return '<tr>' +
+        '<td class="inv-item-name">'+escapeHtml(it.name)+'</td>' +
+        '<td class="inv-center">'+escapeHtml(it.size || '—')+'</td>' +
+        '<td class="inv-center">'+it.qty+'</td>' +
+        '<td class="inv-right">$'+Number(it.price).toFixed(2)+'</td>' +
+        '<td class="inv-right">$'+lineTotal+'</td>' +
+      '</tr>';
+    }).join('');
+
+    var discountRow = order.discount > 0 ?
+      '<div class="inv-totals-row"><span>Discount'+(order.coupon_code ? ' ('+escapeHtml(order.coupon_code)+')' : '')+'</span><span>−$'+Number(order.discount).toFixed(2)+'</span></div>' : '';
+
+    return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
+      '<title>Invoice ' + idShort + ' — Look Book</title>' +
+      '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+      '<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,450;0,9..144,600;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">' +
+      '<style>' +
+        ':root{ --cream:#FAF6F0; --paper:#F3ECE1; --espresso:#2A1D14; --brown-deep:#4A3324; --brown-mid:#8A6A4E; --camel:#C9A177; --line:#E3D6C3; }' +
+        '*{ box-sizing:border-box; }' +
+        'body{ margin:0; font-family:"Manrope",sans-serif; color:var(--espresso); background:var(--cream); padding:56px; -webkit-print-color-adjust:exact; print-color-adjust:exact; }' +
+        '.inv-wrap{ max-width:760px; margin:0 auto; }' +
+        '.inv-head{ display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid var(--espresso); padding-bottom:28px; margin-bottom:32px; }' +
+        '.inv-logo{ font-family:"Fraunces",serif; font-size:28px; font-weight:600; color:var(--espresso); }' +
+        '.inv-logo em{ font-style:italic; font-weight:400; color:var(--brown-mid); }' +
+        '.inv-head-right{ text-align:right; }' +
+        '.inv-head-right h1{ font-family:"Fraunces",serif; font-size:22px; font-weight:450; letter-spacing:0.06em; text-transform:uppercase; margin:0 0 6px; color:var(--espresso); }' +
+        '.inv-head-right p{ margin:2px 0; font-size:12.5px; color:var(--brown-mid); }' +
+        '.inv-meta{ display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-bottom:36px; }' +
+        '.inv-meta h4{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; color:var(--brown-mid); margin:0 0 10px; }' +
+        '.inv-meta p{ margin:0 0 4px; font-size:13.5px; line-height:1.6; color:var(--espresso); }' +
+        'table{ width:100%; border-collapse:collapse; margin-bottom:8px; }' +
+        'thead th{ text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--brown-mid); border-bottom:1.5px solid var(--espresso); padding:0 0 10px; }' +
+        'tbody td{ padding:14px 0; border-bottom:1px solid var(--line); font-size:13.5px; }' +
+        '.inv-item-name{ font-family:"Fraunces",serif; font-size:14.5px; }' +
+        '.inv-center{ text-align:center; }' +
+        '.inv-right{ text-align:right; }' +
+        '.inv-totals{ margin-top:18px; margin-left:auto; width:260px; }' +
+        '.inv-totals-row{ display:flex; justify-content:space-between; font-size:13.5px; padding:6px 0; color:var(--brown-deep); }' +
+        '.inv-totals-row.total{ border-top:2px solid var(--espresso); margin-top:8px; padding-top:12px; font-family:"Fraunces",serif; font-size:19px; color:var(--espresso); font-weight:600; }' +
+        '.inv-cod{ display:inline-block; margin-top:6px; background:var(--paper); color:var(--brown-deep); font-size:11px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; padding:6px 12px; border-radius:20px; }' +
+        '.inv-footer{ margin-top:50px; padding-top:24px; border-top:1px solid var(--line); text-align:center; color:var(--brown-mid); font-size:12px; line-height:1.8; }' +
+        '.inv-print-btn{ display:block; margin:0 auto 30px; background:var(--espresso); color:var(--cream); border:none; padding:12px 28px; font-size:13px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; border-radius:4px; cursor:pointer; font-family:"Manrope",sans-serif; }' +
+        '@media print{ .inv-print-btn{ display:none; } body{ padding:0; background:#fff; } }' +
+      '</style></head><body>' +
+        '<button class="inv-print-btn" onclick="window.print()">Print / Save as PDF</button>' +
+        '<div class="inv-wrap">' +
+          '<div class="inv-head">' +
+            '<div class="inv-logo">LOOK<em>book.</em></div>' +
+            '<div class="inv-head-right">' +
+              '<h1>Invoice</h1>' +
+              '<p>No. ' + idShort + '</p>' +
+              '<p>' + dateStr + '</p>' +
+            '</div>' +
+          '</div>' +
+          '<div class="inv-meta">' +
+            '<div>' +
+              '<h4>Billed To</h4>' +
+              '<p><strong>'+escapeHtml(order.customer_name)+'</strong></p>' +
+              '<p>'+escapeHtml(order.customer_email || '')+'</p>' +
+              '<p>'+escapeHtml(order.customer_phone || '')+'</p>' +
+              '<p>'+escapeHtml(order.customer_address || '')+'</p>' +
+              '<p>'+escapeHtml(locationLine)+'</p>' +
+            '</div>' +
+            '<div style="text-align:right;">' +
+              '<h4>Payment</h4>' +
+              '<span class="inv-cod">Cash on Delivery</span>' +
+            '</div>' +
+          '</div>' +
+          '<table>' +
+            '<thead><tr><th>Item</th><th class="inv-center">Size</th><th class="inv-center">Qty</th><th class="inv-right">Price</th><th class="inv-right">Total</th></tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+          '</table>' +
+          '<div class="inv-totals">' +
+            '<div class="inv-totals-row"><span>Subtotal</span><span>$'+Number(order.subtotal).toFixed(2)+'</span></div>' +
+            discountRow +
+            '<div class="inv-totals-row total"><span>Total Due</span><span>$'+Number(order.total).toFixed(2)+'</span></div>' +
+          '</div>' +
+          '<div class="inv-footer">' +
+            '<p>Thank you for shopping with Look Book. Please have the total amount ready in cash upon delivery.</p>' +
+            '<p>This invoice was generated automatically and does not require a signature.</p>' +
+          '</div>' +
+        '</div>' +
+      '</body></html>';
+  }
+
+  function openInvoice(order){
+    if(!order){ showToast('No order to show yet'); return; }
+    var win = window.open('', '_blank');
+    if(!win){ showToast('Please allow pop-ups to view the invoice'); return; }
+    win.document.open();
+    win.document.write(buildInvoiceHTML(order));
+    win.document.close();
+  }
+
+  document.getElementById('downloadInvoiceBtn').addEventListener('click', function(){
+    openInvoice(lastPlacedOrder);
   });
 
   /* ---------- VIEW STATES ---------- */
