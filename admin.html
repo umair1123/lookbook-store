@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Look Book — Store Manager</title>
+<title>Look Book.pk — Store Manager</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,450;0,9..144,600;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -250,7 +250,7 @@
 <div class="lock-screen" id="lockScreen">
   <div class="lock-card" id="lockCard">
     <div class="lock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
-    <div class="brand">LOOK<em>book.</em></div>
+    <div class="brand">LOOK<em>book.pk</em></div>
     <p class="sub" id="lockSub">Store Manager — sign in to continue</p>
     <form id="lockForm">
       <input type="email" id="lockEmail" placeholder="Admin email" autocomplete="username">
@@ -266,7 +266,7 @@
   <!-- ============ SIDEBAR ============ -->
   <aside class="sidebar">
     <div class="brand-block">
-      <div class="brand">LOOK<em>book.</em></div>
+      <div class="brand">LOOK<em>book.pk</em></div>
       <span class="subtitle">Store Manager</span>
     </div>
     <button class="nav-item active" data-panel="products">
@@ -2299,7 +2299,7 @@ alter table orders add column if not exists shipping_cost numeric not null defau
     var shippingRow = '<div class="inv-totals-row"><span>Shipping</span><span>'+((order.shipping_cost || 0) > 0 ? 'Rs. '+Number(order.shipping_cost).toFixed(2) : 'Free')+'</span></div>';
 
     return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
-      '<title>Invoice ' + idShort + ' — Look Book</title>' +
+      '<title>Invoice ' + idShort + ' — Look Book.pk</title>' +
       '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
       '<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,450;0,9..144,600;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">' +
       '<style>' +
@@ -2333,7 +2333,7 @@ alter table orders add column if not exists shipping_cost numeric not null defau
         '<button class="inv-print-btn" onclick="window.print()">Print / Save as PDF</button>' +
         '<div class="inv-wrap">' +
           '<div class="inv-head">' +
-            '<div class="inv-logo">LOOK<em>book.</em></div>' +
+            '<div class="inv-logo">LOOK<em>book.pk</em></div>' +
             '<div class="inv-head-right">' +
               '<h1>Invoice</h1>' +
               '<p>No. ' + idShort + '</p>' +
@@ -2365,7 +2365,7 @@ alter table orders add column if not exists shipping_cost numeric not null defau
             '<div class="inv-totals-row total"><span>Total Due</span><span>Rs. '+Number(order.total).toFixed(2)+'</span></div>' +
           '</div>' +
           '<div class="inv-footer">' +
-            '<p>Thank you for shopping with Look Book. Please have the total amount ready in cash upon delivery.</p>' +
+            '<p>Thank you for shopping with Look Book.pk. Please have the total amount ready in cash upon delivery.</p>' +
             '<p>This invoice was generated automatically and does not require a signature.</p>' +
           '</div>' +
         '</div>' +
@@ -2398,11 +2398,11 @@ alter table orders add column if not exists shipping_cost numeric not null defau
       return '- ' + it.name + ' (سائز ' + (it.size || '—') + ', تعداد ' + it.qty + ')';
     }).join('\n');
     return 'السلام علیکم ' + order.customer_name + '،\n\n' +
-      'آپ نے Look Book سے آرڈر نمبر #' + idShort + ' دیا ہے۔\n\n' +
+      'آپ نے Look Book.pk سے آرڈر نمبر #' + idShort + ' دیا ہے۔\n\n' +
       itemsList + '\n\n' +
       'کل رقم: Rs. ' + Number(order.total).toFixed(2) + ' (ادائیگی ڈیلیوری کے وقت نقد)\n\n' +
       'کیا آپ اپنے اس آرڈر کی تصدیق کرتے ہیں؟ براہ کرم "ہاں" لکھ کر تصدیق کریں، یا "نہیں" لکھ کر آرڈر منسوخ کریں۔\n\n' +
-      'شکریہ — Look Book';
+      'شکریہ — Look Book.pk';
   }
 
   function openWhatsAppConfirm(order){
