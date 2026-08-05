@@ -320,6 +320,16 @@
         <span>Your database is empty. Load a starter catalog to get going, or just start adding your own products.</span>
         <button class="btn btn-primary btn-sm" id="seedBtn">Load Starter Catalog</button>
       </div>
+      <div class="seed-banner" id="untrackedBanner" style="display:none;">
+        <span id="untrackedBannerText">Some products don't have stock numbers yet.</span>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label style="font-size:12px; color:var(--espresso); display:flex; align-items:center; gap:6px;">
+            Starting stock per size
+            <input type="number" id="untrackedDefaultStock" value="10" min="0" style="width:64px; border:1px solid var(--camel); border-radius:4px; padding:6px 8px; font-size:13px;">
+          </label>
+          <button class="btn btn-primary btn-sm" id="initStockBtn">Initialize Stock</button>
+        </div>
+      </div>
       <div class="section-title">
         <h2>Catalog <span style="color:var(--brown-mid); font-weight:400; font-size:14px;" id="prodCountLabel"></span></h2>
         <div style="display:flex; gap:10px;">
@@ -1162,8 +1172,50 @@ alter table orders add column if not exists customer_city text;</div>
       renderCategoriesPanel();
       setStatus('Synced — ' + state.products.length + (state.products.length === 1 ? ' product live' : ' products live'));
       document.getElementById('seedBanner').style.display = (state.products.length === 0 && !seedOffered) ? 'flex' : 'none';
+      updateUntrackedBanner();
     });
   }
+
+  function updateUntrackedBanner(){
+    var untracked = state.products.filter(function(p){ return !p.sizes_stock || !p.sizes_stock.length; });
+    var banner = document.getElementById('untrackedBanner');
+    if(untracked.length === 0 || state.products.length === 0){
+      banner.style.display = 'none';
+      return;
+    }
+    document.getElementById('untrackedBannerText').textContent =
+      untracked.length + ' product' + (untracked.length === 1 ? '' : 's') + " don't have stock numbers yet — they're treated as always in stock until you set one.";
+    banner.style.display = 'flex';
+  }
+
+  document.getElementById('initStockBtn').addEventListener('click', function(){
+    var defaultStock = parseInt(document.getElementById('untrackedDefaultStock').value, 10);
+    if(isNaN(defaultStock) || defaultStock < 0){ showToast('Enter a valid starting stock number'); return; }
+    var untracked = state.products.filter(function(p){ return !p.sizes_stock || !p.sizes_stock.length; });
+    if(untracked.length === 0){ showToast('Nothing to initialize'); return; }
+    if(!confirm('Set '+defaultStock+' in stock for every size on '+untracked.length+' product(s)? You can fine-tune individual numbers afterward.')) return;
+
+    var btn = this;
+    btn.disabled = true;
+
+    var updates = untracked.map(function(p){
+      var sizeList = (p.sizes && p.sizes.length) ? p.sizes : ['One Size'];
+      var sizesStock = sizeList.map(function(s){ return { size:s, stock:defaultStock }; });
+      return sb.from('products').update({ sizes_stock: sizesStock }).eq('id', p.id);
+    });
+
+    Promise.all(updates).then(function(results){
+      var failed = results.filter(function(r){ return r && r.error; });
+      if(failed.length){
+        showToast(failed.length + ' product(s) failed: ' + failed[0].error.message);
+      } else {
+        showToast('Stock initialized for ' + untracked.length + ' product' + (untracked.length === 1 ? '' : 's'));
+      }
+      refreshProducts();
+    }).finally(function(){
+      btn.disabled = false;
+    });
+  });
   function refreshDeals(){
     return sb.from('deals').select('*').then(function(res){
       if(res.error){ console.error(res.error); return; }
