@@ -1366,6 +1366,11 @@
           '<div class="product-sizes">'+sizesHtml+'</div>' +
           (lowStock ? '<p class="low-stock-note">Only '+stock.total+' left</p>' : '') +
         '</div>';
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function(e){
+        if(e.target.closest('.product-quick') || e.target.closest('.drag-handle')) return;
+        window.location.href = 'product.html?id=' + encodeURIComponent(p.id);
+      });
       grid.appendChild(card);
     });
     bindDragEvents();
@@ -1876,8 +1881,8 @@
   /* ---------- NAV: CATEGORY + SUBCATEGORY DROPDOWN, DEEP LINKS ---------- */
   function catHash(catId, subName){
     if(catId === 'all') return '#shop';
-    var h = '#shop-' + catId;
-    if(subName) h += '~' + encodeURIComponent(subName);
+    var h = 'category.html?cat=' + encodeURIComponent(catId);
+    if(subName) h += '&sub=' + encodeURIComponent(subName);
     return h;
   }
 
@@ -1940,8 +1945,11 @@
     }
     var link = e.target.closest('[data-cat]');
     if(!link) return;
-    e.preventDefault();
-    applyCategoryFilter(link.dataset.cat, link.dataset.sub || null, true);
+    if(link.dataset.cat === 'all'){
+      e.preventDefault();
+      applyCategoryFilter('all', null, true);
+    }
+    // Any specific category/subcategory link now navigates to its own page — let the browser follow it normally.
   });
 
   function applyCategoryFilter(catId, subName, scroll){

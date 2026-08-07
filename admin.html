@@ -851,6 +851,13 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
       </div>
 
       <div class="instructions">
+        <h3>Also new: product descriptions (for the new product detail pages)</h3>
+        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">Run this once so each product can have its own description, shown on its new individual page.</p>
+        <div class="code-block" id="descAlterBlock">alter table products add column if not exists description text;</div>
+        <button class="btn btn-outline btn-sm copy-btn" id="copyDescAlterBtn">Copy Column Addition</button>
+      </div>
+
+      <div class="instructions">
         <h3>Starter catalog</h3>
         <p style="font-size:13px; color:var(--brown-deep); line-height:1.8; margin-bottom:14px;">Loads 27 sample products plus starter deals and coupon codes into a fresh, empty database. Safe to skip if you'd rather start from scratch.</p>
         <button class="btn btn-primary btn-sm" id="seedBtnSetup">Load Starter Catalog</button>
@@ -920,6 +927,9 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
       </div>
       <img id="pf-thumb" class="thumb-preview" style="display:none;">
       <p class="hint" id="thumbSizeHint" style="display:none;"></p>
+      <div class="field" style="margin-top:16px;"><label>Description — shown on the product's page</label>
+        <textarea id="pf-description" rows="4" placeholder="A short, considered description of the piece — fabric, fit, styling notes…" style="width:100%; border:1px solid var(--line); background:var(--white); padding:12px 14px; font-size:14px; border-radius:4px; color:var(--ink); resize:vertical; font-family:inherit;"></textarea>
+      </div>
       <div class="field" style="margin-top:16px;"><label>Discount / Badge</label>
         <select id="pf-tag">
           <option value="">None</option>
@@ -1943,6 +1953,7 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
     document.getElementById('pf-price').value = product ? product.price : '';
     document.getElementById('pf-was').value = (product && product.was) ? product.was : '';
     document.getElementById('pf-img').value = product ? product.img : '';
+    document.getElementById('pf-description').value = product ? (product.description || '') : '';
     document.getElementById('pf-tag').value = product ? (product.tag || '') : '';
     setRating(product ? product.rating : 4);
     populateSizeChecks(product ? product.cat : 'women', getEffectiveSizesStock(product));
@@ -1988,6 +1999,7 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
       price: price,
       was: was ? parseFloat(was) : null,
       img: document.getElementById('pf-img').value.trim() || 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=700&auto=format&fit=crop',
+      description: document.getElementById('pf-description').value.trim() || null,
       tag: document.getElementById('pf-tag').value,
       rating: currentRating,
       sizes: sizes,
@@ -2351,6 +2363,7 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
         '<td><div class="row-actions">' +
           '<button class="icon-action" data-act="whatsapp" title="Confirm via WhatsApp" style="color:#25D366;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.15-4.9-4.34-.14-.19-1.17-1.56-1.17-2.97 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.17.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.3-.29.47-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.29.75 1.24 1.61 2.01 1.11 1 2.04 1.31 2.33 1.46.29.14.46.12.63-.07.17-.19.72-.85.92-1.14.19-.29.38-.24.64-.14.26.1 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36z"/></svg></button>' +
           '<button class="icon-action" data-act="view" title="View details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>' +
+          '<button class="icon-action" data-act="delete-order" title="Delete order"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger);"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>' +
         '</div></td>' +
       '</tr>';
     }).join('');
@@ -2368,11 +2381,21 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
   document.getElementById('ordersTbody').addEventListener('click', function(e){
     var viewBtn = e.target.closest('[data-act="view"]');
     var waBtn = e.target.closest('[data-act="whatsapp"]');
-    if(!viewBtn && !waBtn) return;
+    var delBtn = e.target.closest('[data-act="delete-order"]');
+    if(!viewBtn && !waBtn && !delBtn) return;
     var order = state.orders.find(function(o){ return o.id === e.target.closest('tr').dataset.id; });
     if(!order) return;
     if(viewBtn) openOrderModal(order);
     if(waBtn) openWhatsAppConfirm(order);
+    if(delBtn){
+      var idShort = order.id ? order.id.slice(0,8).toUpperCase() : '';
+      if(confirm('Delete order #'+idShort+' from '+order.customer_name+'? This can\'t be undone — it will not restore any deducted stock.')){
+        sb.from('orders').delete().eq('id', order.id).then(function(res){
+          if(res.error){ showToast('Delete failed: ' + res.error.message); }
+          else{ showToast('Order deleted'); refreshOrders(); }
+        });
+      }
+    }
   });
 
   var currentModalOrder = null;
@@ -2401,13 +2424,25 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
         '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="vertical-align:-2px; margin-right:6px;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.15-4.9-4.34-.14-.19-1.17-1.56-1.17-2.97 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.17.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.3-.29.47-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.29.75 1.24 1.61 2.01 1.11 1 2.04 1.31 2.33 1.46.29.14.46.12.63-.07.17-.19.72-.85.92-1.14.19-.29.38-.24.64-.14.26.1 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36z"/></svg>' +
         'Confirm via WhatsApp' +
       '</button>' +
-      '<button class="btn btn-outline" id="printInvoiceBtn" style="width:100%; margin-top:10px;">Print Invoice</button>';
+      '<button class="btn btn-outline" id="printInvoiceBtn" style="width:100%; margin-top:10px;">Print Invoice</button>' +
+      '<button class="btn btn-outline" id="deleteOrderBtn" style="width:100%; margin-top:10px; color:var(--danger); border-color:var(--danger);">Delete Order</button>';
     document.getElementById('orderModal').classList.add('open');
     document.getElementById('printInvoiceBtn').addEventListener('click', function(){
       openInvoice(currentModalOrder);
     });
     document.getElementById('whatsappConfirmBtn').addEventListener('click', function(){
       openWhatsAppConfirm(currentModalOrder);
+    });
+    document.getElementById('deleteOrderBtn').addEventListener('click', function(){
+      var idShort = order.id ? order.id.slice(0,8).toUpperCase() : '';
+      if(confirm('Delete order #'+idShort+' from '+order.customer_name+'? This can\'t be undone — it will not restore any deducted stock.')){
+        sb.from('orders').delete().eq('id', order.id).then(function(res){
+          if(res.error){ showToast('Delete failed: ' + res.error.message); return; }
+          showToast('Order deleted');
+          document.getElementById('orderModal').classList.remove('open');
+          refreshOrders();
+        });
+      }
     });
   }
   document.getElementById('orderModalClose').addEventListener('click', function(){
@@ -2757,6 +2792,14 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
     var text = document.getElementById('popupRulesBlock').textContent;
     navigator.clipboard.writeText(text).then(function(){
       showToast('Addition copied to clipboard');
+    }).catch(function(){
+      showToast('Could not copy — select the text manually');
+    });
+  });
+  document.getElementById('copyDescAlterBtn').addEventListener('click', function(){
+    var text = document.getElementById('descAlterBlock').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      showToast('Column addition copied to clipboard');
     }).catch(function(){
       showToast('Could not copy — select the text manually');
     });
