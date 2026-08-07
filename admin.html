@@ -387,15 +387,22 @@
           </div>
           <button class="btn btn-primary btn-sm" id="addCatBtn" style="margin-bottom:18px;">Add</button>
         </div>
-        <label class="size-check" style="margin:-6px 0 18px;">
+        <label class="size-check" style="margin:-6px 0 14px;">
           <input type="checkbox" id="newCat-separate">
           Keep off the main Shop page — link it directly from the menu as its own page instead
         </label>
+        <div class="field" id="newCat-parent-wrap" style="display:none; margin-bottom:18px;">
+          <label>Nest under category (optional)</label>
+          <select id="newCat-parent">
+            <option value="">Show as its own top-level menu item</option>
+          </select>
+          <p class="hint">Instead of its own spot in the menu, it'll appear tucked inside the category you pick here — still its own private page, just organized under that menu instead.</p>
+        </div>
       </div>
 
       <div class="card">
         <table>
-          <thead><tr><th>Category</th><th>Size Type</th><th>Page</th><th>Products</th><th></th></tr></thead>
+          <thead><tr><th>Category</th><th>Size Type</th><th>Page</th><th>Nested Under</th><th>Products</th><th></th></tr></thead>
           <tbody id="categoriesTbody"></tbody>
         </table>
         <div class="empty-state" id="catEmptyState" style="display:none;">No categories yet — add one above.</div>
@@ -855,6 +862,13 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
         <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">Run this once so each product can have its own description, shown on its new individual page.</p>
         <div class="code-block" id="descAlterBlock">alter table products add column if not exists description text;</div>
         <button class="btn btn-outline btn-sm copy-btn" id="copyDescAlterBtn">Copy Column Addition</button>
+      </div>
+
+      <div class="instructions">
+        <h3>Also new: nest a separate-page category under another one</h3>
+        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">Run this once so a separate-page category (like Undergarments) can appear tucked inside another category's menu (like Women) instead of sitting as its own top-level nav item — still its own private page, just organized differently.</p>
+        <div class="code-block" id="parentCatAlterBlock">alter table categories add column if not exists parent_category text;</div>
+        <button class="btn btn-outline btn-sm copy-btn" id="copyParentCatAlterBtn">Copy Column Addition</button>
       </div>
 
       <div class="instructions">
@@ -1677,20 +1691,52 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
   function renderCategoriesPanel(){
     var list = state.categories;
     document.getElementById('catEmptyState').style.display = list.length ? 'none' : 'block';
+    var shopCats = list.filter(function(c){ return !c.separate_page; });
+
     document.getElementById('categoriesTbody').innerHTML = list.map(function(c){
       var count = state.products.filter(function(p){ return p.cat === c.key; }).length;
       var pageLabel = c.separate_page
         ? '<span class="tag-chip tag-Bundle" title="Linked from the menu, kept off the main Shop page">Separate Page</span>'
         : '<span class="tag-chip tag-none">In Shop</span>';
+      var nestedCell;
+      if(c.separate_page){
+        var options = '<option value="">Top-level menu item</option>' +
+          shopCats.map(function(sc){ return '<option value="'+sc.key+'"'+(c.parent_category === sc.key ? ' selected' : '')+'>'+sc.label+'</option>'; }).join('');
+        nestedCell = '<select class="nest-under-select" data-key="'+c.key+'" style="border:1px solid var(--line); border-radius:20px; padding:5px 10px; font-size:11.5px;">'+options+'</select>';
+      } else {
+        nestedCell = '<span style="color:var(--brown-mid); font-size:12px;">—</span>';
+      }
       return '<tr data-key="'+c.key+'">' +
         '<td><strong>'+c.label+'</strong></td>' +
         '<td>'+(SIZE_TYPE_LABEL[c.size_type] || c.size_type)+'</td>' +
         '<td><button class="icon-action" data-act="toggle-page" title="Toggle separate page" style="width:auto; padding:0; border:none;">'+pageLabel+'</button></td>' +
+        '<td>'+nestedCell+'</td>' +
         '<td>'+count+' '+(count === 1 ? 'product' : 'products')+'</td>' +
         '<td><button class="icon-action" data-act="delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger);"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td>' +
       '</tr>';
     }).join('');
+
+    // Keep the "add category" form's nesting dropdown up to date too.
+    var addFormSelect = document.getElementById('newCat-parent');
+    var prevVal = addFormSelect.value;
+    addFormSelect.innerHTML = '<option value="">Show as its own top-level menu item</option>' +
+      shopCats.map(function(sc){ return '<option value="'+sc.key+'">'+sc.label+'</option>'; }).join('');
+    if(shopCats.some(function(sc){ return sc.key === prevVal; })) addFormSelect.value = prevVal;
   }
+
+  document.getElementById('newCat-separate').addEventListener('change', function(){
+    document.getElementById('newCat-parent-wrap').style.display = this.checked ? 'block' : 'none';
+  });
+
+  document.getElementById('categoriesTbody').addEventListener('change', function(e){
+    var sel = e.target.closest('.nest-under-select');
+    if(!sel) return;
+    sb.from('categories').update({ parent_category: sel.value || null }).eq('key', sel.dataset.key).then(function(res){
+      if(res.error){ showToast('Save failed: ' + res.error.message); return; }
+      showToast(sel.value ? 'Nested under ' + sel.options[sel.selectedIndex].text : 'Now a top-level menu item');
+      refreshCategories();
+    });
+  });
 
   function slugify(text){
     return text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'category';
@@ -1700,14 +1746,16 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
     var label = document.getElementById('newCat-label').value.trim();
     var sizeType = document.getElementById('newCat-sizetype').value;
     var separatePage = document.getElementById('newCat-separate').checked;
+    var parentCategory = separatePage ? (document.getElementById('newCat-parent').value || null) : null;
     if(!label){ showToast('Enter a category name'); return; }
     var key = slugify(label);
     if(state.categories.some(function(c){ return c.key === key; })){ showToast('A category with that name already exists'); return; }
     var sortOrder = state.categories.length ? Math.max.apply(null, state.categories.map(function(c){ return c.sort_order || 0; })) + 1 : 1;
-    sb.from('categories').insert({ key:key, label:label, size_type:sizeType, sort_order:sortOrder, separate_page:separatePage }).then(function(res){
+    sb.from('categories').insert({ key:key, label:label, size_type:sizeType, sort_order:sortOrder, separate_page:separatePage, parent_category:parentCategory }).then(function(res){
       if(res.error){ showToast('Add failed: ' + res.error.message); return; }
       document.getElementById('newCat-label').value = '';
       document.getElementById('newCat-separate').checked = false;
+      document.getElementById('newCat-parent-wrap').style.display = 'none';
       showToast(label + ' added' + (separatePage ? ' as a separate page' : ''));
       refreshCategories();
     });
@@ -2798,6 +2846,14 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
   });
   document.getElementById('copyDescAlterBtn').addEventListener('click', function(){
     var text = document.getElementById('descAlterBlock').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      showToast('Column addition copied to clipboard');
+    }).catch(function(){
+      showToast('Could not copy — select the text manually');
+    });
+  });
+  document.getElementById('copyParentCatAlterBtn').addEventListener('click', function(){
+    var text = document.getElementById('parentCatAlterBlock').textContent;
     navigator.clipboard.writeText(text).then(function(){
       showToast('Column addition copied to clipboard');
     }).catch(function(){

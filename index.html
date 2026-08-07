@@ -1857,11 +1857,13 @@
 
   /* ---------- NAV: SEPARATE-PAGE CATEGORY LINKS ---------- */
   function buildPageCategoryNav(){
+    var topLevel = pageCategories.filter(function(c){ return !c.parent; });
+
     // Desktop: insert as extra top-level <li> items right after the Shop dropdown
     document.querySelectorAll('.primary-nav .page-cat-nav-item').forEach(function(el){ el.remove(); });
     var shopLi = document.querySelector('.primary-nav .nav-dropdown');
     if(shopLi){
-      var html = pageCategories.map(function(c){
+      var html = topLevel.map(function(c){
         return '<li class="page-cat-nav-item"><a href="category.html?cat='+encodeURIComponent(c.id)+'">'+c.label+'</a></li>';
       }).join('');
       shopLi.insertAdjacentHTML('afterend', html);
@@ -1871,11 +1873,15 @@
     document.querySelectorAll('#mobileMenu .page-cat-mobile-item').forEach(function(el){ el.remove(); });
     var mobileCatList = document.getElementById('mobileCatMenu');
     if(mobileCatList){
-      var mobileHtml = pageCategories.map(function(c){
+      var mobileHtml = topLevel.map(function(c){
         return '<a href="category.html?cat='+encodeURIComponent(c.id)+'" class="page-cat-mobile-item">'+c.label+'</a>';
       }).join('');
       mobileCatList.insertAdjacentHTML('afterend', mobileHtml);
     }
+  }
+
+  function nestedPageCatsFor(catId){
+    return pageCategories.filter(function(c){ return c.parent === catId; });
   }
 
   /* ---------- NAV: CATEGORY + SUBCATEGORY DROPDOWN, DEEP LINKS ---------- */
@@ -1893,13 +1899,15 @@
         return '<a href="#shop" data-cat="all">All</a>';
       }
       var subs = subcategories[c.id] || [];
+      var nested = nestedPageCatsFor(c.id);
       var catLink = '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">'+c.label+'</a>';
-      if(subs.length === 0){
+      if(subs.length === 0 && nested.length === 0){
         return '<div class="cat-item"><div class="cat-item-row">'+catLink+'</div></div>';
       }
       var flyout = '<div class="sub-flyout">' +
         '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">All ' + c.label + '</a>' +
         subs.map(function(s){ return '<a href="'+catHash(c.id, s)+'" data-cat="'+c.id+'" data-sub="'+s+'">'+s+'</a>'; }).join('') +
+        nested.map(function(n){ return '<a href="category.html?cat='+encodeURIComponent(n.id)+'">'+n.label+'</a>'; }).join('') +
       '</div>';
       return '<div class="cat-item">' +
         '<div class="cat-item-row">'+catLink+'<span class="sub-caret">▸</span></div>' +
@@ -1914,13 +1922,15 @@
         return '<div class="mobile-cat-item"><div class="mobile-cat-row"><a href="#shop" data-cat="all">All</a></div></div>';
       }
       var subs = subcategories[c.id] || [];
+      var nested = nestedPageCatsFor(c.id);
       var catLink = '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">'+c.label+'</a>';
-      if(subs.length === 0){
+      if(subs.length === 0 && nested.length === 0){
         return '<div class="mobile-cat-item"><div class="mobile-cat-row">'+catLink+'</div></div>';
       }
       var subList = '<div class="mobile-sub-list" data-sublist="'+c.id+'">' +
         '<a href="'+catHash(c.id)+'" data-cat="'+c.id+'">All '+c.label+'</a>' +
         subs.map(function(s){ return '<a href="'+catHash(c.id, s)+'" data-cat="'+c.id+'" data-sub="'+s+'">'+s+'</a>'; }).join('') +
+        nested.map(function(n){ return '<a href="category.html?cat='+encodeURIComponent(n.id)+'">'+n.label+'</a>'; }).join('') +
       '</div>';
       return '<div class="mobile-cat-item">' +
         '<div class="mobile-cat-row">'+catLink+
@@ -2020,7 +2030,7 @@
     if(!rows || !rows.length) return [];
     var pageRows = rows.filter(function(r){ return !!r.separate_page; });
     var sorted = pageRows.slice().sort(function(a,b){ return (a.sort_order||0) - (b.sort_order||0); });
-    return sorted.map(function(r){ return { id:r.key, label:r.label }; });
+    return sorted.map(function(r){ return { id:r.key, label:r.label, parent:r.parent_category || null }; });
   }
   function subcategoryRowsToMap(rows){
     if(!rows || !rows.length) return Object.assign({}, DEFAULT_SUBCATEGORIES);

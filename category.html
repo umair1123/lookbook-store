@@ -875,6 +875,7 @@
   /* ---------- STATE ---------- */
   var allCategories = [];      // every category (for nav)
   var allSubcategories = {};   // every category's subcategories (for nav flyouts)
+  var pageCategories = [];     // separate-page categories, for top-level links + nesting
   var thisCategory = null;     // the category this page is showing
   var products = [];           // this category's products only
   var coupons = {};
@@ -893,13 +894,15 @@
   function buildNavCategoryMenu(){
     var desktopHtml = allCategories.map(function(c){
       var subs = allSubcategories[c.id] || [];
+      var nested = pageCategories.filter(function(n){ return n.parent === c.id; });
       var catLink = '<a href="'+catPageHref(c.id)+'">'+c.label+'</a>';
-      if(subs.length === 0){
+      if(subs.length === 0 && nested.length === 0){
         return '<div class="cat-item"><div class="cat-item-row">'+catLink+'</div></div>';
       }
       var flyout = '<div class="sub-flyout">' +
         '<a href="'+catPageHref(c.id)+'">All ' + c.label + '</a>' +
         subs.map(function(s){ return '<a href="'+catPageHref(c.id, s)+'">'+s+'</a>'; }).join('') +
+        nested.map(function(n){ return '<a href="category.html?cat='+encodeURIComponent(n.id)+'">'+n.label+'</a>'; }).join('') +
       '</div>';
       return '<div class="cat-item"><div class="cat-item-row">'+catLink+'<span class="sub-caret">▸</span></div>'+flyout+'</div>';
     }).join('');
@@ -907,13 +910,15 @@
 
     var mobileHtml = allCategories.map(function(c){
       var subs = allSubcategories[c.id] || [];
+      var nested = pageCategories.filter(function(n){ return n.parent === c.id; });
       var catLink = '<a href="'+catPageHref(c.id)+'">'+c.label+'</a>';
-      if(subs.length === 0){
+      if(subs.length === 0 && nested.length === 0){
         return '<div class="mobile-cat-item"><div class="mobile-cat-row">'+catLink+'</div></div>';
       }
       var subList = '<div class="mobile-sub-list" data-sublist="'+c.id+'">' +
         '<a href="'+catPageHref(c.id)+'">All '+c.label+'</a>' +
         subs.map(function(s){ return '<a href="'+catPageHref(c.id, s)+'">'+s+'</a>'; }).join('') +
+        nested.map(function(n){ return '<a href="category.html?cat='+encodeURIComponent(n.id)+'">'+n.label+'</a>'; }).join('') +
       '</div>';
       return '<div class="mobile-cat-item"><div class="mobile-cat-row">'+catLink+
         '<button type="button" class="mobile-sub-toggle" data-toggle="'+c.id+'" aria-label="Show '+c.label+' types">' +
@@ -933,11 +938,12 @@
     }
   });
 
-  function buildPageCategoryNav(pageCategories){
+  function buildPageCategoryNav(pageCats){
+    var topLevel = pageCats.filter(function(c){ return !c.parent; });
     document.querySelectorAll('.primary-nav .page-cat-nav-item').forEach(function(el){ el.remove(); });
     var shopLi = document.querySelector('.primary-nav .nav-dropdown');
     if(shopLi){
-      var html = pageCategories.map(function(c){
+      var html = topLevel.map(function(c){
         var isCurrent = c.id === catKey;
         return '<li class="page-cat-nav-item"><a href="category.html?cat='+encodeURIComponent(c.id)+'"'+(isCurrent ? ' style="color:var(--brown-mid);"' : '')+'>'+c.label+'</a></li>';
       }).join('');
@@ -946,7 +952,7 @@
     document.querySelectorAll('#mobileMenu .page-cat-mobile-item').forEach(function(el){ el.remove(); });
     var mobileCatList = document.getElementById('mobileCatMenu');
     if(mobileCatList){
-      var mobileHtml = pageCategories.map(function(c){
+      var mobileHtml = topLevel.map(function(c){
         return '<a href="category.html?cat='+encodeURIComponent(c.id)+'" class="page-cat-mobile-item">'+c.label+'</a>';
       }).join('');
       mobileCatList.insertAdjacentHTML('afterend', mobileHtml);
@@ -1342,9 +1348,9 @@
       allCategories = catRows.filter(function(r){ return !r.separate_page; })
         .sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); })
         .map(function(r){ return { id:r.key, label:r.label }; });
-      var pageCategories = catRows.filter(function(r){ return !!r.separate_page; })
+      pageCategories = catRows.filter(function(r){ return !!r.separate_page; })
         .sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); })
-        .map(function(r){ return { id:r.key, label:r.label }; });
+        .map(function(r){ return { id:r.key, label:r.label, parent:r.parent_category || null }; });
       allSubcategories = {};
       (subRes.data || []).forEach(function(r){
         if(!allSubcategories[r.cat]) allSubcategories[r.cat] = [];

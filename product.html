@@ -946,6 +946,7 @@
   /* ---------- STATE ---------- */
   var allCategories = [];
   var allSubcategories = {};
+  var pageCategories = [];
   var product = null;
   var products = [];   // cart needs to resolve line items, so we keep the cart's own product; this page adds this product to that list on load
   var coupons = {};
@@ -962,13 +963,15 @@
   function buildNavCategoryMenu(){
     var desktopHtml = allCategories.map(function(c){
       var subs = allSubcategories[c.id] || [];
+      var nested = pageCategories.filter(function(n){ return n.parent === c.id; });
       var catLink = '<a href="'+catPageHref(c.id)+'">'+c.label+'</a>';
-      if(subs.length === 0){
+      if(subs.length === 0 && nested.length === 0){
         return '<div class="cat-item"><div class="cat-item-row">'+catLink+'</div></div>';
       }
       var flyout = '<div class="sub-flyout">' +
         '<a href="'+catPageHref(c.id)+'">All ' + c.label + '</a>' +
         subs.map(function(s){ return '<a href="'+catPageHref(c.id, s)+'">'+s+'</a>'; }).join('') +
+        nested.map(function(n){ return '<a href="category.html?cat='+encodeURIComponent(n.id)+'">'+n.label+'</a>'; }).join('') +
       '</div>';
       return '<div class="cat-item"><div class="cat-item-row">'+catLink+'<span class="sub-caret">▸</span></div>'+flyout+'</div>';
     }).join('');
@@ -976,13 +979,15 @@
 
     var mobileHtml = allCategories.map(function(c){
       var subs = allSubcategories[c.id] || [];
+      var nested = pageCategories.filter(function(n){ return n.parent === c.id; });
       var catLink = '<a href="'+catPageHref(c.id)+'">'+c.label+'</a>';
-      if(subs.length === 0){
+      if(subs.length === 0 && nested.length === 0){
         return '<div class="mobile-cat-item"><div class="mobile-cat-row">'+catLink+'</div></div>';
       }
       var subList = '<div class="mobile-sub-list" data-sublist="'+c.id+'">' +
         '<a href="'+catPageHref(c.id)+'">All '+c.label+'</a>' +
         subs.map(function(s){ return '<a href="'+catPageHref(c.id, s)+'">'+s+'</a>'; }).join('') +
+        nested.map(function(n){ return '<a href="category.html?cat='+encodeURIComponent(n.id)+'">'+n.label+'</a>'; }).join('') +
       '</div>';
       return '<div class="mobile-cat-item"><div class="mobile-cat-row">'+catLink+
         '<button type="button" class="mobile-sub-toggle" data-toggle="'+c.id+'" aria-label="Show '+c.label+' types">' +
@@ -990,6 +995,24 @@
         '</button></div>'+subList+'</div>';
     }).join('');
     document.getElementById('mobileCatMenu').innerHTML = '<div class="mobile-cat-item"><div class="mobile-cat-row"><a href="index.html#shop">All</a></div></div>' + mobileHtml;
+
+    var topLevel = pageCategories.filter(function(c){ return !c.parent; });
+    document.querySelectorAll('.primary-nav .page-cat-nav-item').forEach(function(el){ el.remove(); });
+    var shopLi = document.querySelector('.primary-nav .nav-dropdown');
+    if(shopLi){
+      var topHtml = topLevel.map(function(c){
+        return '<li class="page-cat-nav-item"><a href="category.html?cat='+encodeURIComponent(c.id)+'">'+c.label+'</a></li>';
+      }).join('');
+      shopLi.insertAdjacentHTML('afterend', topHtml);
+    }
+    document.querySelectorAll('#mobileMenu .page-cat-mobile-item').forEach(function(el){ el.remove(); });
+    var mobileCatList2 = document.getElementById('mobileCatMenu');
+    if(mobileCatList2){
+      var topMobileHtml = topLevel.map(function(c){
+        return '<a href="category.html?cat='+encodeURIComponent(c.id)+'" class="page-cat-mobile-item">'+c.label+'</a>';
+      }).join('');
+      mobileCatList2.insertAdjacentHTML('afterend', topMobileHtml);
+    }
   }
   document.addEventListener('click', function(e){
     var toggle = e.target.closest('[data-toggle]');
@@ -1302,6 +1325,9 @@
       allCategories = catRows.filter(function(r){ return !r.separate_page; })
         .sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); })
         .map(function(r){ return { id:r.key, label:r.label }; });
+      pageCategories = catRows.filter(function(r){ return !!r.separate_page; })
+        .sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); })
+        .map(function(r){ return { id:r.key, label:r.label, parent:r.parent_category || null }; });
       allSubcategories = {};
       (subRes.data || []).forEach(function(r){
         if(!allSubcategories[r.cat]) allSubcategories[r.cat] = [];
