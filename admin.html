@@ -23,7 +23,10 @@
 
   /* ---------- LAYOUT ---------- */
   .app{ display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
-  .sidebar{ background:var(--espresso); color:var(--camel-light); padding:28px 20px; position:sticky; top:0; height:100vh; }
+  .sidebar{ background:var(--espresso); color:var(--camel-light); padding:28px 20px; position:sticky; top:0; height:100vh; display:flex; flex-direction:column; }
+  .nav-scroll-list{ flex:1; overflow-y:auto; overflow-x:hidden; margin:0 -6px; padding:0 6px; }
+  .nav-scroll-list::-webkit-scrollbar{ width:5px; }
+  .nav-scroll-list::-webkit-scrollbar-thumb{ background:rgba(250,246,240,0.15); border-radius:3px; }
   .sidebar .brand{ font-family:'Fraunces',serif; font-size:20px; color:var(--cream); margin-bottom:4px; }
   .sidebar .brand em{ font-style:italic; color:var(--camel); }
   .sidebar .subtitle{ font-size:11.5px; color:rgba(231,211,184,0.6); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:36px; display:block; }
@@ -241,8 +244,10 @@
 
   @media (max-width:900px){
     .app{ grid-template-columns:1fr; }
-    .sidebar{ position:static; height:auto; display:flex; align-items:center; gap:16px; padding:18px 20px; }
+    .sidebar{ position:static; height:auto; flex-direction:row; align-items:center; gap:16px; padding:18px 20px; overflow:visible; }
     .sidebar .brand-block{ display:none; }
+    .nav-scroll-list{ display:flex; flex-direction:row; flex:1; overflow-x:auto; overflow-y:visible; gap:4px; margin:0; padding:0; }
+    .nav-item{ flex-shrink:0; margin-bottom:0; }
     .nav-item span{ display:none; }
     .sidebar-foot{ display:none; }
     .mobile-signout-btn{ display:flex !important; }
@@ -277,6 +282,7 @@
       <div class="brand">LOOK<em>book.</em></div>
       <span class="subtitle">Store Manager</span>
     </div>
+    <div class="nav-scroll-list">
     <button class="nav-item active" data-panel="products">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L22 8H6"/></svg>
       <span>Products</span>
@@ -319,6 +325,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
       <span>Setup &amp; Backup</span>
     </button>
+    </div>
     <button class="mobile-signout-btn" id="mobileSignOutBtn" title="Sign out" style="display:none; margin-left:auto;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
     </button>
@@ -2988,11 +2995,11 @@ alter table orders add column if not exists shipment_status text;</div>
       (order.discount > 0 ? '<div class="cart-subtotal line-discount"><span>'+(order.coupon_code || 'Discount')+'</span><strong>−Rs. '+Number(order.discount).toFixed(2)+'</strong></div>' : '') +
       '<div class="cart-subtotal"><span>Shipping</span><strong>'+(order.shipping_cost > 0 ? 'Rs. '+Number(order.shipping_cost).toFixed(2) : 'Free')+'</strong></div>' +
       '<div class="cart-subtotal line-total"><span>Total (Cash on Delivery)</span><strong>Rs. '+Number(order.total).toFixed(2)+'</strong></div>' +
-      '<div class="field" id="courierSection" style="margin-top:18px; border-top:1px solid var(--line); padding-top:18px;"><label>Courier / Shipment</label><div id="courierStatusBox"><p class="hint">Checking shipment status…</p></div></div>' +
       '<button class="btn btn-primary" id="whatsappConfirmBtn" style="width:100%; margin-top:18px; background:#25D366; border-color:#25D366;">' +
         '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="vertical-align:-2px; margin-right:6px;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.15-4.9-4.34-.14-.19-1.17-1.56-1.17-2.97 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.17.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.3-.29.47-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.29.75 1.24 1.61 2.01 1.11 1 2.04 1.31 2.33 1.46.29.14.46.12.63-.07.17-.19.72-.85.92-1.14.19-.29.38-.24.64-.14.26.1 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36z"/></svg>' +
         'Confirm via WhatsApp' +
       '</button>' +
+      '<div class="field" id="courierSection" style="margin-top:18px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:18px 0;"><label>Courier / Shipment</label><div id="courierStatusBox"><p class="hint">Checking shipment status…</p></div></div>' +
       '<button class="btn btn-outline" id="printInvoiceBtn" style="width:100%; margin-top:10px;">Print Invoice</button>' +
       '<button class="btn btn-outline" id="deleteOrderBtn" style="width:100%; margin-top:10px; color:var(--danger); border-color:var(--danger);">Delete Order</button>';
     document.getElementById('orderModal').classList.add('open');
