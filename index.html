@@ -738,17 +738,17 @@
 <section class="hero" id="home">
   <div class="container">
     <div class="hero-copy reveal in">
-      <p class="eyebrow">Autumn / Winter Edit</p>
-      <h1>Wear your <em>story</em>,<br>one look at a time.</h1>
-      <p class="lede">Look Book is a contemporary fashion house for people who dress with intention — considered silhouettes, honest fabrics, and pieces built to outlast a season.</p>
+      <p class="eyebrow" id="heroEyebrow">Autumn / Winter Edit</p>
+      <h1><span id="heroHeadLine1">Wear your</span> <em id="heroHeadEm">story</em>,<br><span id="heroHeadLine2">one look at a time.</span></h1>
+      <p class="lede" id="heroLede">Look Book is a contemporary fashion house for people who dress with intention — considered silhouettes, honest fabrics, and pieces built to outlast a season.</p>
       <div class="hero-cta">
-        <a href="#shop" class="btn btn-primary">Shop New Arrivals</a>
-        <a href="#services" class="btn btn-outline">View The Edit</a>
+        <a href="#shop" class="btn btn-primary" id="heroBtnPrimary">Shop New Arrivals</a>
+        <a href="#services" class="btn btn-outline" id="heroBtnSecondary">View The Edit</a>
       </div>
       <div class="hero-meta">
-        <div><strong>120+</strong><span>Curated Looks</span></div>
-        <div><strong>18k</strong><span>Happy Wardrobes</span></div>
-        <div><strong>4.9★</strong><span>Average Rating</span></div>
+        <div><strong id="heroStat1Num">120+</strong><span id="heroStat1Label">Curated Looks</span></div>
+        <div><strong id="heroStat2Num">18k</strong><span id="heroStat2Label">Happy Wardrobes</span></div>
+        <div><strong id="heroStat3Num">4.9★</strong><span id="heroStat3Label">Average Rating</span></div>
       </div>
     </div>
     <div class="hero-visual">
@@ -764,7 +764,7 @@
 
 <!-- ============ MARQUEE ============ -->
 <div class="marquee-strip">
-  <div class="marquee-track">
+  <div class="marquee-track" id="marqueeTrack">
     <span>Free Shipping Over Rs. 120</span><span>New Season Arrivals</span><span>Curated Seasonal Edits</span><span>30-Day Easy Returns</span><span>Personal Styling</span>
     <span>Free Shipping Over Rs. 120</span><span>New Season Arrivals</span><span>Curated Seasonal Edits</span><span>30-Day Easy Returns</span><span>Personal Styling</span>
   </div>
@@ -778,16 +778,16 @@
       <div class="img-b"><img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=600&auto=format&fit=crop" alt="Detail of tailored fabric and stitching"></div>
     </div>
     <div class="about-copy reveal">
-      <p class="eyebrow">Our Story</p>
-      <h2 style="margin:16px 0 22px; font-size:clamp(30px,3.6vw,42px); color:var(--espresso);">Founded on the belief that style is <em style="color:var(--brown-mid); font-style:italic;">personal</em>, not seasonal.</h2>
-      <p>Look Book began in a small studio with one idea: build a wardrobe you actually reach for. Every piece we release is developed over months, fit-tested on real bodies, and cut from fabrics we'd wear ourselves.</p>
-      <p>Today we work with a small circle of ethical mills and independent ateliers, releasing considered capsule collections rather than chasing every trend.</p>
+      <p class="eyebrow" id="aboutEyebrow">Our Story</p>
+      <h2 style="margin:16px 0 22px; font-size:clamp(30px,3.6vw,42px); color:var(--espresso);"><span id="aboutHeadPre">Founded on the belief that style is</span> <em id="aboutHeadEm" style="color:var(--brown-mid); font-style:italic;">personal</em><span id="aboutHeadPost">, not seasonal.</span></h2>
+      <p id="aboutBody1">Look Book began in a small studio with one idea: build a wardrobe you actually reach for. Every piece we release is developed over months, fit-tested on real bodies, and cut from fabrics we'd wear ourselves.</p>
+      <p id="aboutBody2">Today we work with a small circle of ethical mills and independent ateliers, releasing considered capsule collections rather than chasing every trend.</p>
       <ul class="about-list">
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg> Responsibly sourced, low-waste fabrics</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg> Small-batch production, zero overstock</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg> Fit-checked across 12 body types</li>
       </ul>
-      <a href="#services" class="btn btn-primary" style="margin-top:36px;">Discover Our Process</a>
+      <a href="#services" class="btn btn-primary" id="aboutBtn" style="margin-top:36px;">Discover Our Process</a>
     </div>
   </div>
 </section>
@@ -796,9 +796,9 @@
 <section class="section bg-paper" id="services">
   <div class="container">
     <div class="section-head reveal">
-      <p class="eyebrow">What We Offer</p>
-      <h2>The Edit — <em>four ways</em> we take care of your wardrobe.</h2>
-      <p>From first fitting to final delivery, every service is designed around one goal: getting dressed should feel easy.</p>
+      <p class="eyebrow" id="servicesEyebrow">What We Offer</p>
+      <h2><span id="servicesHeadPre">The Edit —</span> <em id="servicesHeadEm">four ways</em> <span id="servicesHeadPost">we take care of your wardrobe.</span></h2>
+      <p id="servicesSubtext">From first fitting to final delivery, every service is designed around one goal: getting dressed should feel easy.</p>
     </div>
     <div class="edit-list">
       <div class="edit-row reveal">
@@ -938,8 +938,8 @@
 <section class="testi-section" id="testimonials">
   <div class="container">
     <div class="section-head center" style="margin-bottom:0;">
-      <p class="eyebrow">Client Notes</p>
-      <h2 style="color:var(--cream);">What our <em style="color:var(--camel-light); font-style:italic;">community</em> is saying</h2>
+      <p class="eyebrow" id="testiEyebrow">Client Notes</p>
+      <h2 style="color:var(--cream);"><span id="testiHeadPre">What our</span> <em id="testiHeadEm" style="color:var(--camel-light); font-style:italic;">community</em> <span id="testiHeadPost">is saying</span></h2>
     </div>
     <div class="testi-slider" id="testiSlider">
       <div class="testi-slide active">
@@ -971,8 +971,8 @@
 <!-- ============ NEWSLETTER ============ -->
 <section class="newsletter reveal">
   <div class="container">
-    <h2>Join the <em>inner circle</em>.</h2>
-    <p>Get early access to new drops, styling notes, and subscriber-only pricing — one email a week, nothing more.</p>
+    <h2><span id="nlHeadPre">Join the</span> <em id="nlHeadEm">inner circle</em><span id="nlHeadPost">.</span></h2>
+    <p id="nlSubtext">Get early access to new drops, styling notes, and subscriber-only pricing — one email a week, nothing more.</p>
     <form class="newsletter-form" id="newsletterForm">
       <input type="email" id="newsletterEmail" placeholder="Enter your email address" required aria-label="Email address">
       <button type="submit">Subscribe <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
@@ -984,17 +984,17 @@
 <section class="section" id="contact">
   <div class="container contact-grid">
     <div class="contact-info reveal">
-      <p class="eyebrow">Get In Touch</p>
-      <h2>We'd love to hear from you.</h2>
-      <p>Questions about an order, a fit, or a future collaboration — our team responds within one business day.</p>
+      <p class="eyebrow" id="contactEyebrow">Get In Touch</p>
+      <h2 id="contactHead">We'd love to hear from you.</h2>
+      <p id="contactSubtext">Questions about an order, a fit, or a future collaboration — our team responds within one business day.</p>
 
       <div class="contact-detail">
         <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5a2 2 0 0 1 2-2h3l2 5-2.5 1.5a11 11 0 0 0 5 5L14 12l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 5z"/></svg></div>
-        <div><strong>Call Us</strong><span>+1 (555) 021-4487</span></div>
+        <div><strong>Call Us</strong><span id="contactPhone">+1 (555) 021-4487</span></div>
       </div>
       <div class="contact-detail">
         <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></div>
-        <div><strong>Email</strong><span>hello@lookbook-store.com</span></div>
+        <div><strong>Email</strong><span id="contactEmail">hello@lookbook-store.com</span></div>
       </div>
       <div class="contact-detail">
         <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
@@ -1035,7 +1035,7 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <a href="#home" class="logo">LOOK<em>book.</em></a>
-        <p>A contemporary fashion house for people who dress with intention. Curated edits, considered essentials, made to last.</p>
+        <p id="footerTagline">A contemporary fashion house for people who dress with intention. Curated edits, considered essentials, made to last.</p>
       </div>
       <div>
         <h4>Shop</h4>
@@ -1066,7 +1066,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© <span id="year"></span> Look Book. All rights reserved.</span>
+      <span>© <span id="year"></span> <span id="footerCopyright">Look Book. All rights reserved.</span></span>
       <span><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a></span>
     </div>
   </div>
@@ -1108,9 +1108,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
     <div id="exitFormView">
-      <p class="eyebrow" style="justify-content:center;">Before You Go</p>
-      <h3>Wait — get <em>10% off</em></h3>
-      <p class="exit-sub">Share your WhatsApp number and we'll send you a discount code for your first order.</p>
+      <p class="eyebrow" id="popupEyebrow" style="justify-content:center;">Before You Go</p>
+      <h3><span id="popupHeadPre">Wait — get</span> <em id="popupHeadEm">10% off</em></h3>
+      <p class="exit-sub" id="popupSubtext">Share your WhatsApp number and we'll send you a discount code for your first order.</p>
       <div class="field"><label>WhatsApp Number</label><input type="tel" id="exit-whatsapp" placeholder="+92 300 1234567"></div>
       <div class="field"><label>Name — optional</label><input type="text" id="exit-name" placeholder="Your name"></div>
       <div class="field"><label>Email — optional</label><input type="email" id="exit-email" placeholder="you@email.com"></div>
@@ -1794,6 +1794,44 @@
   var popupSettings = { enabled:true, coupon_code:'WELCOME10', delay_seconds:45 };
   var heroSlides = [];
 
+  /* ---------- SITE CONTENT (CMS) ---------- */
+  // Maps a Supabase site_content.key to the element whose text it controls.
+  // Any key not present in the database simply leaves the page's built-in default text as-is.
+  var CMS_TEXT_TARGETS = {
+    hero_eyebrow:'heroEyebrow', hero_heading_line1:'heroHeadLine1', hero_heading_em:'heroHeadEm', hero_heading_line2:'heroHeadLine2',
+    hero_description:'heroLede', hero_btn_primary:'heroBtnPrimary', hero_btn_secondary:'heroBtnSecondary',
+    hero_stat1_num:'heroStat1Num', hero_stat1_label:'heroStat1Label',
+    hero_stat2_num:'heroStat2Num', hero_stat2_label:'heroStat2Label',
+    hero_stat3_num:'heroStat3Num', hero_stat3_label:'heroStat3Label',
+    about_eyebrow:'aboutEyebrow', about_heading_pre:'aboutHeadPre', about_heading_em:'aboutHeadEm', about_heading_post:'aboutHeadPost',
+    about_body1:'aboutBody1', about_body2:'aboutBody2', about_btn:'aboutBtn',
+    services_eyebrow:'servicesEyebrow', services_heading_pre:'servicesHeadPre', services_heading_em:'servicesHeadEm', services_heading_post:'servicesHeadPost',
+    services_subtext:'servicesSubtext',
+    testimonials_eyebrow:'testiEyebrow', testimonials_heading_pre:'testiHeadPre', testimonials_heading_em:'testiHeadEm', testimonials_heading_post:'testiHeadPost',
+    newsletter_heading_pre:'nlHeadPre', newsletter_heading_em:'nlHeadEm', newsletter_heading_post:'nlHeadPost', newsletter_subtext:'nlSubtext',
+    contact_eyebrow:'contactEyebrow', contact_heading:'contactHead', contact_subtext:'contactSubtext', contact_phone:'contactPhone', contact_email:'contactEmail',
+    footer_tagline:'footerTagline', footer_copyright:'footerCopyright',
+    popup_eyebrow:'popupEyebrow', popup_heading_pre:'popupHeadPre', popup_heading_em:'popupHeadEm', popup_subtext:'popupSubtext'
+  };
+  function contentRowsToMap(rows){
+    var map = {};
+    (rows || []).forEach(function(r){ if(r.value) map[r.key] = r.value; });
+    return map;
+  }
+  function applyContentMap(map){
+    Object.keys(CMS_TEXT_TARGETS).forEach(function(key){
+      var el = document.getElementById(CMS_TEXT_TARGETS[key]);
+      if(el && map[key]) el.textContent = map[key];
+    });
+  }
+  function applyMarqueeItems(rows){
+    if(!rows || !rows.length) return; // keep the built-in default strip
+    var track = document.getElementById('marqueeTrack');
+    if(!track) return;
+    var items = rows.map(function(r){ return '<span>'+r.text+'</span>'; }).join('');
+    track.innerHTML = items + items; // duplicated once for the seamless scroll loop
+  }
+
   /* ---------- HERO SLIDER ---------- */
   var heroSlideIndex = 0;
   var heroSlideTimer = null;
@@ -2150,9 +2188,11 @@
         sb.from('categories').select('*'),
         sb.from('subcategories').select('*'),
         sb.from('popup_settings').select('*').eq('id', 1).maybeSingle(),
-        sb.from('hero_slides').select('*').order('sort_order')
+        sb.from('hero_slides').select('*').order('sort_order'),
+        sb.from('site_content').select('*'),
+        sb.from('marquee_items').select('*').order('sort_order')
       ]).then(function(results){
-        var prodRes = results[0], dealsRes = results[1], couponsRes = results[2], catRes = results[3], subRes = results[4], popupRes = results[5], heroRes = results[6];
+        var prodRes = results[0], dealsRes = results[1], couponsRes = results[2], catRes = results[3], subRes = results[4], popupRes = results[5], heroRes = results[6], contentRes = results[7], marqueeRes = results[8];
         products = (prodRes.data && prodRes.data.length) ? prodRes.data : DEFAULT_PRODUCTS;
         dealsConfig = (dealsRes.data && dealsRes.data.length) ? dealsRowsToConfig(dealsRes.data) : DEFAULT_DEALS;
         coupons = (couponsRes.data && couponsRes.data.length) ? couponRowsToConfig(couponsRes.data) : DEFAULT_COUPONS;
@@ -2164,6 +2204,8 @@
           popupSettings = { enabled: popupRes.data.enabled !== false, coupon_code: popupRes.data.coupon_code || 'WELCOME10', delay_seconds: popupRes.data.delay_seconds || 45 };
         }
         heroSlides = (heroRes && heroRes.data) ? heroRes.data : [];
+        applyContentMap(contentRowsToMap(contentRes.data));
+        applyMarqueeItems(marqueeRes.data);
         init();
         initExitIntentTriggers();
         initHeroSlider();
@@ -2233,6 +2275,20 @@
           sb.from('hero_slides').select('*').order('sort_order').then(function(res){
             heroSlides = (res && res.data) ? res.data : [];
             initHeroSlider();
+          });
+        }).subscribe();
+
+      sb.channel('public:content-site')
+        .on('postgres_changes', { event:'*', schema:'public', table:'site_content' }, function(){
+          sb.from('site_content').select('*').then(function(res){
+            applyContentMap(contentRowsToMap(res.data));
+          });
+        }).subscribe();
+
+      sb.channel('public:marquee-site')
+        .on('postgres_changes', { event:'*', schema:'public', table:'marquee_items' }, function(){
+          sb.from('marquee_items').select('*').order('sort_order').then(function(res){
+            applyMarqueeItems(res.data);
           });
         }).subscribe();
     }catch(err){

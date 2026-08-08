@@ -285,6 +285,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 15l-5-5-9 9"/></svg>
       <span>Hero Slider</span>
     </button>
+    <button class="nav-item" data-panel="content">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      <span>Content</span>
+    </button>
     <button class="nav-item" data-panel="categories">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       <span>Categories</span>
@@ -418,6 +422,136 @@
           <tbody id="heroSlidesTbody"></tbody>
         </table>
         <div class="empty-state" id="heroEmptyState" style="display:none;">No slides yet — showing the default hero image. Add up to 5 above.</div>
+      </div>
+    </section>
+
+    <!-- ============ CONTENT PANEL ============ -->
+    <section class="panel" id="panel-content">
+      <div class="section-title"><h2>Content</h2></div>
+      <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:22px; max-width:640px;">Edit the text shown across your homepage — headings, buttons, and section copy. Changes save automatically when you click out of a field, and go live on your site right away. Leave a field blank to keep the current default text.</p>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head"><h3><span class="deal-badge">Marquee</span> Scrolling ticker</h3></div>
+        <p class="hint" style="margin-bottom:14px;">The scrolling strip of short messages under your hero image (e.g. "Free Shipping Over Rs. 120"). Add up to 8, reorder, or delete — leave empty to keep the default set.</p>
+        <div style="display:flex; gap:10px; margin-bottom:14px;">
+          <input type="text" id="marquee-new-text" placeholder="e.g. Free Shipping Over Rs. 2000" style="flex:1;">
+          <button class="btn btn-primary btn-sm" id="addMarqueeBtn">Add</button>
+        </div>
+        <div id="marqueeItemsList"></div>
+      </div>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head"><h3><span class="deal-badge">Hero</span> Homepage banner text</h3></div>
+        <div class="deal-manage-body" style="display:block;">
+          <div class="field"><label>Eyebrow label</label><input type="text" data-key="hero_eyebrow" placeholder="Autumn / Winter Edit"></div>
+          <div class="form-row">
+            <div class="field"><label>Heading — line 1</label><input type="text" data-key="hero_heading_line1" placeholder="Wear your"></div>
+            <div class="field"><label>Heading — italic word</label><input type="text" data-key="hero_heading_em" placeholder="story"></div>
+          </div>
+          <div class="field"><label>Heading — line 2</label><input type="text" data-key="hero_heading_line2" placeholder="one look at a time."></div>
+          <div class="field"><label>Description</label><textarea rows="2" data-key="hero_description" placeholder="Look Book is a contemporary fashion house…" style="width:100%; border:1px solid var(--line); background:var(--white); padding:12px 14px; font-size:14px; border-radius:4px; font-family:inherit;"></textarea></div>
+          <div class="form-row">
+            <div class="field"><label>Primary button text</label><input type="text" data-key="hero_btn_primary" placeholder="Shop New Arrivals"></div>
+            <div class="field"><label>Secondary button text</label><input type="text" data-key="hero_btn_secondary" placeholder="View The Edit"></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Stat 1 number</label><input type="text" data-key="hero_stat1_num" placeholder="120+"></div>
+            <div class="field"><label>Stat 1 label</label><input type="text" data-key="hero_stat1_label" placeholder="Curated Looks"></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Stat 2 number</label><input type="text" data-key="hero_stat2_num" placeholder="18k"></div>
+            <div class="field"><label>Stat 2 label</label><input type="text" data-key="hero_stat2_label" placeholder="Happy Wardrobes"></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Stat 3 number</label><input type="text" data-key="hero_stat3_num" placeholder="4.9★"></div>
+            <div class="field"><label>Stat 3 label</label><input type="text" data-key="hero_stat3_label" placeholder="Average Rating"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head"><h3><span class="deal-badge">About</span> Our Story section</h3></div>
+        <div class="deal-manage-body" style="display:block;">
+          <div class="field"><label>Eyebrow label</label><input type="text" data-key="about_eyebrow" placeholder="Our Story"></div>
+          <div class="form-row">
+            <div class="field"><label>Heading — before italic</label><input type="text" data-key="about_heading_pre" placeholder="Founded on the belief that style is"></div>
+            <div class="field"><label>Heading — italic word</label><input type="text" data-key="about_heading_em" placeholder="personal"></div>
+          </div>
+          <div class="field"><label>Heading — after italic</label><input type="text" data-key="about_heading_post" placeholder=", not seasonal."></div>
+          <div class="field"><label>Body paragraph 1</label><textarea rows="2" data-key="about_body1" style="width:100%; border:1px solid var(--line); background:var(--white); padding:12px 14px; font-size:14px; border-radius:4px; font-family:inherit;"></textarea></div>
+          <div class="field"><label>Body paragraph 2</label><textarea rows="2" data-key="about_body2" style="width:100%; border:1px solid var(--line); background:var(--white); padding:12px 14px; font-size:14px; border-radius:4px; font-family:inherit;"></textarea></div>
+          <div class="field"><label>Button text</label><input type="text" data-key="about_btn" placeholder="Discover Our Process"></div>
+        </div>
+      </div>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head"><h3><span class="deal-badge">Services</span> The Edit section</h3></div>
+        <div class="deal-manage-body" style="display:block;">
+          <div class="field"><label>Eyebrow label</label><input type="text" data-key="services_eyebrow" placeholder="What We Offer"></div>
+          <div class="form-row">
+            <div class="field"><label>Heading — before italic</label><input type="text" data-key="services_heading_pre" placeholder="The Edit —"></div>
+            <div class="field"><label>Heading — italic words</label><input type="text" data-key="services_heading_em" placeholder="four ways"></div>
+          </div>
+          <div class="field"><label>Heading — after italic</label><input type="text" data-key="services_heading_post" placeholder="we take care of your wardrobe."></div>
+          <div class="field"><label>Subtext</label><input type="text" data-key="services_subtext" placeholder="From first fitting to final delivery…"></div>
+        </div>
+      </div>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head"><h3><span class="deal-badge">Reviews</span> Testimonials heading</h3></div>
+        <div class="deal-manage-body" style="display:block;">
+          <div class="field"><label>Eyebrow label</label><input type="text" data-key="testimonials_eyebrow" placeholder="Client Notes"></div>
+          <div class="form-row">
+            <div class="field"><label>Heading — before italic</label><input type="text" data-key="testimonials_heading_pre" placeholder="What our"></div>
+            <div class="field"><label>Heading — italic word</label><input type="text" data-key="testimonials_heading_em" placeholder="community"></div>
+          </div>
+          <div class="field"><label>Heading — after italic</label><input type="text" data-key="testimonials_heading_post" placeholder="is saying"></div>
+        </div>
+      </div>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head"><h3><span class="deal-badge">Newsletter</span> Signup section</h3></div>
+        <div class="deal-manage-body" style="display:block;">
+          <div class="form-row">
+            <div class="field"><label>Heading — before italic</label><input type="text" data-key="newsletter_heading_pre" placeholder="Join the"></div>
+            <div class="field"><label>Heading — italic words</label><input type="text" data-key="newsletter_heading_em" placeholder="inner circle"></div>
+          </div>
+          <div class="field"><label>Subtext</label><input type="text" data-key="newsletter_subtext" placeholder="Get early access to new drops…"></div>
+        </div>
+      </div>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head"><h3><span class="deal-badge">Contact</span> Get In Touch section</h3></div>
+        <div class="deal-manage-body" style="display:block;">
+          <div class="field"><label>Eyebrow label</label><input type="text" data-key="contact_eyebrow" placeholder="Get In Touch"></div>
+          <div class="field"><label>Heading</label><input type="text" data-key="contact_heading" placeholder="We'd love to hear from you."></div>
+          <div class="field"><label>Subtext</label><input type="text" data-key="contact_subtext" placeholder="Questions about an order, a fit…"></div>
+          <div class="form-row">
+            <div class="field"><label>Phone number shown</label><input type="text" data-key="contact_phone" placeholder="+1 (555) 021-4487"></div>
+            <div class="field"><label>Email shown</label><input type="text" data-key="contact_email" placeholder="hello@lookbook-store.com"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head"><h3><span class="deal-badge">Popup</span> Exit-intent offer text</h3></div>
+        <div class="deal-manage-body" style="display:block;">
+          <div class="field"><label>Eyebrow label</label><input type="text" data-key="popup_eyebrow" placeholder="Before You Go"></div>
+          <div class="form-row">
+            <div class="field"><label>Heading — before italic</label><input type="text" data-key="popup_heading_pre" placeholder="Wait — get"></div>
+            <div class="field"><label>Heading — italic words</label><input type="text" data-key="popup_heading_em" placeholder="10% off"></div>
+          </div>
+          <div class="field"><label>Subtext</label><input type="text" data-key="popup_subtext" placeholder="Share your WhatsApp number…"></div>
+          <p class="hint">The coupon code and delay are set in the Deals &amp; Discounts tab, not here.</p>
+        </div>
+      </div>
+
+      <div class="deal-manage-card">
+        <div class="deal-manage-head"><h3><span class="deal-badge">Footer</span> Footer text</h3></div>
+        <div class="deal-manage-body" style="display:block;">
+          <div class="field"><label>Tagline (under the logo)</label><input type="text" data-key="footer_tagline" placeholder="A contemporary fashion house…"></div>
+          <div class="field"><label>Copyright line (year is added automatically)</label><input type="text" data-key="footer_copyright" placeholder="Look Book. All rights reserved."></div>
+        </div>
       </div>
     </section>
 
@@ -943,6 +1077,64 @@ alter publication supabase_realtime add table hero_slides;</div>
       </div>
 
       <div class="instructions">
+        <h3>Also new: site content (Content tab) &amp; ticker/marquee</h3>
+        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">Run this once to enable the new Content tab — a simple key/value store for editable customer-facing text, plus a dedicated list for the scrolling ticker so you can add, edit, delete, and reorder its messages.</p>
+        <div class="code-block" id="cmsRulesBlock">create table site_content (
+  key text primary key,
+  value text,
+  updated_at timestamptz not null default now()
+);
+
+alter table site_content enable row level security;
+
+create policy "Public read site content" on site_content for select using (true);
+create policy "Admins write site content" on site_content for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+alter publication supabase_realtime add table site_content;
+
+create table marquee_items (
+  id uuid primary key default gen_random_uuid(),
+  text text not null,
+  sort_order int not null default 0
+);
+
+alter table marquee_items enable row level security;
+
+create policy "Public read marquee" on marquee_items for select using (true);
+create policy "Admins write marquee" on marquee_items for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+alter publication supabase_realtime add table marquee_items;</div>
+        <button class="btn btn-outline btn-sm copy-btn" id="copyCmsRulesBtn">Copy Addition</button>
+      </div>
+
+      <div class="instructions">
+        <h3>Also new: courier integration</h3>
+        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">Run this once to enable the "Send to Courier" button and store shipment/tracking results against each order. The actual courier API call itself lives in a separate Supabase Edge Function (see below) — no courier credentials are ever stored here or in your site's files.</p>
+        <div class="code-block" id="courierRulesBlock">create table courier_shipments (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid not null references orders(id) on delete cascade,
+  courier_name text,
+  consignment_number text,
+  tracking_number text,
+  status text default 'pending',
+  raw_response jsonb,
+  created_at timestamptz not null default now()
+);
+
+alter table courier_shipments enable row level security;
+
+create policy "Admins manage courier shipments" on courier_shipments for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+alter publication supabase_realtime add table courier_shipments;
+
+alter table orders add column if not exists shipment_status text;</div>
+        <button class="btn btn-outline btn-sm copy-btn" id="copyCourierRulesBtn">Copy Addition</button>
+      </div>
+
+      <div class="instructions">
         <h3>Starter catalog</h3>
         <p style="font-size:13px; color:var(--brown-deep); line-height:1.8; margin-bottom:14px;">Loads 27 sample products plus starter deals and coupon codes into a fresh, empty database. Safe to skip if you'd rather start from scratch.</p>
         <button class="btn btn-primary btn-sm" id="seedBtnSetup">Load Starter Catalog</button>
@@ -1238,7 +1430,7 @@ alter publication supabase_realtime add table hero_slides;</div>
   ];
 
   /* ---------- STATE ---------- */
-  var state = { products:[], deals:{}, coupons:{}, subcategories:[], categories:[], orders:[], leads:[], heroSlides:[], shipping:{ enabled:true, flat_rate:0, free_threshold:null }, popup:{ enabled:true, coupon_code:'WELCOME10', delay_seconds:45 } };
+  var state = { products:[], deals:{}, coupons:{}, subcategories:[], categories:[], orders:[], leads:[], heroSlides:[], content:{}, marqueeItems:[], shipping:{ enabled:true, flat_rate:0, free_threshold:null }, popup:{ enabled:true, coupon_code:'WELCOME10', delay_seconds:45 } };
   var prodFilter = { cat:'all', search:'' };
   var subFilter = { cat:'all' };
   var sb = null;
@@ -1543,6 +1735,24 @@ alter publication supabase_realtime add table hero_slides;</div>
     });
   }
 
+  function refreshSiteContent(){
+    return sb.from('site_content').select('*').then(function(res){
+      if(res.error){ console.error(res.error); return; }
+      var map = {};
+      (res.data || []).forEach(function(r){ map[r.key] = r.value; });
+      state.content = map;
+      renderContentForm();
+    });
+  }
+
+  function refreshMarqueeItems(){
+    return sb.from('marquee_items').select('*').order('sort_order').then(function(res){
+      if(res.error){ console.error(res.error); return; }
+      state.marqueeItems = res.data || [];
+      renderMarqueeItemsList();
+    });
+  }
+
   function refreshPopupSettings(){
     return sb.from('popup_settings').select('*').eq('id', 1).maybeSingle().then(function(res){
       if(res.error){ console.error(res.error); return; }
@@ -1595,7 +1805,7 @@ alter publication supabase_realtime add table hero_slides;</div>
     }
 
     setStatus('Connecting…');
-    Promise.all([refreshProducts(), refreshDeals(), refreshCoupons(), refreshSubcategories(), refreshCategories(), refreshOrders(), refreshShipping(), refreshLeads(), refreshPopupSettings(), refreshHeroSlides()]);
+    Promise.all([refreshProducts(), refreshDeals(), refreshCoupons(), refreshSubcategories(), refreshCategories(), refreshOrders(), refreshShipping(), refreshLeads(), refreshPopupSettings(), refreshHeroSlides(), refreshSiteContent(), refreshMarqueeItems()]);
 
     var pCh = sb.channel('admin-products')
       .on('postgres_changes', { event:'*', schema:'public', table:'products' }, refreshProducts)
@@ -1627,7 +1837,13 @@ alter publication supabase_realtime add table hero_slides;</div>
     var hCh = sb.channel('admin-hero')
       .on('postgres_changes', { event:'*', schema:'public', table:'hero_slides' }, refreshHeroSlides)
       .subscribe();
-    channels = [pCh, dCh, cCh, sCh, catCh, oCh, shCh, lCh, poCh, hCh];
+    var contCh = sb.channel('admin-content')
+      .on('postgres_changes', { event:'*', schema:'public', table:'site_content' }, refreshSiteContent)
+      .subscribe();
+    var mqCh = sb.channel('admin-marquee')
+      .on('postgres_changes', { event:'*', schema:'public', table:'marquee_items' }, refreshMarqueeItems)
+      .subscribe();
+    channels = [pCh, dCh, cCh, sCh, catCh, oCh, shCh, lCh, poCh, hCh, contCh, mqCh];
   }
 
   /* ---------- SEED STARTER CATALOG ---------- */
@@ -2167,6 +2383,105 @@ alter publication supabase_realtime add table hero_slides;</div>
     }
   });
 
+  /* ---------- CONTENT PANEL (site_content CMS) ---------- */
+  function isEditingContent(){
+    var active = document.activeElement;
+    return !!(active && active.closest && active.closest('#panel-content') && active.matches('[data-key]'));
+  }
+  function renderContentForm(){
+    if(isEditingContent()) return; // don't clobber a field the admin is actively typing in
+    document.querySelectorAll('#panel-content [data-key]').forEach(function(el){
+      var key = el.dataset.key;
+      el.value = state.content.hasOwnProperty(key) ? (state.content[key] || '') : '';
+    });
+  }
+  document.getElementById('panel-content').addEventListener('blur', function(e){
+    var el = e.target;
+    if(!el.matches || !el.matches('[data-key]')) return;
+    var key = el.dataset.key;
+    var value = el.value.trim();
+    var payload = value ? value : null; // empty field = fall back to the site's built-in default
+    if(state.content[key] === value) return; // no change, skip the write
+    sb.from('site_content').upsert({ key:key, value:payload, updated_at:new Date().toISOString() }, { onConflict:'key' }).then(function(res){
+      if(res.error){ showToast('Save failed: ' + res.error.message); return; }
+      state.content[key] = payload;
+    });
+  }, true); // capture phase, since blur doesn't bubble
+
+  /* ---------- MARQUEE ITEMS ---------- */
+  function renderMarqueeItemsList(){
+    var list = state.marqueeItems;
+    document.getElementById('addMarqueeBtn').disabled = list.length >= 8;
+    document.getElementById('marqueeItemsList').innerHTML = list.map(function(m, i){
+      return '<div class="size-stock-row" data-id="'+m.id+'" style="margin-bottom:8px;">' +
+        '<input type="text" class="marquee-edit-input" value="'+m.text.replace(/"/g,'&quot;')+'" style="flex:1; border:1px solid var(--line); border-radius:4px; padding:8px 10px; font-size:13px; background:var(--white);">' +
+        '<div class="stock-input-wrap" style="gap:6px;">' +
+          '<button class="icon-action" data-act="up" title="Move earlier"'+(i===0?' disabled style="opacity:.3;"':'')+' style="width:auto; padding:4px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>' +
+          '<button class="icon-action" data-act="down" title="Move later"'+(i===list.length-1?' disabled style="opacity:.3;"':'')+' style="width:auto; padding:4px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>' +
+          '<button class="icon-action" data-act="delete" title="Delete" style="width:auto; padding:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger);"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  document.getElementById('addMarqueeBtn').addEventListener('click', function(){
+    var text = document.getElementById('marquee-new-text').value.trim();
+    if(!text){ showToast('Enter some text first'); return; }
+    if(state.marqueeItems.length >= 8){ showToast('Maximum 8 messages — delete one first'); return; }
+    var nextOrder = state.marqueeItems.length ? Math.max.apply(null, state.marqueeItems.map(function(m){ return m.sort_order || 0; })) + 1 : 0;
+    sb.from('marquee_items').insert({ text:text, sort_order:nextOrder }).then(function(res){
+      if(res.error){ showToast('Add failed: ' + res.error.message); return; }
+      document.getElementById('marquee-new-text').value = '';
+      showToast('Message added');
+      refreshMarqueeItems();
+    });
+  });
+  document.getElementById('marquee-new-text').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('addMarqueeBtn').click(); }
+  });
+
+  document.getElementById('marqueeItemsList').addEventListener('blur', function(e){
+    if(!e.target.matches || !e.target.matches('.marquee-edit-input')) return;
+    var row = e.target.closest('[data-id]');
+    var id = row.dataset.id;
+    var item = state.marqueeItems.find(function(m){ return m.id === id; });
+    var newText = e.target.value.trim();
+    if(!newText){ e.target.value = item ? item.text : ''; return; }
+    if(item && item.text === newText) return;
+    sb.from('marquee_items').update({ text:newText }).eq('id', id).then(function(res){
+      if(res.error){ showToast('Save failed: ' + res.error.message); return; }
+      if(item) item.text = newText;
+    });
+  }, true);
+
+  document.getElementById('marqueeItemsList').addEventListener('click', function(e){
+    var row = e.target.closest('[data-id]');
+    if(!row) return;
+    var id = row.dataset.id;
+    var idx = state.marqueeItems.findIndex(function(m){ return m.id === id; });
+    if(idx === -1) return;
+
+    if(e.target.closest('[data-act="delete"]')){
+      if(confirm('Delete this ticker message?')){
+        sb.from('marquee_items').delete().eq('id', id).then(function(res){
+          if(res.error){ showToast('Delete failed: ' + res.error.message); }
+          else{ showToast('Message deleted'); refreshMarqueeItems(); }
+        });
+      }
+      return;
+    }
+    var upBtn2 = e.target.closest('[data-act="up"]');
+    var downBtn2 = e.target.closest('[data-act="down"]');
+    if((upBtn2 && idx > 0) || (downBtn2 && idx < state.marqueeItems.length - 1)){
+      var swapIdx2 = upBtn2 ? idx - 1 : idx + 1;
+      var a2 = state.marqueeItems[idx], b2 = state.marqueeItems[swapIdx2];
+      Promise.all([
+        sb.from('marquee_items').update({ sort_order: b2.sort_order }).eq('id', a2.id),
+        sb.from('marquee_items').update({ sort_order: a2.sort_order }).eq('id', b2.id)
+      ]).then(function(){ refreshMarqueeItems(); });
+    }
+  });
+
   document.getElementById('pf-upload').addEventListener('change', function(e){
     var file = e.target.files[0];
     if(!file) return;
@@ -2673,6 +2988,7 @@ alter publication supabase_realtime add table hero_slides;</div>
       (order.discount > 0 ? '<div class="cart-subtotal line-discount"><span>'+(order.coupon_code || 'Discount')+'</span><strong>−Rs. '+Number(order.discount).toFixed(2)+'</strong></div>' : '') +
       '<div class="cart-subtotal"><span>Shipping</span><strong>'+(order.shipping_cost > 0 ? 'Rs. '+Number(order.shipping_cost).toFixed(2) : 'Free')+'</strong></div>' +
       '<div class="cart-subtotal line-total"><span>Total (Cash on Delivery)</span><strong>Rs. '+Number(order.total).toFixed(2)+'</strong></div>' +
+      '<div class="field" id="courierSection" style="margin-top:18px; border-top:1px solid var(--line); padding-top:18px;"><label>Courier / Shipment</label><div id="courierStatusBox"><p class="hint">Checking shipment status…</p></div></div>' +
       '<button class="btn btn-primary" id="whatsappConfirmBtn" style="width:100%; margin-top:18px; background:#25D366; border-color:#25D366;">' +
         '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="vertical-align:-2px; margin-right:6px;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.15-4.9-4.34-.14-.19-1.17-1.56-1.17-2.97 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.17.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.3-.29.47-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.29.75 1.24 1.61 2.01 1.11 1 2.04 1.31 2.33 1.46.29.14.46.12.63-.07.17-.19.72-.85.92-1.14.19-.29.38-.24.64-.14.26.1 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36z"/></svg>' +
         'Confirm via WhatsApp' +
@@ -2686,6 +3002,7 @@ alter publication supabase_realtime add table hero_slides;</div>
     document.getElementById('whatsappConfirmBtn').addEventListener('click', function(){
       openWhatsAppConfirm(currentModalOrder);
     });
+    loadCourierStatus(order);
     document.getElementById('deleteOrderBtn').addEventListener('click', function(){
       var idShort = order.id ? order.id.slice(0,8).toUpperCase() : '';
       if(confirm('Delete order #'+idShort+' from '+order.customer_name+'? This can\'t be undone — it will not restore any deducted stock.')){
@@ -2850,6 +3167,56 @@ alter publication supabase_realtime add table hero_slides;</div>
     var message = buildWhatsAppMessage(order);
     var url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
     window.open(url, '_blank');
+  }
+
+  /* ---------- COURIER INTEGRATION ---------- */
+  // The actual courier API call lives server-side in a Supabase Edge Function
+  // (see the courier-send-to-courier-function.ts file) — no courier API keys
+  // are ever present in this admin panel or on the public site.
+  function loadCourierStatus(order){
+    var box = document.getElementById('courierStatusBox');
+    if(!box) return;
+    sb.from('courier_shipments').select('*').eq('order_id', order.id).order('created_at', { ascending:false }).limit(1).maybeSingle().then(function(res){
+      if(res.error){
+        box.innerHTML = '<p class="hint" style="color:var(--danger);">Could not load shipment status: '+res.error.message+'</p>';
+        return;
+      }
+      renderCourierBox(box, order, res.data);
+    });
+  }
+
+  function renderCourierBox(box, order, shipment){
+    if(!shipment){
+      box.innerHTML =
+        '<p class="hint" style="margin-bottom:10px;">Not sent to a courier yet.</p>' +
+        '<button class="btn btn-outline btn-sm" id="sendToCourierBtn" style="width:100%;">Send to Courier</button>';
+      document.getElementById('sendToCourierBtn').addEventListener('click', function(){ sendToCourier(order); });
+      return;
+    }
+    var statusMap = { pending:'tag-Sale', booked:'tag-Bestseller', in_transit:'tag-Bestseller', delivered:'tag-Bestseller', failed:'tag-none', error:'tag-none' };
+    box.innerHTML =
+      '<p style="font-size:13.5px; color:var(--espresso); margin-bottom:6px;"><strong>'+(shipment.courier_name || 'Courier')+'</strong> · <span class="tag-chip '+(statusMap[shipment.status] || 'tag-none')+'" style="text-transform:capitalize;">'+(shipment.status || 'pending')+'</span></p>' +
+      (shipment.consignment_number ? '<p class="hint">Consignment #: '+shipment.consignment_number+'</p>' : '') +
+      (shipment.tracking_number ? '<p class="hint">Tracking #: '+shipment.tracking_number+'</p>' : '') +
+      '<button class="btn btn-outline btn-sm" id="sendToCourierBtn" style="width:100%; margin-top:10px;">Resend to Courier</button>';
+    document.getElementById('sendToCourierBtn').addEventListener('click', function(){ sendToCourier(order); });
+  }
+
+  function sendToCourier(order){
+    var btn = document.getElementById('sendToCourierBtn');
+    var box = document.getElementById('courierStatusBox');
+    if(btn){ btn.disabled = true; btn.textContent = 'Sending…'; }
+    sb.functions.invoke('send-to-courier', { body: { order_id: order.id } }).then(function(res){
+      if(res.error){
+        showToast('Courier request failed: ' + res.error.message);
+      } else {
+        showToast('Sent to courier');
+      }
+      loadCourierStatus(order); // re-check either way — the Edge Function may have logged a shipment row even on partial failure
+    }).catch(function(err){
+      showToast('Courier request failed: ' + err.message);
+      if(btn){ btn.disabled = false; btn.textContent = 'Send to Courier'; }
+    });
   }
 
   /* ---------- LEADS PANEL ---------- */
@@ -3067,6 +3434,22 @@ alter publication supabase_realtime add table hero_slides;</div>
   });
   document.getElementById('copyHeroRulesBtn').addEventListener('click', function(){
     var text = document.getElementById('heroRulesBlock').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      showToast('Addition copied to clipboard');
+    }).catch(function(){
+      showToast('Could not copy — select the text manually');
+    });
+  });
+  document.getElementById('copyCmsRulesBtn').addEventListener('click', function(){
+    var text = document.getElementById('cmsRulesBlock').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      showToast('Addition copied to clipboard');
+    }).catch(function(){
+      showToast('Could not copy — select the text manually');
+    });
+  });
+  document.getElementById('copyCourierRulesBtn').addEventListener('click', function(){
+    var text = document.getElementById('courierRulesBlock').textContent;
     navigator.clipboard.writeText(text).then(function(){
       showToast('Addition copied to clipboard');
     }).catch(function(){
