@@ -40,6 +40,13 @@
     min-width:18px; height:18px; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:0 5px;
   }
   .nav-item.active .nav-badge{ background:var(--espresso); }
+  .mobile-signout-btn{
+    align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%;
+    background:rgba(250,246,240,0.08); border:none; color:rgba(250,246,240,0.8);
+    transition:background .3s var(--ease), color .3s var(--ease); flex-shrink:0;
+  }
+  .mobile-signout-btn svg{ width:17px; height:17px; }
+  .mobile-signout-btn:hover{ background:rgba(166,67,47,0.25); color:var(--cream); }
   .sidebar-foot{ margin-top:40px; padding-top:20px; border-top:1px solid rgba(250,246,240,0.12); font-size:12px; color:rgba(250,246,240,0.5); line-height:1.6; }
   .sidebar-foot a{ color:var(--camel-light); text-decoration:underline; }
 
@@ -238,6 +245,7 @@
     .sidebar .brand-block{ display:none; }
     .nav-item span{ display:none; }
     .sidebar-foot{ display:none; }
+    .mobile-signout-btn{ display:flex !important; }
     .main{ padding:24px 20px 100px; }
     .export-bar{ left:0; padding:14px 20px; }
     .form-row, .deal-manage-body{ grid-template-columns:1fr; }
@@ -306,6 +314,9 @@
     <button class="nav-item" data-panel="publish">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
       <span>Setup &amp; Backup</span>
+    </button>
+    <button class="mobile-signout-btn" id="mobileSignOutBtn" title="Sign out" style="display:none; margin-left:auto;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
     </button>
     <div class="sidebar-foot">
       <span id="sidebarWho">Signed in</span> · Changes go live on your site instantly.<br>
@@ -377,7 +388,8 @@
     <!-- ============ HERO SLIDER PANEL ============ -->
     <section class="panel" id="panel-hero">
       <div class="section-title"><h2>Hero Slider <span style="color:var(--brown-mid); font-weight:400; font-size:14px;" id="heroCountLabel"></span></h2></div>
-      <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:22px; max-width:620px;">The rotating images on your homepage hero banner. Add up to 5 — they'll auto-rotate every few seconds. Leave this empty to show the default single image.</p>
+      <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:14px; max-width:620px;">The rotating images on your homepage hero banner. Add up to 5 — they'll auto-rotate every few seconds. Leave this empty to show the default single image.</p>
+      <button class="btn btn-outline btn-sm" id="loadDemoHeroBtn" style="margin-bottom:22px;">Load 5 Demo Images</button>
 
       <div class="card" style="padding:22px 22px 6px; margin-bottom:22px;" id="heroAddCard">
         <div class="image-tabs">
@@ -1361,6 +1373,9 @@ alter publication supabase_realtime add table hero_slides;</div>
     e.preventDefault();
     if(sb) sb.auth.signOut();
   });
+  document.getElementById('mobileSignOutBtn').addEventListener('click', function(){
+    if(confirm('Sign out of the Store Manager?') && sb) sb.auth.signOut();
+  });
 
   /* ---------- REALTIME SYNC ---------- */
   function isEditingDeals(){
@@ -2097,6 +2112,29 @@ alter publication supabase_realtime add table hero_slides;</div>
       document.getElementById('hero-upload').value = '';
       document.getElementById('hero-thumb').style.display = 'none';
       showToast('Slide added');
+      refreshHeroSlides();
+    });
+  });
+
+  document.getElementById('loadDemoHeroBtn').addEventListener('click', function(){
+    if(state.heroSlides.length > 0){
+      if(!confirm('You already have '+state.heroSlides.length+' slide(s). Demo images will fill any remaining slots up to 5 — continue?')) return;
+    }
+    var DEMO_HERO_SLIDES = [
+      { image_url:'https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=1200&auto=format&fit=crop', caption:'"Effortless, editorial, and made to last." — Studio Notes' },
+      { image_url:'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1200&auto=format&fit=crop', caption:'"Considered essentials for every season." — The Edit' },
+      { image_url:'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1200&auto=format&fit=crop', caption:'"Cut for real life, built to last." — Studio Notes' },
+      { image_url:'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=1200&auto=format&fit=crop', caption:'"New arrivals, curated weekly." — Look Book' },
+      { image_url:'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?q=80&w=1200&auto=format&fit=crop', caption:'"Wear your story, one look at a time." — Look Book' }
+    ];
+    var room = 5 - state.heroSlides.length;
+    var toAdd = DEMO_HERO_SLIDES.slice(0, room);
+    if(toAdd.length === 0){ showToast('You already have 5 slides — delete some first'); return; }
+    var baseOrder = state.heroSlides.length ? Math.max.apply(null, state.heroSlides.map(function(s){ return s.sort_order || 0; })) + 1 : 0;
+    var rows = toAdd.map(function(s, i){ return { image_url:s.image_url, caption:s.caption, sort_order: baseOrder + i }; });
+    sb.from('hero_slides').insert(rows).then(function(res){
+      if(res.error){ showToast('Load failed: ' + res.error.message); return; }
+      showToast(rows.length + ' demo image' + (rows.length === 1 ? '' : 's') + ' added');
       refreshHeroSlides();
     });
   });
