@@ -2937,6 +2937,7 @@ alter table orders add column if not exists shipment_status text;</div>
         '</td>' +
         '<td><div class="row-actions">' +
           '<button class="icon-action" data-act="whatsapp" title="Confirm via WhatsApp" style="color:#25D366;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.81-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.15-4.9-4.34-.14-.19-1.17-1.56-1.17-2.97 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.17.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.3-.29.47-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.17.29.75 1.24 1.61 2.01 1.11 1 2.04 1.31 2.33 1.46.29.14.46.12.63-.07.17-.19.72-.85.92-1.14.19-.29.38-.24.64-.14.26.1 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36z"/></svg></button>' +
+          '<button class="icon-action" data-act="courier" title="Send to Courier"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="6" width="14" height="11" rx="1"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="17.5" cy="19" r="2"/></svg></button>' +
           '<button class="icon-action" data-act="view" title="View details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>' +
           '<button class="icon-action" data-act="delete-order" title="Delete order"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger);"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>' +
         '</div></td>' +
@@ -2956,12 +2957,20 @@ alter table orders add column if not exists shipment_status text;</div>
   document.getElementById('ordersTbody').addEventListener('click', function(e){
     var viewBtn = e.target.closest('[data-act="view"]');
     var waBtn = e.target.closest('[data-act="whatsapp"]');
+    var courierBtn = e.target.closest('[data-act="courier"]');
     var delBtn = e.target.closest('[data-act="delete-order"]');
-    if(!viewBtn && !waBtn && !delBtn) return;
+    if(!viewBtn && !waBtn && !courierBtn && !delBtn) return;
     var order = state.orders.find(function(o){ return o.id === e.target.closest('tr').dataset.id; });
     if(!order) return;
     if(viewBtn) openOrderModal(order);
     if(waBtn) openWhatsAppConfirm(order);
+    if(courierBtn){
+      openOrderModal(order);
+      setTimeout(function(){
+        var section = document.getElementById('courierSection');
+        if(section) section.scrollIntoView({ behavior:'smooth', block:'center' });
+      }, 50);
+    }
     if(delBtn){
       var idShort = order.id ? order.id.slice(0,8).toUpperCase() : '';
       if(confirm('Delete order #'+idShort+' from '+order.customer_name+'? This can\'t be undone — it will not restore any deducted stock.')){
