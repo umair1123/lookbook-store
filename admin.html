@@ -273,6 +273,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L22 8H6"/></svg>
       <span>Products</span>
     </button>
+    <button class="nav-item" data-panel="hero">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 15l-5-5-9 9"/></svg>
+      <span>Hero Slider</span>
+    </button>
     <button class="nav-item" data-panel="categories">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       <span>Categories</span>
@@ -370,6 +374,41 @@
     </section>
 
     <!-- ============ DEALS PANEL ============ -->
+    <!-- ============ HERO SLIDER PANEL ============ -->
+    <section class="panel" id="panel-hero">
+      <div class="section-title"><h2>Hero Slider <span style="color:var(--brown-mid); font-weight:400; font-size:14px;" id="heroCountLabel"></span></h2></div>
+      <p style="font-size:13.5px; color:var(--brown-mid); margin-bottom:22px; max-width:620px;">The rotating images on your homepage hero banner. Add up to 5 — they'll auto-rotate every few seconds. Leave this empty to show the default single image.</p>
+
+      <div class="card" style="padding:22px 22px 6px; margin-bottom:22px;" id="heroAddCard">
+        <div class="image-tabs">
+          <button type="button" class="image-tab active" data-tab="url" id="heroTabUrl">Paste Image URL</button>
+          <button type="button" class="image-tab" data-tab="upload" id="heroTabUpload">Upload From Device</button>
+        </div>
+        <div class="image-tab-panel active" id="heroImgtab-url">
+          <input type="text" id="hero-img-url" placeholder="https://images.unsplash.com/…" style="margin-bottom:14px;">
+        </div>
+        <div class="image-tab-panel" id="heroImgtab-upload">
+          <label class="btn btn-outline btn-sm file-btn" style="width:100%; justify-content:center; margin-bottom:8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            Choose a photo…
+            <input type="file" id="hero-upload" accept="image/*">
+          </label>
+          <p class="hint" id="heroUploadHint" style="margin-bottom:14px;">JPG, PNG or WEBP. Resized and compressed automatically.</p>
+        </div>
+        <img id="hero-thumb" class="thumb-preview" style="display:none; width:120px; height:80px; object-fit:cover;">
+        <div class="field" style="margin-top:14px;"><label>Caption — optional</label><input type="text" id="hero-caption" placeholder='"Effortless, editorial, and made to last."'></div>
+        <button class="btn btn-primary btn-sm" id="addHeroSlideBtn" style="margin-bottom:18px;">Add Slide</button>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead><tr><th></th><th>Caption</th><th>Order</th><th></th></tr></thead>
+          <tbody id="heroSlidesTbody"></tbody>
+        </table>
+        <div class="empty-state" id="heroEmptyState" style="display:none;">No slides yet — showing the default hero image. Add up to 5 above.</div>
+      </div>
+    </section>
+
     <!-- ============ CATEGORIES PANEL ============ -->
     <section class="panel" id="panel-categories">
       <div class="section-title"><h2>Categories</h2></div>
@@ -872,6 +911,26 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
       </div>
 
       <div class="instructions">
+        <h3>Also new: homepage hero slider</h3>
+        <p style="font-size:13px; color:var(--brown-deep); line-height:1.8;">Run this once to manage the rotating homepage hero images from the new Hero Slider tab, instead of a single fixed photo.</p>
+        <div class="code-block" id="heroRulesBlock">create table hero_slides (
+  id uuid primary key default gen_random_uuid(),
+  image_url text not null,
+  caption text,
+  sort_order int not null default 0
+);
+
+alter table hero_slides enable row level security;
+
+create policy "Public read hero slides" on hero_slides for select using (true);
+create policy "Admins write hero slides" on hero_slides for all
+  using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+alter publication supabase_realtime add table hero_slides;</div>
+        <button class="btn btn-outline btn-sm copy-btn" id="copyHeroRulesBtn">Copy Addition</button>
+      </div>
+
+      <div class="instructions">
         <h3>Starter catalog</h3>
         <p style="font-size:13px; color:var(--brown-deep); line-height:1.8; margin-bottom:14px;">Loads 27 sample products plus starter deals and coupon codes into a fresh, empty database. Safe to skip if you'd rather start from scratch.</p>
         <button class="btn btn-primary btn-sm" id="seedBtnSetup">Load Starter Catalog</button>
@@ -1167,7 +1226,7 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
   ];
 
   /* ---------- STATE ---------- */
-  var state = { products:[], deals:{}, coupons:{}, subcategories:[], categories:[], orders:[], leads:[], shipping:{ enabled:true, flat_rate:0, free_threshold:null }, popup:{ enabled:true, coupon_code:'WELCOME10', delay_seconds:45 } };
+  var state = { products:[], deals:{}, coupons:{}, subcategories:[], categories:[], orders:[], leads:[], heroSlides:[], shipping:{ enabled:true, flat_rate:0, free_threshold:null }, popup:{ enabled:true, coupon_code:'WELCOME10', delay_seconds:45 } };
   var prodFilter = { cat:'all', search:'' };
   var subFilter = { cat:'all' };
   var sb = null;
@@ -1461,6 +1520,14 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
     });
   }
 
+  function refreshHeroSlides(){
+    return sb.from('hero_slides').select('*').order('sort_order').then(function(res){
+      if(res.error){ console.error(res.error); return; }
+      state.heroSlides = res.data || [];
+      renderHeroSlidesTable();
+    });
+  }
+
   function refreshPopupSettings(){
     return sb.from('popup_settings').select('*').eq('id', 1).maybeSingle().then(function(res){
       if(res.error){ console.error(res.error); return; }
@@ -1513,7 +1580,7 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
     }
 
     setStatus('Connecting…');
-    Promise.all([refreshProducts(), refreshDeals(), refreshCoupons(), refreshSubcategories(), refreshCategories(), refreshOrders(), refreshShipping(), refreshLeads(), refreshPopupSettings()]);
+    Promise.all([refreshProducts(), refreshDeals(), refreshCoupons(), refreshSubcategories(), refreshCategories(), refreshOrders(), refreshShipping(), refreshLeads(), refreshPopupSettings(), refreshHeroSlides()]);
 
     var pCh = sb.channel('admin-products')
       .on('postgres_changes', { event:'*', schema:'public', table:'products' }, refreshProducts)
@@ -1542,7 +1609,10 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
     var poCh = sb.channel('admin-popup')
       .on('postgres_changes', { event:'*', schema:'public', table:'popup_settings' }, refreshPopupSettings)
       .subscribe();
-    channels = [pCh, dCh, cCh, sCh, catCh, oCh, shCh, lCh, poCh];
+    var hCh = sb.channel('admin-hero')
+      .on('postgres_changes', { event:'*', schema:'public', table:'hero_slides' }, refreshHeroSlides)
+      .subscribe();
+    channels = [pCh, dCh, cCh, sCh, catCh, oCh, shCh, lCh, poCh, hCh];
   }
 
   /* ---------- SEED STARTER CATALOG ---------- */
@@ -1961,6 +2031,103 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
       reader.readAsDataURL(file);
     });
   }
+
+  /* ---------- HERO SLIDER PANEL ---------- */
+  document.getElementById('heroTabUrl').addEventListener('click', function(){
+    document.getElementById('heroTabUrl').classList.add('active');
+    document.getElementById('heroTabUpload').classList.remove('active');
+    document.getElementById('heroImgtab-url').classList.add('active');
+    document.getElementById('heroImgtab-upload').classList.remove('active');
+  });
+  document.getElementById('heroTabUpload').addEventListener('click', function(){
+    document.getElementById('heroTabUpload').classList.add('active');
+    document.getElementById('heroTabUrl').classList.remove('active');
+    document.getElementById('heroImgtab-upload').classList.add('active');
+    document.getElementById('heroImgtab-url').classList.remove('active');
+  });
+  document.getElementById('hero-img-url').addEventListener('input', function(){
+    var thumb = document.getElementById('hero-thumb');
+    if(this.value){ thumb.src = this.value; thumb.style.display = 'block'; } else { thumb.style.display = 'none'; }
+  });
+  document.getElementById('hero-upload').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var hint = document.getElementById('heroUploadHint');
+    hint.textContent = 'Processing image…';
+    resizeImageFile(file, 1600, 0.82).then(function(dataUrl){
+      document.getElementById('hero-img-url').value = dataUrl;
+      var thumb = document.getElementById('hero-thumb');
+      thumb.src = dataUrl;
+      thumb.style.display = 'block';
+      hint.textContent = 'JPG, PNG or WEBP. Resized and compressed automatically.';
+    }).catch(function(err){
+      hint.textContent = "Couldn't process that file — try a different image.";
+      showToast('Image upload failed: ' + err.message);
+    });
+  });
+
+  function renderHeroSlidesTable(){
+    var list = state.heroSlides;
+    document.getElementById('heroCountLabel').textContent = '(' + list.length + ' of 5)';
+    document.getElementById('heroEmptyState').style.display = list.length ? 'none' : 'block';
+    document.getElementById('addHeroSlideBtn').disabled = list.length >= 5;
+    document.getElementById('heroSlidesTbody').innerHTML = list.map(function(s, i){
+      return '<tr data-id="'+s.id+'">' +
+        '<td><img src="'+s.image_url+'" style="width:70px; height:46px; object-fit:cover; border-radius:3px;"></td>' +
+        '<td style="font-size:12.5px; color:var(--brown-deep); max-width:220px;">'+(s.caption || '<span style="color:var(--brown-mid);">No caption</span>')+'</td>' +
+        '<td><div style="display:flex; gap:4px;">' +
+          '<button class="icon-action" data-act="up" title="Move earlier"'+(i===0?' disabled style="opacity:.3;"':'')+'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>' +
+          '<button class="icon-action" data-act="down" title="Move later"'+(i===list.length-1?' disabled style="opacity:.3;"':'')+'><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>' +
+        '</div></td>' +
+        '<td><button class="icon-action" data-act="delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--danger);"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  document.getElementById('addHeroSlideBtn').addEventListener('click', function(){
+    var url = document.getElementById('hero-img-url').value.trim();
+    var caption = document.getElementById('hero-caption').value.trim();
+    if(!url){ showToast('Add an image first'); return; }
+    if(state.heroSlides.length >= 5){ showToast('Maximum 5 slides — delete one first'); return; }
+    var nextOrder = state.heroSlides.length ? Math.max.apply(null, state.heroSlides.map(function(s){ return s.sort_order || 0; })) + 1 : 0;
+    sb.from('hero_slides').insert({ image_url:url, caption: caption || null, sort_order:nextOrder }).then(function(res){
+      if(res.error){ showToast('Add failed: ' + res.error.message); return; }
+      document.getElementById('hero-img-url').value = '';
+      document.getElementById('hero-caption').value = '';
+      document.getElementById('hero-upload').value = '';
+      document.getElementById('hero-thumb').style.display = 'none';
+      showToast('Slide added');
+      refreshHeroSlides();
+    });
+  });
+
+  document.getElementById('heroSlidesTbody').addEventListener('click', function(e){
+    var tr = e.target.closest('tr');
+    if(!tr) return;
+    var id = tr.dataset.id;
+    var idx = state.heroSlides.findIndex(function(s){ return s.id === id; });
+    if(idx === -1) return;
+
+    if(e.target.closest('[data-act="delete"]')){
+      if(confirm('Delete this hero slide?')){
+        sb.from('hero_slides').delete().eq('id', id).then(function(res){
+          if(res.error){ showToast('Delete failed: ' + res.error.message); }
+          else{ showToast('Slide deleted'); refreshHeroSlides(); }
+        });
+      }
+      return;
+    }
+    var upBtn = e.target.closest('[data-act="up"]');
+    var downBtn = e.target.closest('[data-act="down"]');
+    if((upBtn && idx > 0) || (downBtn && idx < state.heroSlides.length - 1)){
+      var swapIdx = upBtn ? idx - 1 : idx + 1;
+      var a = state.heroSlides[idx], b = state.heroSlides[swapIdx];
+      Promise.all([
+        sb.from('hero_slides').update({ sort_order: b.sort_order }).eq('id', a.id),
+        sb.from('hero_slides').update({ sort_order: a.sort_order }).eq('id', b.id)
+      ]).then(function(){ refreshHeroSlides(); });
+    }
+  });
 
   document.getElementById('pf-upload').addEventListener('change', function(e){
     var file = e.target.files[0];
@@ -2856,6 +3023,14 @@ insert into popup_settings (id, enabled, coupon_code, delay_seconds)
     var text = document.getElementById('parentCatAlterBlock').textContent;
     navigator.clipboard.writeText(text).then(function(){
       showToast('Column addition copied to clipboard');
+    }).catch(function(){
+      showToast('Could not copy — select the text manually');
+    });
+  });
+  document.getElementById('copyHeroRulesBtn').addEventListener('click', function(){
+    var text = document.getElementById('heroRulesBlock').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      showToast('Addition copied to clipboard');
     }).catch(function(){
       showToast('Could not copy — select the text manually');
     });

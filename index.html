@@ -227,16 +227,31 @@
   }
   .hero-frame img{ width:100%; height:100%; object-fit:cover; transition:transform 1.2s var(--ease); }
   .hero-frame:hover img{ transform:scale(1.05); }
+  .hero-slide-img{
+    position:absolute; inset:0; width:100%; height:100%; opacity:0; transition:opacity 1s var(--ease), transform 1.2s var(--ease);
+  }
+  .hero-slide-img.active{ opacity:1; }
+  .hero-slide-img:not(.active){ pointer-events:none; }
+  .hero-dots{
+    position:absolute; bottom:18px; left:50%; transform:translateX(-50%); z-index:5;
+    display:flex; gap:8px;
+  }
+  .hero-dots button{
+    width:7px; height:7px; border-radius:50%; background:rgba(250,246,240,0.5); border:none; padding:0;
+    transition:background .3s var(--ease), width .3s var(--ease);
+  }
+  .hero-dots button.active{ background:var(--cream); width:22px; border-radius:5px; }
   .hero-tag{
     position:absolute; left:-26px; bottom:36px; background:var(--espresso); color:var(--cream);
     padding:18px 22px; border-radius:2px; box-shadow:var(--shadow-soft);
     font-family:'Fraunces',serif; font-style:italic; font-size:15px; max-width:220px; line-height:1.4;
+    transition:opacity .4s var(--ease);
   }
   .hero-badge{
     position:absolute; top:-22px; right:24px; width:96px; height:96px; border-radius:50%;
     background:var(--camel); color:var(--espresso); display:flex; align-items:center; justify-content:center;
     text-align:center; font-size:10.5px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;
-    box-shadow:var(--shadow-soft); animation:spin 16s linear infinite;
+    box-shadow:var(--shadow-soft); animation:spin 16s linear infinite; z-index:4;
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
   .hero-badge span{ animation:spin-rev 16s linear infinite; }
@@ -737,11 +752,12 @@
       </div>
     </div>
     <div class="hero-visual">
-      <div class="hero-frame">
-        <img src="https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=1000&auto=format&fit=crop" alt="Model wearing a tailored brown coat, Look Book autumn collection">
+      <div class="hero-frame" id="heroFrame">
+        <img src="https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?q=80&w=1000&auto=format&fit=crop" alt="Model wearing a tailored brown coat, Look Book autumn collection" class="hero-slide-img active" data-default="true">
         <span class="hero-badge"><span>New Season Edit</span></span>
+        <div class="hero-dots" id="heroDots" style="display:none;"></div>
       </div>
-      <div class="hero-tag">"Effortless, editorial, and made to last." — Studio Notes</div>
+      <div class="hero-tag" id="heroTag">"Effortless, editorial, and made to last." — Studio Notes</div>
     </div>
   </div>
 </section>
@@ -1776,6 +1792,80 @@
   var exitOverlay = document.getElementById('exitOverlay');
   var exitTimer = null;
   var popupSettings = { enabled:true, coupon_code:'WELCOME10', delay_seconds:45 };
+  var heroSlides = [];
+
+  /* ---------- HERO SLIDER ---------- */
+  var heroSlideIndex = 0;
+  var heroSlideTimer = null;
+  function initHeroSlider(){
+    var frame = document.getElementById('heroFrame');
+    var dotsWrap = document.getElementById('heroDots');
+    var tagEl = document.getElementById('heroTag');
+    clearInterval(heroSlideTimer);
+
+    if(!heroSlides.length){
+      // Nothing configured — keep the default single image already in the markup.
+      dotsWrap.style.display = 'none';
+      return;
+    }
+
+    // Remove any previously-injected slide images (in case of a realtime refresh) and the default one.
+    frame.querySelectorAll('.hero-slide-img').forEach(function(img){ img.remove(); });
+
+    heroSlides.forEach(function(slide, i){
+      var img = document.createElement('img');
+      img.src = slide.image_url;
+      img.alt = 'Look Book hero image ' + (i + 1);
+      img.className = 'hero-slide-img' + (i === 0 ? ' active' : '');
+      frame.insertBefore(img, frame.querySelector('.hero-badge'));
+    });
+
+    if(heroSlides.length > 1){
+      dotsWrap.style.display = 'flex';
+      dotsWrap.innerHTML = heroSlides.map(function(s, i){
+        return '<button data-i="'+i+'" class="'+(i===0?'active':'')+'" aria-label="Show slide '+(i+1)+'"></button>';
+      }).join('');
+      dotsWrap.querySelectorAll('button').forEach(function(b){
+        b.addEventListener('click', function(){ goToHeroSlide(parseInt(this.dataset.i, 10)); resetHeroTimer(); });
+      });
+    } else {
+      dotsWrap.style.display = 'none';
+    }
+
+    heroSlideIndex = 0;
+    updateHeroTag();
+    resetHeroTimer();
+  }
+
+  function updateHeroTag(){
+    var tagEl = document.getElementById('heroTag');
+    var slide = heroSlides[heroSlideIndex];
+    if(slide && slide.caption){
+      tagEl.textContent = slide.caption;
+      tagEl.style.display = 'block';
+    } else if(heroSlides.length){
+      tagEl.style.display = 'none';
+    }
+  }
+
+  function goToHeroSlide(i){
+    var frame = document.getElementById('heroFrame');
+    var imgs = frame.querySelectorAll('.hero-slide-img');
+    imgs.forEach(function(img, idx){ img.classList.toggle('active', idx === i); });
+    var dotsWrap = document.getElementById('heroDots');
+    dotsWrap.querySelectorAll('button').forEach(function(b, idx){ b.classList.toggle('active', idx === i); });
+    heroSlideIndex = i;
+    updateHeroTag();
+  }
+
+  function resetHeroTimer(){
+    clearInterval(heroSlideTimer);
+    if(heroSlides.length <= 1) return;
+    heroSlideTimer = setInterval(function(){
+      goToHeroSlide((heroSlideIndex + 1) % heroSlides.length);
+    }, 5000);
+  }
+
 
   function exitAlreadyShown(){
     try{ return sessionStorage.getItem(EXIT_SHOWN_KEY) === '1'; }catch(e){ return false; }
@@ -2059,9 +2149,10 @@
         sb.from('coupons').select('*'),
         sb.from('categories').select('*'),
         sb.from('subcategories').select('*'),
-        sb.from('popup_settings').select('*').eq('id', 1).maybeSingle()
+        sb.from('popup_settings').select('*').eq('id', 1).maybeSingle(),
+        sb.from('hero_slides').select('*').order('sort_order')
       ]).then(function(results){
-        var prodRes = results[0], dealsRes = results[1], couponsRes = results[2], catRes = results[3], subRes = results[4], popupRes = results[5];
+        var prodRes = results[0], dealsRes = results[1], couponsRes = results[2], catRes = results[3], subRes = results[4], popupRes = results[5], heroRes = results[6];
         products = (prodRes.data && prodRes.data.length) ? prodRes.data : DEFAULT_PRODUCTS;
         dealsConfig = (dealsRes.data && dealsRes.data.length) ? dealsRowsToConfig(dealsRes.data) : DEFAULT_DEALS;
         coupons = (couponsRes.data && couponsRes.data.length) ? couponRowsToConfig(couponsRes.data) : DEFAULT_COUPONS;
@@ -2072,8 +2163,10 @@
         if(popupRes && popupRes.data){
           popupSettings = { enabled: popupRes.data.enabled !== false, coupon_code: popupRes.data.coupon_code || 'WELCOME10', delay_seconds: popupRes.data.delay_seconds || 45 };
         }
+        heroSlides = (heroRes && heroRes.data) ? heroRes.data : [];
         init();
         initExitIntentTriggers();
+        initHeroSlider();
       }).catch(function(err){
         console.warn('Supabase load failed, using starter data:', err.message);
         useFallbackData();
@@ -2132,6 +2225,14 @@
             if(res && res.data){
               popupSettings = { enabled: res.data.enabled !== false, coupon_code: res.data.coupon_code || 'WELCOME10', delay_seconds: res.data.delay_seconds || 45 };
             }
+          });
+        }).subscribe();
+
+      sb.channel('public:hero-site')
+        .on('postgres_changes', { event:'*', schema:'public', table:'hero_slides' }, function(){
+          sb.from('hero_slides').select('*').order('sort_order').then(function(res){
+            heroSlides = (res && res.data) ? res.data : [];
+            initHeroSlider();
           });
         }).subscribe();
     }catch(err){
